@@ -1,42 +1,34 @@
 import React from 'react';
-import { browser, Tabs } from 'webextension-polyfill-ts';
+import { browser } from 'webextension-polyfill-ts';
 
 import './styles.scss';
 
-function openWebPage(url: string): Promise<Tabs.Tab> {
-    return browser.tabs.create({ url });
-}
-
 const Popup: React.FC = () => {
-    return (
-        <section id="popup">
-            <h2>WEB-EXTENSION-STARTER</h2>
-            <div className="links__holder">
-                <ul>
-                    <li>
-                        <button
-                            type="button"
-                            onClick={(): Promise<Tabs.Tab> => {
-                                return openWebPage('https://github.com/abhijithvijayan/web-extension-starter');
-                            }}
-                        >
-                            GitHub
-                        </button>
-                    </li>
-                    <li>
-                        <button
-                            type="button"
-                            onClick={(): Promise<Tabs.Tab> => {
-                                return openWebPage('https://www.buymeacoffee.com/abhijithvijayan');
-                            }}
-                        >
-                            Buy Me A Coffee
-                        </button>
-                    </li>
-                </ul>
-            </div>
-        </section>
-    );
+  return (
+    <div
+      style={{
+        height: '100%',
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '24px',
+        color: '#384366'
+      }}
+    >
+      Change the 🌎
+    </div>
+  );
 };
 
 export default Popup;
+
+async function saveAndFetchSampleData(): Promise<void> {
+  await browser.storage.local.set({ howdy: 'therez' });
+  const hi = await browser.storage.local.get('howdy');
+  console.log('hi', hi);
+}
+
+saveAndFetchSampleData()
+  .then()
+  .catch();

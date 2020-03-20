@@ -1,5 +1,7 @@
 import { browser } from 'webextension-polyfill-ts';
 
-browser.runtime.onInstalled.addListener((): void => {
-    console.log('extension installed');
+browser.browserAction.onClicked.addListener(async tab => {
+  await browser.tabs.sendMessage(tab.id as number, {
+    action: 'EXTENSION_ICON_CLICKED'
+  });
 });

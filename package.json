@@ -1,10 +1,10 @@
 {
-  "name": "web-extension-starter",
-  "version": "2.0.0",
-  "description": "Web extension starter using react and typescript",
+  "name": "pay-with-bitpay",
+  "version": "1.0.0",
+  "description": "Be alerted whenever a website you visit accepts BitPay as a payment option.",
   "private": true,
-  "repository": "https://github.com/abhijithvijayan/web-extension-starter.git",
-  "author": "abhijithvijayan <34790378+abhijithvijayan@users.noreply.github.com>",
+  "repository": "https://github.com/bitpay/pay-with-bitpay.git",
+  "author": "BitPay",
   "license": "MIT",
   "engines": {
     "node": ">=10 <=12",
