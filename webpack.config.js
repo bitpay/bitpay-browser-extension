@@ -55,10 +55,10 @@ module.exports = {
   mode: nodeEnv,
 
   entry: {
-    background: path.join(sourcePath, 'Background', 'index.ts'),
-    contentScript: path.join(sourcePath, 'ContentScript', 'index.ts'),
-    popup: path.join(sourcePath, 'Popup', 'index.tsx'),
-    options: path.join(sourcePath, 'Options', 'index.tsx')
+    background: path.join(sourcePath, 'background', 'index.ts'),
+    contentScript: path.join(sourcePath, 'content-script', 'index.ts'),
+    popup: path.join(sourcePath, 'popup', 'index.tsx'),
+    options: path.join(sourcePath, 'options', 'index.tsx')
   },
 
   output: {

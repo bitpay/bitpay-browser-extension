@@ -1,0 +1,16 @@
+@import "../styles/fonts";
+@import "../styles/reset";
+@import "../styles/variables";
+@import "../popup/components/navbar/navbar";
+@import "../popup/components/tabs/tabs";
+
+body {
+  color: $black;
+  background-color: white;
+}
+
+html,
+body,
+#popup-root {
+  height: 100%;
+}

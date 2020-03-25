@@ -4,7 +4,8 @@ let iframe: HTMLIFrameElement | undefined;
 
 function createIframe(): HTMLIFrameElement {
   const frame = document.createElement('iframe');
-  frame.src = browser.runtime.getURL('popup.html');
+  const baseUrl = browser.runtime.getURL('popup.html');
+  frame.src = `${baseUrl}?url=${window.location.href}`;
   frame.style.cssText = `
     position:fixed;
     overflow:hidden;
@@ -15,7 +16,7 @@ function createIframe(): HTMLIFrameElement {
     box-shadow: 0 0 14px 4px rgba(0,0,0,0.1); 
     border-radius: 8px;
     width:300px;
-    height:367px;
+    height:367px; 
     z-index:2147483647;
   `;
   document.body.appendChild(frame);

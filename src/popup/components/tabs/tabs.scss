@@ -1,0 +1,11 @@
+.tabs {
+  position: fixed;
+  bottom: 0;
+  display: flex;
+  width: 100%;
+  justify-content: space-evenly;
+
+  a.is-active {
+    font-weight: 600;
+  }
+}
