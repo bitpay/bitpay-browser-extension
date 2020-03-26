@@ -42,7 +42,7 @@ const Popup: React.FC = () => {
 export default Popup;
 
 async function saveAndFetchSampleData(): Promise<void> {
-  await browser.storage.local.set({ howdy: 'therez' });
+  await browser.storage.local.set({ howdy: 'there' });
   const hi = await browser.storage.local.get('howdy');
   console.log('hi', hi);
 }

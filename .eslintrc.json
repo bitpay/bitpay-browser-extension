@@ -12,6 +12,8 @@
     "no-unused-expressions": ["error", {
       "allowTernary": true
     }],
+    "@typescript-eslint/no-unused-vars": ["error", { "ignoreRestSiblings": true }],
+    "no-unused-vars": ["error", { "ignoreRestSiblings": true }],
     "prettier/prettier": [
       "error",
       {
