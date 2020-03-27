@@ -11,7 +11,8 @@ function createIframe(): HTMLIFrameElement {
     width: 300px;
     height: 367px; 
     border: 0;
-    margin: 0; 
+    margin: 0;
+    padding: 0;
     overflow: hidden;
   `;
   const outerFrameStyles = `
