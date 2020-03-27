@@ -1,4 +1,4 @@
-import { browser } from 'webextension-polyfill-ts';
+import { browser, Tabs } from 'webextension-polyfill-ts';
 import { fetchAvailableCards } from '../services/gift-card';
 import { CardConfig } from '../services/gift-card.types';
 import { removeProtocolAndWww } from '../services/utils';
@@ -21,6 +21,21 @@ async function getCachedMerchants(): Promise<CardConfig[]> {
   return availableGiftCards;
 }
 
+async function handleUrlChange(host: string): Promise<void> {
+  const merchants = await getCachedMerchants();
+  const bitpayAccepted = !!(host && isBitPayAccepted(host, merchants));
+  return setIcon(bitpayAccepted);
+}
+
+async function sendMessageToTab(messageName: string, tab: Tabs.Tab | undefined): Promise<void> {
+  return (
+    tab &&
+    browser.tabs.sendMessage(tab.id as number, {
+      name: messageName
+    })
+  );
+}
+
 browser.tabs.onActivated.addListener(async () => {
   const tabs = await browser.tabs.query({ active: true });
   const { url } = tabs[0];
@@ -32,7 +47,7 @@ browser.tabs.onActivated.addListener(async () => {
 
 browser.browserAction.onClicked.addListener(async tab => {
   await browser.tabs.sendMessage(tab.id as number, {
-    action: 'EXTENSION_ICON_CLICKED'
+    name: 'EXTENSION_ICON_CLICKED'
   });
 });
 
@@ -43,9 +58,8 @@ browser.runtime.onInstalled.addListener(async () => {
   await browser.storage.local.set({ availableGiftCards });
 });
 
-browser.runtime.onMessage.addListener(async message => {
-  console.log('message', message);
-  const merchants = await getCachedMerchants();
-  const bitpayAccepted = message.host && isBitPayAccepted(message.host, merchants);
-  return message.name === 'URL_CHANGED' && setIcon(bitpayAccepted);
+browser.runtime.onMessage.addListener(async (message, sender) => {
+  message && message.name === 'URL_CHANGED'
+    ? handleUrlChange(message.host)
+    : sendMessageToTab(message.name, sender.tab);
 });

@@ -2,14 +2,16 @@ import { browser } from 'webextension-polyfill-ts';
 
 let iframe: HTMLIFrameElement | undefined;
 
-function createIframe(): HTMLIFrameElement {
-  const outerFrame = document.createElement('iframe');
-  const baseUrl = browser.runtime.getURL('popup.html');
-  const frameSrc = `${baseUrl}?url=${window.location.href}`;
-  console.log('frameSrc', frameSrc);
+enum FrameDimensions {
+  collapsedHeight = '50px',
+  height = '367px',
+  width = '300px'
+}
+
+function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string } {
   const innerFrameStyles = `
-    width: 300px;
-    height: 367px; 
+    width: ${FrameDimensions.width};
+    height: ${FrameDimensions.height}; 
     border: 0;
     margin: 0;
     padding: 0;
@@ -25,9 +27,17 @@ function createIframe(): HTMLIFrameElement {
     border-radius: 8px;
     z-index: 2147483647;
   `;
+  return { outerFrameStyles, innerFrameStyles };
+}
+
+function createIframe(): HTMLIFrameElement {
+  const outerFrame = document.createElement('iframe');
+  const baseUrl = browser.runtime.getURL('popup.html');
+  const innerFrameSrc = `${baseUrl}?url=${window.location.href}`;
+  const { innerFrameStyles, outerFrameStyles } = getIframeStyles();
   outerFrame.srcdoc = `
     <body style="${innerFrameStyles}">
-      <iframe src="${frameSrc}" style="${innerFrameStyles}">frameSrc</iframe>
+      <iframe src="${innerFrameSrc}" style="${innerFrameStyles}">frameSrc</iframe>
     </body>
   `;
   outerFrame.style.cssText = outerFrameStyles;
@@ -45,7 +55,28 @@ function addIframe(frame: HTMLIFrameElement): void {
   document.body.appendChild(frame);
 }
 
-browser.runtime.onMessage.addListener(() => (iframe ? removeIframe(iframe) : addIframe(createIframe())));
+function collapseIframe(frame: HTMLIFrameElement): void {
+  frame.style.height = FrameDimensions.collapsedHeight;
+}
+
+function expandIframe(frame: HTMLIFrameElement): void {
+  frame.style.height = FrameDimensions.height;
+}
+
+browser.runtime.onMessage.addListener(message => {
+  switch (message && message.name) {
+    case 'EXTENSION_ICON_CLICKED':
+      return iframe ? removeIframe(iframe) : addIframe(createIframe());
+    case 'POPUP_CLOSED':
+      return iframe && removeIframe(iframe);
+    case 'POPUP_COLLAPSED':
+      return iframe && collapseIframe(iframe);
+    case 'POPUP_EXPANDED':
+      return iframe && expandIframe(iframe);
+    default:
+      console.log('Unsupported Event:', message);
+  }
+});
 
 if (document.visibilityState !== 'hidden') {
   browser.runtime.sendMessage(undefined, {

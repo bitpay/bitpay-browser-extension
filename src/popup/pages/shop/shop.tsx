@@ -6,7 +6,7 @@ const Shop: React.FC<{ merchants: CardConfig[] }> = ({ merchants }) => (
   <div>
     <div>Shop ({merchants?.length})</div>
     {merchants.map(merchant => (
-      <Link to={`brand/${merchant.name}`}>
+      <Link to={`brand/${merchant.name}`} key={merchant.name}>
         <div>{merchant.displayName}</div>
       </Link>
     ))}
