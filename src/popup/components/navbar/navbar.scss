@@ -1,3 +1,41 @@
-.navbar {
+.fixed {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  background-color: white;
+}
+
+.header-bar {
   display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-height: 48px;
+  height: 48px;
+  padding: 0 12px;
+  border-bottom: 1px solid rgba(black, 0.05);
+
+  &__row {
+    transform: translateY(1px);
+  }
+
+  button {
+    cursor: pointer;
+  }
+}
+
+.bp-logo {
+  height: 18px;
+  margin-left: 4px;
+  transform: translateY(1px);
+
+  &--solo {
+    transform: translateY(-1.5px);
+  }
+}
+
+.back-button {
+  margin-left: 4px;
 }
