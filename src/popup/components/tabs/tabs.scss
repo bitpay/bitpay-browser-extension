@@ -1,11 +1,28 @@
-.tabs {
+.tab-bar {
   position: fixed;
   bottom: 0;
   display: flex;
   width: 100%;
-  justify-content: space-evenly;
+  justify-content: space-between;
+  background-color: white;
+  padding: 14px 64px;
+  border-top: 1px solid rgba(black, 0.05);
 
-  a.is-active {
+  .active {
+    display: none;
+  }
+
+  .is-active {
     font-weight: 600;
+    .inactive {
+      display: none;
+    }
+    .active {
+      display: block;
+    }
+  }
+
+  img {
+    cursor: pointer;
   }
 }
