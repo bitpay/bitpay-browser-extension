@@ -1,8 +1,10 @@
 import { browser, Tabs } from 'webextension-polyfill-ts';
+import * as uuid from 'uuid';
 import { fetchAvailableCards } from '../services/gift-card';
 import { CardConfig } from '../services/gift-card.types';
 import { removeProtocolAndWww } from '../services/utils';
 import { isBitPayAccepted } from '../services/merchant';
+import { get, set } from '../services/storage';
 
 let cachedMerchants: CardConfig[] | undefined;
 
@@ -15,16 +17,20 @@ function setIcon(bitpayAccepted: boolean): void {
 }
 
 async function getCachedMerchants(): Promise<CardConfig[]> {
-  const { availableGiftCards } = cachedMerchants
-    ? { availableGiftCards: cachedMerchants }
-    : ((await browser.storage.local.get('availableGiftCards')) as { availableGiftCards: CardConfig[] });
-  return availableGiftCards;
+  return cachedMerchants || get<CardConfig[]>('availableGiftCards');
 }
 
 async function handleUrlChange(host: string): Promise<void> {
   const merchants = await getCachedMerchants();
   const bitpayAccepted = !!(host && isBitPayAccepted(host, merchants));
   return setIcon(bitpayAccepted);
+}
+
+async function createClientIdIfNotExists(): Promise<void> {
+  const clientId = await get<string>('clientId');
+  if (!clientId) {
+    await set<string>('clientId', uuid.v4());
+  }
 }
 
 async function sendMessageToTab(messageName: string, tab: Tabs.Tab | undefined): Promise<void> {
@@ -55,11 +61,16 @@ browser.runtime.onInstalled.addListener(async () => {
   console.log('on installed');
   const availableGiftCards = await fetchAvailableCards();
   cachedMerchants = availableGiftCards;
-  await browser.storage.local.set({ availableGiftCards });
+  await Promise.all([set<CardConfig[]>('availableGiftCards', availableGiftCards), createClientIdIfNotExists()]);
 });
 
 browser.runtime.onMessage.addListener(async (message, sender) => {
-  message && message.name === 'URL_CHANGED'
-    ? handleUrlChange(message.host)
-    : sendMessageToTab(message.name, sender.tab);
+  switch (message && message.name) {
+    case 'LAUNCH_PAGE':
+      return browser.windows.create({ url: message.url, type: 'popup', height: 735, width: 430 });
+    case 'URL_CHANGED':
+      return handleUrlChange(message.host);
+    default:
+      return sendMessageToTab(message.name, sender.tab);
+  }
 });

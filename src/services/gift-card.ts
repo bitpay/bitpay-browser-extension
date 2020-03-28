@@ -4,8 +4,11 @@ import {
   CardConfig,
   GiftCard,
   GiftCardActivationFee,
-  ApiCard
+  ApiCard,
+  GiftCardInvoiceParams,
+  GiftCardOrder
 } from './gift-card.types';
+import { post } from './utils';
 
 function getCardConfigFromApiBrandConfig(cardName: string, apiBrandConfig: ApiCardConfig): CardConfig {
   const cards = apiBrandConfig;
@@ -24,8 +27,8 @@ function getCardConfigFromApiBrandConfig(cardName: string, apiBrandConfig: ApiCa
     .filter(c => c.activationFees)
     .reduce((allFees, card) => [...allFees, ...(card.activationFees || [])], [] as GiftCardActivationFee[]);
 
-  const { amount, type, maxAmount, minAmount, ...config } = firstCard;
-  const baseConfig = { ...config, name: cardName, activationFees };
+  const { amount, type, maxAmount, minAmount, website, ...config } = firstCard;
+  const baseConfig = { ...config, name: cardName, activationFees, website: website || '' };
   const rangeMin = range && (range.minAmount as number);
   return range
     ? {
@@ -48,7 +51,7 @@ function sortByDisplayName(a: CardConfig | GiftCard, b: CardConfig | GiftCard): 
 }
 
 function fetchPublicAvailableCardMap(): Promise<AvailableCardMap> {
-  const url = `https://bitpay.com/gift-cards/cards`;
+  const url = `${process.env.API_ORIGIN}/gift-cards/cards`;
   return fetch(url).then(res => res.json());
 }
 
@@ -57,10 +60,10 @@ async function fetchAvailableCardMap(): Promise<AvailableCardMap> {
   return availableCardMap;
 }
 
-function removeDiscountsForNow(cardConfig: CardConfig, isCordova = false): CardConfig {
+function removeDiscountsForNow(cardConfig: CardConfig): CardConfig {
   return {
     ...cardConfig,
-    discounts: isCordova ? cardConfig.discounts : undefined
+    discounts: undefined
   };
 }
 
@@ -77,6 +80,11 @@ function getCardConfigFromApiConfigMap(availableCardMap: AvailableCardMap): Card
     }))
     .sort(sortByDisplayName);
   return availableCards;
+}
+
+export async function createBitPayInvoice(params: GiftCardInvoiceParams): Promise<GiftCardOrder> {
+  const url = `${process.env.API_ORIGIN}/gift-cards/pay`;
+  return post(url, params);
 }
 
 export function fetchAvailableCards(): Promise<CardConfig[]> {

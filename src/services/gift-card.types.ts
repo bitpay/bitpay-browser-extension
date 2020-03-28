@@ -83,6 +83,21 @@ export interface ApiCard extends CommonCardConfig {
   type: 'fixed' | 'range';
 }
 
+export interface GiftCardInvoiceParams {
+  brand: string;
+  currency: string;
+  amount: number;
+  clientId: string;
+  discounts: string[];
+  email?: string;
+}
+
+export interface GiftCardOrder {
+  accessKey: string;
+  invoiceId: string;
+  totalDiscount: number;
+}
+
 export type ApiCardConfig = ApiCard[];
 
 export interface AvailableCardMap {

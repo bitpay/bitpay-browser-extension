@@ -1,4 +1,4 @@
-<h1 align="center">Pay With BitPay &bull; Browser Extension</h1>
+<h1 align="center">Pay with BitPay &bull; Browser Extension</h1>
 <p align="center">Be alerted whenever a website you visit offers BitPay as a payment option.</p>
 
 <hr />
@@ -55,6 +55,14 @@ Then run the following:
 
     - Load the extension via `opera:extensions`
     - Check the `Developer Mode` and load as unpacked from extension’s extracted directory.
+
+
+### Enabling testnet payments
+Change your `.env.development` file to the following:
+
+```bash
+API_ORIGIN=https://test.bitpay.com
+```
    
 ### Generating browser specific manifest.json
 Update `src/manifest/index.js` file with browser vendor prefixed manifest keys
