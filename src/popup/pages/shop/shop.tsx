@@ -1,12 +1,17 @@
 import React from 'react';
+import './shop.scss';
+
 import { Link } from 'react-router-dom';
 import { CardConfig } from '../../../services/gift-card.types';
 
 import MerchantCell from '../../components/merchant-cell/merchant-cell';
 
 const Shop: React.FC<{ merchants: CardConfig[] }> = ({ merchants }) => (
-  <div>
-    <div>Shop ({merchants?.length})</div>
+  <div className="shop-page">
+    <div className="list-header">
+      Shop {merchants?.length} Brands
+      {/* <div className="list-header__action">See All</div> */}
+    </div>
     {merchants.map(merchant => (
       <Link to={`brand/${merchant.name}`} key={merchant.name}>
         <MerchantCell
