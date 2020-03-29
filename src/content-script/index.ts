@@ -4,7 +4,7 @@ let iframe: HTMLIFrameElement | undefined;
 
 enum FrameDimensions {
   collapsedHeight = '50px',
-  height = '367px',
+  height = '529px',
   width = '300px'
 }
 
