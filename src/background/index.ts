@@ -1,12 +1,16 @@
 import { browser, Tabs } from 'webextension-polyfill-ts';
 import * as uuid from 'uuid';
 import { fetchAvailableCards } from '../services/gift-card';
-import { CardConfig } from '../services/gift-card.types';
+import { CardConfig, GiftCardInvoiceMessage } from '../services/gift-card.types';
 import { removeProtocolAndWww } from '../services/utils';
 import { isBitPayAccepted } from '../services/merchant';
 import { get, set } from '../services/storage';
 
 let cachedMerchants: CardConfig[] | undefined;
+const invoiceEventResolveFunctionMap: {
+  [invoiceId: string]: (message: GiftCardInvoiceMessage) => GiftCardInvoiceMessage;
+} = {};
+const windowIdInvoiceMap: { [windowId: number]: string } = {};
 
 function getIconPath(bitpayAccepted: boolean): string {
   return `/assets/icons/favicon${bitpayAccepted ? '-active' : ''}-128.png`;
@@ -33,13 +37,10 @@ async function createClientIdIfNotExists(): Promise<void> {
   }
 }
 
-async function sendMessageToTab(messageName: string, tab: Tabs.Tab | undefined): Promise<void> {
-  return (
-    tab &&
-    browser.tabs.sendMessage(tab.id as number, {
-      name: messageName
-    })
-  );
+async function sendMessageToTab(messageName: string, tab: Tabs.Tab): Promise<void> {
+  return browser.tabs.sendMessage(tab.id as number, {
+    name: messageName
+  });
 }
 
 browser.tabs.onActivated.addListener(async () => {
@@ -58,19 +59,44 @@ browser.browserAction.onClicked.addListener(async tab => {
 });
 
 browser.runtime.onInstalled.addListener(async () => {
-  console.log('on installed');
   const availableGiftCards = await fetchAvailableCards();
   cachedMerchants = availableGiftCards;
   await Promise.all([set<CardConfig[]>('availableGiftCards', availableGiftCards), createClientIdIfNotExists()]);
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function launchInvoiceAndListenForPayment(invoiceId: string): Promise<GiftCardInvoiceMessage> {
+  const url = `${process.env.API_ORIGIN}/invoice?id=${invoiceId}&v=3?view=modal`;
+  const { id } = await browser.windows.create({ url, type: 'popup', height: 735, width: 430 });
+  windowIdInvoiceMap[id as number] = invoiceId;
+  const promise = new Promise<GiftCardInvoiceMessage>(resolve => {
+    invoiceEventResolveFunctionMap[invoiceId] = resolve as () => GiftCardInvoiceMessage;
+  });
+  const message = await promise;
+  return message;
+}
+
 browser.runtime.onMessage.addListener(async (message, sender) => {
+  const { tab } = sender;
   switch (message && message.name) {
-    case 'LAUNCH_PAGE':
-      return browser.windows.create({ url: message.url, type: 'popup', height: 735, width: 430 });
+    case 'LAUNCH_INVOICE':
+      return tab && launchInvoiceAndListenForPayment(message.invoiceId);
+    case 'INVOICE_EVENT': {
+      if (!message.data || !message.data.status) {
+        return;
+      }
+      const resolveFn = invoiceEventResolveFunctionMap[message.data.invoiceId];
+      return resolveFn && resolveFn(message);
+    }
     case 'URL_CHANGED':
       return handleUrlChange(message.host);
     default:
-      return sendMessageToTab(message.name, sender.tab);
+      return tab && sendMessageToTab(message.name, tab);
   }
+});
+
+browser.windows.onRemoved.addListener(windowId => {
+  const invoiceId = windowIdInvoiceMap[windowId];
+  const resolveFn = invoiceEventResolveFunctionMap[invoiceId];
+  return resolveFn && resolveFn({ data: { status: 'closed' } });
 });

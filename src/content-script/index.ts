@@ -87,4 +87,19 @@ if (document.visibilityState !== 'hidden') {
   });
 }
 
+if (window.location.origin === process.env.API_ORIGIN) {
+  const invoiceId = new URLSearchParams(window.location.search).get('id');
+  window.addEventListener('message', message => {
+    browser.runtime.sendMessage(undefined, {
+      name: 'INVOICE_EVENT',
+      data: message.data
+        ? {
+            invoiceId,
+            status: message.data.status,
+            exceptionStatus: message.data.exceptionStatus
+          }
+        : undefined
+    });
+  });
+}
 export {};
