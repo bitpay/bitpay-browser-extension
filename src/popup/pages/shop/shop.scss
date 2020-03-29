@@ -6,6 +6,13 @@
     margin-bottom: 56px;
 }
 
+.category-divider {
+    background-color: rgba(black, 0.05);
+    height: 1px;
+    width: 90%;
+    margin: 24px auto;
+}
+
 .list-header {
     display: flex;
     align-items: center;

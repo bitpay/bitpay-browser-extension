@@ -9,22 +9,41 @@ import MerchantCell from '../../components/merchant-cell/merchant-cell';
 const Shop: React.FC<{ merchants: CardConfig[] }> = ({ merchants }) => (
   <div className="shop-page">
     <div className="list-header">
-      Shop {merchants?.length} Brands
+      Popular Brands
       {/* <div className="list-header__action">See All</div> */}
     </div>
-    {merchants.map(merchant => (
-      <Link to={`brand/${merchant.name}`} key={merchant.name}>
-        <MerchantCell
-          key={merchant.name}
-          avatar={merchant.icon}
-          displayName={merchant.displayName}
-          currency={merchant.currency}
-          minAmount={merchant.minAmount}
-          maxAmount={merchant.maxAmount}
-          amounts={merchant.supportedAmounts}
-        />
-      </Link>
-    ))}
+    {merchants
+      .filter(merchant => merchant.featured)
+      .map(merchant => (
+        <Link to={`brand/${merchant.name}`} key={merchant.name}>
+          <MerchantCell
+            key={merchant.name}
+            avatar={merchant.icon}
+            displayName={merchant.displayName}
+            currency={merchant.currency}
+            minAmount={merchant.minAmount}
+            maxAmount={merchant.maxAmount}
+            amounts={merchant.supportedAmounts}
+          />
+        </Link>
+      ))}
+    <div className="category-divider" />
+    <div className="list-header">Shop {merchants?.length} Brands</div>
+    {merchants
+      .filter(merchant => !merchant.featured)
+      .map(merchant => (
+        <Link to={`brand/${merchant.name}`} key={merchant.name}>
+          <MerchantCell
+            key={merchant.name}
+            avatar={merchant.icon}
+            displayName={merchant.displayName}
+            currency={merchant.currency}
+            minAmount={merchant.minAmount}
+            maxAmount={merchant.maxAmount}
+            amounts={merchant.supportedAmounts}
+          />
+        </Link>
+      ))}
   </div>
 );
 
