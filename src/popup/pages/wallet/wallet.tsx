@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import { get } from '../../../services/storage';
 import { GiftCard } from '../../../services/gift-card.types';
 import { groupBy } from '../../../services/utils';
+import { Merchant } from '../../../services/merchant';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Wallet: React.FC<any> = ({ location }) => {
-  const supportedMerchant = location.state && location.state.merchant;
+const Wallet: React.FC<{ supportedMerchant?: Merchant }> = ({ supportedMerchant }) => {
   const [activeGiftCardsByBrand, setActiveGiftCardsByBrand] = useState({} as { [brand: string]: GiftCard[] });
   useEffect(() => {
     const fetchActiveGiftCards = async (): Promise<void> => {

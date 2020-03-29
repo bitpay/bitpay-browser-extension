@@ -19,9 +19,10 @@ import { getDirectIntegrations } from '../services/directory';
 console.log('parent', window.location);
 
 const Popup: React.FC = () => {
-  const [initialEntries, setInitialEntries] = useState([{ pathname: '/shop', state: {} }]);
+  const [initialEntries, setInitialEntries] = useState([{ pathname: '/shop' }]);
   const [loaded, setLoaded] = useState(false);
   const [merchants, setMerchants] = useState([] as Merchant[]);
+  const [supportedMerchant, setSupportedMerchant] = useState(undefined as Merchant | undefined);
 
   useEffect(() => {
     const getStartPage = async (): Promise<void> => {
@@ -30,10 +31,11 @@ const Popup: React.FC = () => {
       const allMerchants = getMerchants(directIntegrations, availableGiftCardBrands);
       const parent = new URLSearchParams(window.location.search).get('url') as string;
       const { host } = new URL(parent);
-      const supportedMerchant = getBitPayMerchantFromHost(host, allMerchants);
-      const initialPath = supportedMerchant ? `/wallet` : '/shop';
-      setInitialEntries([{ pathname: initialPath || '/shop', state: { merchant: supportedMerchant } }]);
+      const merchant = getBitPayMerchantFromHost(host, allMerchants);
+      const initialPath = merchant ? `/wallet` : '/shop';
+      setInitialEntries([{ pathname: initialPath || '/shop' }]);
       setMerchants(allMerchants);
+      setSupportedMerchant(merchant);
       setLoaded(true);
     };
     getStartPage();
@@ -51,7 +53,10 @@ const Popup: React.FC = () => {
             <Route path="/payment/:brand" component={Payment} />
             <Route path="/shop" render={(props): JSX.Element => <Shop merchants={merchants} {...props} />} />
             <Route path="/settings" component={Settings} />
-            <Route path="/wallet" component={Wallet} />
+            <Route
+              path="/wallet"
+              render={(props): JSX.Element => <Wallet supportedMerchant={supportedMerchant} {...props} />}
+            />
           </Switch>
           <Tabs />
         </Router>

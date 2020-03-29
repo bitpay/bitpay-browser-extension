@@ -3,7 +3,7 @@ import { browser } from 'webextension-polyfill-ts';
 let iframe: HTMLIFrameElement | undefined;
 
 enum FrameDimensions {
-  collapsedHeight = '50px',
+  collapsedHeight = '47px',
   height = '529px',
   width = '300px'
 }
