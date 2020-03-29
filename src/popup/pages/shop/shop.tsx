@@ -2,11 +2,11 @@ import React from 'react';
 import './shop.scss';
 
 import { Link } from 'react-router-dom';
-import { CardConfig } from '../../../services/gift-card.types';
 
 import MerchantCell from '../../components/merchant-cell/merchant-cell';
+import { Merchant } from '../../../services/merchant';
 
-const Shop: React.FC<{ merchants: CardConfig[] }> = ({ merchants }) => (
+const Shop: React.FC<{ merchants: Merchant[] }> = ({ merchants }) => (
   <div className="shop-page">
     <div className="list-header">
       Popular Brands
@@ -16,15 +16,7 @@ const Shop: React.FC<{ merchants: CardConfig[] }> = ({ merchants }) => (
       .filter(merchant => merchant.featured)
       .map(merchant => (
         <Link to={`brand/${merchant.name}`} key={merchant.name}>
-          <MerchantCell
-            key={merchant.name}
-            avatar={merchant.icon}
-            displayName={merchant.displayName}
-            currency={merchant.currency}
-            minAmount={merchant.minAmount}
-            maxAmount={merchant.maxAmount}
-            amounts={merchant.supportedAmounts}
-          />
+          <MerchantCell key={merchant.name} merchant={merchant} />
         </Link>
       ))}
     <div className="category-divider" />
@@ -33,15 +25,7 @@ const Shop: React.FC<{ merchants: CardConfig[] }> = ({ merchants }) => (
       .filter(merchant => !merchant.featured)
       .map(merchant => (
         <Link to={`brand/${merchant.name}`} key={merchant.name}>
-          <MerchantCell
-            key={merchant.name}
-            avatar={merchant.icon}
-            displayName={merchant.displayName}
-            currency={merchant.currency}
-            minAmount={merchant.minAmount}
-            maxAmount={merchant.maxAmount}
-            amounts={merchant.supportedAmounts}
-          />
+          <MerchantCell key={merchant.name} merchant={merchant} />
         </Link>
       ))}
   </div>

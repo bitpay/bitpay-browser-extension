@@ -25,7 +25,7 @@ export interface CommonCardConfig {
   cardImage: string;
   currency: string;
   defaultClaimCodeType: ClaimCodeType;
-  description?: string;
+  description: string;
   discounts?: GiftCardDiscount[];
   displayName: string;
   emailRequired: boolean;

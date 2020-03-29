@@ -1,14 +1,6 @@
 import React from 'react';
 import './merchant-cell.scss';
-
-export interface MerchantCell {
-  avatar: string;
-  displayName: string;
-  minAmount: number | undefined;
-  maxAmount: number | undefined;
-  amounts: Array<number> | undefined;
-  currency: string;
-}
+import { Merchant } from '../../../services/merchant';
 
 const currencySymbols: Record<string, string> = {
   USD: '$',
@@ -34,23 +26,38 @@ function spreadAmounts(values: Array<number>, currencySymbol: string | undefined
   return caption;
 }
 
-const MerchantCell: React.FC<MerchantCell> = merchant => (
-  <div className="MerchantCell">
-    <img className="MerchantCell__Avatar" alt="amazon" src={merchant.avatar} />
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div className="MerchantCell__Title">{merchant.displayName}</div>
-      {merchant.minAmount && merchant.maxAmount && (
+const MerchantCell: React.FC<{ merchant: Merchant }> = ({ merchant }) => {
+  const cardConfig = merchant.giftCards[0];
+  return (
+    <div className="MerchantCell">
+      <img className="MerchantCell__Avatar" alt="amazon" src={merchant.logo} />
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div className="MerchantCell__Title">{merchant.displayName}</div>
         <div className="MerchantCell__Caption">
-          ${merchant.minAmount} - ${merchant.maxAmount}
+          {merchant.hasDirectIntegration ? (
+            <>{merchant.caption}</>
+          ) : (
+            <>
+              {cardConfig.minAmount && cardConfig.maxAmount && (
+                <>
+                  ${merchant.giftCards[0].minAmount} - ${merchant.giftCards[0].maxAmount}
+                </>
+              )}
+              {cardConfig.supportedAmounts && (
+                <>
+                  {spreadAmounts(
+                    cardConfig.supportedAmounts,
+                    currencySymbols[cardConfig.currency],
+                    cardConfig.currency
+                  )}
+                </>
+              )}
+            </>
+          )}
         </div>
-      )}
-      {merchant.amounts && (
-        <div className="MerchantCell__Caption">
-          {spreadAmounts(merchant.amounts, currencySymbols[merchant.currency], merchant.currency)}
-        </div>
-      )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default MerchantCell;
