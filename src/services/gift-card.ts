@@ -87,6 +87,34 @@ export async function createBitPayInvoice(params: GiftCardInvoiceParams): Promis
   return post(url, params);
 }
 
+export async function redeemGiftCard(data: Partial<GiftCard>): Promise<GiftCard> {
+  const url = `${process.env.API_ORIGIN}/gift-cards/redeem`;
+  const params = {
+    clientId: data.clientId,
+    invoiceId: data.invoiceId,
+    accessKey: data.accessKey
+  };
+  const giftCard = await post(url, params)
+    .then((res: { claimCode?: string; claimLink?: string; pin?: string; barcodeImage?: string }) => {
+      const status = res.claimCode || res.claimLink ? 'SUCCESS' : 'PENDING';
+      const fullCard = {
+        ...data,
+        ...res,
+        status
+      };
+      return fullCard;
+    })
+    .catch(err => {
+      const errMessage = err.error && err.error.message;
+      const pendingMessages = ['Card creation delayed', 'Invoice is unpaid or payment has not confirmed'];
+      if (pendingMessages.indexOf(errMessage) === -1 && errMessage.indexOf('Please wait') === -1) {
+        throw err;
+      }
+      return { ...data, status: 'PENDING' };
+    });
+  return giftCard as GiftCard;
+}
+
 export function fetchAvailableCards(): Promise<CardConfig[]> {
   return fetchAvailableCardMap().then(availableCardMap => getCardConfigFromApiConfigMap(availableCardMap));
 }

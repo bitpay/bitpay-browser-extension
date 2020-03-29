@@ -14,3 +14,11 @@ export async function post(url: string, params: any): Promise<any> {
   const data = await response.json();
   return data;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function groupBy(list: any[], props: any): {} {
+  return list.reduce((a, b) => {
+    (a[b[props]] = a[b[props]] || []).push(b);
+    return a;
+  }, {});
+}

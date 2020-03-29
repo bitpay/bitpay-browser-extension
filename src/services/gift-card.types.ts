@@ -61,15 +61,15 @@ export interface GiftCard {
   claimCode: string;
   claimLink?: string;
   currency: string;
-  date: number;
+  date: string;
   displayName: string;
   invoiceId: string;
   invoiceTime?: number;
-  invoiceUrl: string;
   name: string;
   pin?: string;
   status: string;
-  uuid: string;
+  clientId: string;
+  totalDiscount?: number;
 }
 
 export type GiftCardSaveParams = Partial<{
@@ -96,6 +96,16 @@ export interface GiftCardOrder {
   accessKey: string;
   invoiceId: string;
   totalDiscount: number;
+}
+
+export interface GiftCardRedeemParams {
+  accessKey: string;
+  clientId: string;
+  invoiceId: string;
+}
+
+export interface GiftCardInvoiceMessage {
+  data: { status: 'closed' | 'paid' | 'confirmed' | 'complete' };
 }
 
 export type ApiCardConfig = ApiCard[];

@@ -1,16 +1,28 @@
 import React, { useState } from 'react';
 import { browser } from 'webextension-polyfill-ts';
-import { createBitPayInvoice } from '../../../services/gift-card';
-import { get } from '../../../services/storage';
+import { createBitPayInvoice, redeemGiftCard } from '../../../services/gift-card';
+import { get, set } from '../../../services/storage';
+import { GiftCard } from '../../../services/gift-card.types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Payment: React.FC<any> = ({ match: { params }, location }) => {
+const Payment: React.FC<any> = ({ match: { params }, location, history }) => {
   const [awaitingPayment, setAwaitingPayment] = useState(false);
   const amount = location.state.amount as number;
   const currency = location.state.currency as string;
+  const saveGiftCard = async (card: GiftCard): Promise<void> => {
+    const purchasedGiftCards = (await get<GiftCard[]>('purchasedGiftCards')) || [];
+    await set<GiftCard[]>('purchasedGiftCards', [...purchasedGiftCards, card]);
+  };
+  const showCard = (card: GiftCard): void => {
+    history.goBack();
+    history.goBack();
+    history.goBack();
+    history.push(`/wallet`);
+    history.push({ pathname: `/card/${card.invoiceId}`, state: { card } });
+  };
   const launchInvoice = async (): Promise<void> => {
     const clientId = await get<string>('clientId');
-    const { invoiceId } = await createBitPayInvoice({
+    const { invoiceId, accessKey, totalDiscount } = await createBitPayInvoice({
       brand: params.brand,
       currency,
       amount,
@@ -19,10 +31,26 @@ const Payment: React.FC<any> = ({ match: { params }, location }) => {
       email: 'satoshi@nakamoto.com'
     });
     setAwaitingPayment(true);
-    browser.runtime.sendMessage({
-      name: 'LAUNCH_PAGE',
-      url: `${process.env.API_ORIGIN}/invoice?id=${invoiceId}&v=3?view=page`
+    const res = await browser.runtime.sendMessage({
+      name: 'LAUNCH_INVOICE',
+      invoiceId
     });
+    if (res.data.status === 'closed') {
+      setAwaitingPayment(false);
+      return;
+    }
+    const giftCard = await redeemGiftCard({
+      currency,
+      date: new Date().toISOString(),
+      amount,
+      clientId,
+      accessKey,
+      invoiceId,
+      name: params.brand,
+      totalDiscount
+    });
+    await saveGiftCard(giftCard);
+    showCard(giftCard);
   };
   return (
     <div>
