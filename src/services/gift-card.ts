@@ -44,7 +44,7 @@ function getDisplayNameSortValue(displayName: string): string {
   const name = displayName.toLowerCase();
   return `${startsNumeric(name) ? 'zzz' : ''}${name}`;
 }
-function sortByDisplayName(a: CardConfig | GiftCard, b: CardConfig | GiftCard): 1 | -1 {
+export function sortByDisplayName(a: { displayName: string }, b: { displayName: string }): 1 | -1 {
   const aSortValue = getDisplayNameSortValue(a.displayName);
   const bSortValue = getDisplayNameSortValue(b.displayName);
   return aSortValue > bSortValue ? 1 : -1;

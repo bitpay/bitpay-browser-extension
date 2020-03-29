@@ -3,10 +3,11 @@ import * as uuid from 'uuid';
 import { fetchAvailableCards } from '../services/gift-card';
 import { CardConfig, GiftCardInvoiceMessage } from '../services/gift-card.types';
 import { removeProtocolAndWww } from '../services/utils';
-import { isBitPayAccepted } from '../services/merchant';
+import { isBitPayAccepted, getMerchants, Merchant } from '../services/merchant';
 import { get, set } from '../services/storage';
+import { getDirectIntegrations } from '../services/directory';
 
-let cachedMerchants: CardConfig[] | undefined;
+let cachedMerchants: Merchant[] | undefined;
 const invoiceEventResolveFunctionMap: {
   [invoiceId: string]: (message: GiftCardInvoiceMessage) => GiftCardInvoiceMessage;
 } = {};
@@ -20,8 +21,14 @@ function setIcon(bitpayAccepted: boolean): void {
   browser.browserAction.setIcon({ path: getIconPath(bitpayAccepted) });
 }
 
-async function getCachedMerchants(): Promise<CardConfig[]> {
-  return cachedMerchants || get<CardConfig[]>('availableGiftCards');
+async function fetchCachedMerchants(): Promise<Merchant[]> {
+  const directIntegrations = await getDirectIntegrations();
+  const availableGiftCardBrands = await get<CardConfig[]>('availableGiftCards');
+  return getMerchants(directIntegrations, availableGiftCardBrands);
+}
+
+async function getCachedMerchants(): Promise<Merchant[]> {
+  return cachedMerchants || fetchCachedMerchants();
 }
 
 async function handleUrlChange(host: string): Promise<void> {
@@ -59,8 +66,9 @@ browser.browserAction.onClicked.addListener(async tab => {
 });
 
 browser.runtime.onInstalled.addListener(async () => {
+  const directIntegrations = await getDirectIntegrations();
   const availableGiftCards = await fetchAvailableCards();
-  cachedMerchants = availableGiftCards;
+  cachedMerchants = getMerchants(directIntegrations, availableGiftCards);
   await Promise.all([set<CardConfig[]>('availableGiftCards', availableGiftCards), createClientIdIfNotExists()]);
 });
 

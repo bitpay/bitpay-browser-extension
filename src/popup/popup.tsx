@@ -9,27 +9,31 @@ import Shop from './pages/shop/shop';
 import './styles.scss';
 import Tabs from './components/tabs/tabs';
 import Navbar from './components/navbar/navbar';
-import { isBitPayAccepted } from '../services/merchant';
+import { getMerchants, Merchant, getBitPayMerchantFromHost } from '../services/merchant';
 import { CardConfig } from '../services/gift-card.types';
 import Amount from './pages/amount/amount';
 import Payment from './pages/payment/payment';
 import { get } from '../services/storage';
+import { getDirectIntegrations } from '../services/directory';
 
 console.log('parent', window.location);
 
 const Popup: React.FC = () => {
-  const [initialEntries, setInitialEntries] = useState(['/shop']);
+  const [initialEntries, setInitialEntries] = useState([{ pathname: '/shop', state: {} }]);
   const [loaded, setLoaded] = useState(false);
-  const [merchants, setMerchants] = useState([] as CardConfig[]);
+  const [merchants, setMerchants] = useState([] as Merchant[]);
 
   useEffect(() => {
     const getStartPage = async (): Promise<void> => {
-      const availableGiftCards = await get<CardConfig[]>('availableGiftCards');
+      const directIntegrations = await getDirectIntegrations();
+      const availableGiftCardBrands = await get<CardConfig[]>('availableGiftCards');
+      const allMerchants = getMerchants(directIntegrations, availableGiftCardBrands);
       const parent = new URLSearchParams(window.location.search).get('url') as string;
       const { host } = new URL(parent);
-      const initialPath = isBitPayAccepted(host, availableGiftCards) ? '/wallet' : '/shop';
-      setInitialEntries([initialPath]);
-      setMerchants(availableGiftCards);
+      const supportedMerchant = getBitPayMerchantFromHost(host, allMerchants);
+      const initialPath = supportedMerchant ? `/wallet` : '/shop';
+      setInitialEntries([{ pathname: initialPath || '/shop', state: { merchant: supportedMerchant } }]);
+      setMerchants(allMerchants);
       setLoaded(true);
     };
     getStartPage();
