@@ -10,8 +10,8 @@ enum FrameDimensions {
 
 function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string } {
   const innerFrameStyles = `
-    width: ${FrameDimensions.width};
-    height: ${FrameDimensions.height}; 
+    width: 100%;
+    height: 100%; 
     border: 0;
     margin: 0;
     padding: 0;
@@ -19,6 +19,8 @@ function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string
   `;
   const outerFrameStyles = `
     ${innerFrameStyles}
+    width: ${FrameDimensions.width};
+    height: ${FrameDimensions.height}; 
     position: fixed;
     top: 10px;
     right: 10px;
@@ -36,9 +38,11 @@ function createIframe(): HTMLIFrameElement {
   const innerFrameSrc = `${baseUrl}?url=${window.location.href}`;
   const { innerFrameStyles, outerFrameStyles } = getIframeStyles();
   outerFrame.srcdoc = `
-    <body style="${innerFrameStyles}">
-      <iframe src="${innerFrameSrc}" style="${innerFrameStyles}">frameSrc</iframe>
-    </body>
+    <html style="height: 100%">
+      <body style="${innerFrameStyles}">
+        <iframe src="${innerFrameSrc}" style="${innerFrameStyles}">frameSrc</iframe>
+      </body>
+    </html>
   `;
   outerFrame.style.cssText = outerFrameStyles;
   document.body.appendChild(outerFrame);

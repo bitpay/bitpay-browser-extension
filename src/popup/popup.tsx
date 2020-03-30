@@ -13,10 +13,8 @@ import { Merchant, getBitPayMerchantFromHost, fetchCachedMerchants } from '../se
 import Amount from './pages/amount/amount';
 import Payment from './pages/payment/payment';
 
-console.log('parent', window.location);
-
 const Popup: React.FC = () => {
-  const [initialEntries, setInitialEntries] = useState([{ pathname: '/shop' }]);
+  const [initialEntries, setInitialEntries] = useState(['/shop']);
   const [loaded, setLoaded] = useState(false);
   const [merchants, setMerchants] = useState([] as Merchant[]);
   const [supportedMerchant, setSupportedMerchant] = useState(undefined as Merchant | undefined);
@@ -28,7 +26,7 @@ const Popup: React.FC = () => {
       const { host } = new URL(parent);
       const merchant = getBitPayMerchantFromHost(host, allMerchants);
       const initialPath = merchant ? `/wallet` : '/shop';
-      setInitialEntries([{ pathname: initialPath || '/shop' }]);
+      setInitialEntries([initialPath || '/shop']);
       setMerchants(allMerchants);
       setSupportedMerchant(merchant);
       setLoaded(true);
@@ -36,7 +34,7 @@ const Popup: React.FC = () => {
     getStartPage();
   }, []);
   return (
-    <div>
+    <>
       {loaded ? (
         <Router initialEntries={initialEntries}>
           <Navbar />
@@ -56,7 +54,7 @@ const Popup: React.FC = () => {
           <Tabs />
         </Router>
       ) : null}
-    </div>
+    </>
   );
 };
 
