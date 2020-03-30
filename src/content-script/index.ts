@@ -23,6 +23,7 @@ function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string
     box-shadow: 0 0 14px 4px rgba(0,0,0,0.1); 
     border-radius: 8px;
     z-index: 2147483647;
+    transition: height 250ms ease 0s;
   `;
   return { outerFrameStyles, innerFrameStyles };
 }
