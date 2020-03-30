@@ -3,9 +3,9 @@ import * as uuid from 'uuid';
 import { fetchAvailableCards } from '../services/gift-card';
 import { CardConfig, GiftCardInvoiceMessage } from '../services/gift-card.types';
 import { removeProtocolAndWww } from '../services/utils';
-import { isBitPayAccepted, getMerchants, Merchant } from '../services/merchant';
+import { isBitPayAccepted, getMerchants, Merchant, fetchCachedMerchants } from '../services/merchant';
 import { get, set } from '../services/storage';
-import { getDirectIntegrations } from '../services/directory';
+import { fetchDirectIntegrations, DirectIntegration } from '../services/directory';
 
 let cachedMerchants: Merchant[] | undefined;
 const invoiceEventResolveFunctionMap: {
@@ -19,12 +19,6 @@ function getIconPath(bitpayAccepted: boolean): string {
 
 function setIcon(bitpayAccepted: boolean): void {
   browser.browserAction.setIcon({ path: getIconPath(bitpayAccepted) });
-}
-
-async function fetchCachedMerchants(): Promise<Merchant[]> {
-  const directIntegrations = await getDirectIntegrations();
-  const availableGiftCardBrands = await get<CardConfig[]>('availableGiftCards');
-  return getMerchants(directIntegrations, availableGiftCardBrands);
 }
 
 async function getCachedMerchants(): Promise<Merchant[]> {
@@ -66,13 +60,16 @@ browser.browserAction.onClicked.addListener(async tab => {
 });
 
 browser.runtime.onInstalled.addListener(async () => {
-  const directIntegrations = await getDirectIntegrations();
-  const availableGiftCards = await fetchAvailableCards();
+  const directIntegrations = await fetchDirectIntegrations().catch(() => []);
+  const availableGiftCards = await fetchAvailableCards().catch(() => []);
   cachedMerchants = getMerchants(directIntegrations, availableGiftCards);
-  await Promise.all([set<CardConfig[]>('availableGiftCards', availableGiftCards), createClientIdIfNotExists()]);
+  await Promise.all([
+    set<DirectIntegration[]>('directIntegrations', directIntegrations),
+    set<CardConfig[]>('availableGiftCards', availableGiftCards),
+    createClientIdIfNotExists()
+  ]);
 });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function launchInvoiceAndListenForPayment(invoiceId: string): Promise<GiftCardInvoiceMessage> {
   const url = `${process.env.API_ORIGIN}/invoice?id=${invoiceId}&v=3?view=modal`;
   const { id } = await browser.windows.create({ url, type: 'popup', height: 735, width: 430 });

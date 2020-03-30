@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 
 import MerchantCell from '../../components/merchant-cell/merchant-cell';
 import { Merchant } from '../../../services/merchant';
+import { resizeFrame, FrameDimensions } from '../../../services/frame';
 
 const Shop: React.FC<{ merchants: Merchant[] }> = ({ merchants }) => (
   <div className="shop-page">
@@ -15,7 +16,11 @@ const Shop: React.FC<{ merchants: Merchant[] }> = ({ merchants }) => (
     {merchants
       .filter(merchant => merchant.featured)
       .map(merchant => (
-        <Link to={`brand/${merchant.name}`} key={merchant.name}>
+        <Link
+          to={`brand/${merchant.name}`}
+          key={merchant.name}
+          onClick={(): void => resizeFrame(FrameDimensions.height)}
+        >
           <MerchantCell key={merchant.name} merchant={merchant} />
         </Link>
       ))}
@@ -24,7 +29,11 @@ const Shop: React.FC<{ merchants: Merchant[] }> = ({ merchants }) => (
     {merchants
       .filter(merchant => !merchant.featured)
       .map(merchant => (
-        <Link to={`brand/${merchant.name}`} key={merchant.name}>
+        <Link
+          to={`brand/${merchant.name}`}
+          key={merchant.name}
+          onClick={(): void => resizeFrame(FrameDimensions.height)}
+        >
           <MerchantCell key={merchant.name} merchant={merchant} />
         </Link>
       ))}

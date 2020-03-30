@@ -12,6 +12,14 @@ body {
 html,
 body,
 #popup-root {
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  font-family: 'Heebo', sans-serif;
+  font-family: "Heebo", sans-serif;
+  overflow: hidden;
+
+  .header-bar + div {
+    flex-grow: 1;
+    overflow-y: auto;
+  }
 }

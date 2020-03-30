@@ -9,39 +9,34 @@ import Shop from './pages/shop/shop';
 import './styles.scss';
 import Tabs from './components/tabs/tabs';
 import Navbar from './components/navbar/navbar';
-import { getMerchants, Merchant, getBitPayMerchantFromHost } from '../services/merchant';
-import { CardConfig } from '../services/gift-card.types';
+import { Merchant, getBitPayMerchantFromHost, fetchCachedMerchants } from '../services/merchant';
 import Amount from './pages/amount/amount';
 import Payment from './pages/payment/payment';
-import { get } from '../services/storage';
-import { getDirectIntegrations } from '../services/directory';
-
-console.log('parent', window.location);
+import { resizeFrameForPath } from '../services/frame';
 
 const Popup: React.FC = () => {
-  const [initialEntries, setInitialEntries] = useState([{ pathname: '/shop' }]);
+  const [initialEntries, setInitialEntries] = useState(['/shop']);
   const [loaded, setLoaded] = useState(false);
   const [merchants, setMerchants] = useState([] as Merchant[]);
   const [supportedMerchant, setSupportedMerchant] = useState(undefined as Merchant | undefined);
 
   useEffect(() => {
     const getStartPage = async (): Promise<void> => {
-      const directIntegrations = await getDirectIntegrations();
-      const availableGiftCardBrands = await get<CardConfig[]>('availableGiftCards');
-      const allMerchants = getMerchants(directIntegrations, availableGiftCardBrands);
+      const allMerchants = await fetchCachedMerchants();
       const parent = new URLSearchParams(window.location.search).get('url') as string;
       const { host } = new URL(parent);
       const merchant = getBitPayMerchantFromHost(host, allMerchants);
       const initialPath = merchant ? `/wallet` : '/shop';
-      setInitialEntries([{ pathname: initialPath || '/shop' }]);
+      setInitialEntries([initialPath || '/shop']);
       setMerchants(allMerchants);
       setSupportedMerchant(merchant);
       setLoaded(true);
+      resizeFrameForPath(initialPath);
     };
     getStartPage();
   }, []);
   return (
-    <div>
+    <>
       {loaded ? (
         <Router initialEntries={initialEntries}>
           <Navbar />
@@ -61,7 +56,7 @@ const Popup: React.FC = () => {
           <Tabs />
         </Router>
       ) : null}
-    </div>
+    </>
   );
 };
 

@@ -2,6 +2,7 @@ import { CardConfig } from './gift-card.types';
 import { sortByDisplayName } from './gift-card';
 import { removeProtocolAndWww } from './utils';
 import { DirectIntegration } from './directory';
+import { get } from './storage';
 
 export interface Merchant extends DirectIntegration {
   name: string;
@@ -27,7 +28,6 @@ export function getMerchants(
 ): Merchant[] {
   const directIntegrationMerchants = directIntegrations.map(integration => ({
     ...integration,
-    logo: `https://marty.bp:8088/img/merchant-logos/${integration.logo}`,
     hasDirectIntegration: true,
     giftCards: []
   }));
@@ -37,7 +37,7 @@ export function getMerchants(
     displayName: cardConfig.displayName,
     caption: cardConfig.description,
     featured: cardConfig.featured,
-    logo: cardConfig.icon,
+    icon: cardConfig.icon,
     link: cardConfig.website,
     displayLink: cardConfig.website,
     tags: [],
@@ -47,4 +47,10 @@ export function getMerchants(
     giftCards: [cardConfig]
   }));
   return [...directIntegrationMerchants, ...giftCardMerchants].sort(sortByDisplayName);
+}
+
+export async function fetchCachedMerchants(): Promise<Merchant[]> {
+  const directIntegrations = await get<DirectIntegration[]>('directIntegrations');
+  const availableGiftCardBrands = await get<CardConfig[]>('availableGiftCards');
+  return getMerchants(directIntegrations, availableGiftCardBrands);
 }
