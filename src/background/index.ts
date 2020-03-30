@@ -60,8 +60,8 @@ browser.browserAction.onClicked.addListener(async tab => {
 });
 
 browser.runtime.onInstalled.addListener(async () => {
-  const directIntegrations = await fetchDirectIntegrations();
-  const availableGiftCards = await fetchAvailableCards();
+  const directIntegrations = await fetchDirectIntegrations().catch(() => []);
+  const availableGiftCards = await fetchAvailableCards().catch(() => []);
   cachedMerchants = getMerchants(directIntegrations, availableGiftCards);
   await Promise.all([
     set<DirectIntegration[]>('directIntegrations', directIntegrations),

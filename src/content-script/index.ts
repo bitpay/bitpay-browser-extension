@@ -1,12 +1,7 @@
 import { browser } from 'webextension-polyfill-ts';
+import { FrameDimensions } from '../services/frame';
 
 let iframe: HTMLIFrameElement | undefined;
-
-enum FrameDimensions {
-  collapsedHeight = '47px',
-  height = '529px',
-  width = '300px'
-}
 
 function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string } {
   const innerFrameStyles = `
@@ -59,24 +54,20 @@ function addIframe(frame: HTMLIFrameElement): void {
   document.body.appendChild(frame);
 }
 
-function collapseIframe(frame: HTMLIFrameElement): void {
-  frame.style.height = FrameDimensions.collapsedHeight;
-}
-
-function expandIframe(frame: HTMLIFrameElement): void {
-  frame.style.height = FrameDimensions.height;
+function resizeIframe(frame: HTMLIFrameElement, height: string = FrameDimensions.height): void {
+  frame.style.height = height;
 }
 
 browser.runtime.onMessage.addListener(message => {
-  switch (message && message.name) {
+  const messageName = message && message.name;
+  const [messagePrefix, messageSuffix] = messageName.split(':');
+  switch (messagePrefix) {
     case 'EXTENSION_ICON_CLICKED':
       return iframe ? removeIframe(iframe) : addIframe(createIframe());
     case 'POPUP_CLOSED':
       return iframe && removeIframe(iframe);
-    case 'POPUP_COLLAPSED':
-      return iframe && collapseIframe(iframe);
-    case 'POPUP_EXPANDED':
-      return iframe && expandIframe(iframe);
+    case 'POPUP_RESIZED':
+      return iframe && resizeIframe(iframe, messageSuffix);
     default:
       console.log('Unsupported Event:', message);
   }

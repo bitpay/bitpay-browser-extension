@@ -12,6 +12,7 @@ import Navbar from './components/navbar/navbar';
 import { Merchant, getBitPayMerchantFromHost, fetchCachedMerchants } from '../services/merchant';
 import Amount from './pages/amount/amount';
 import Payment from './pages/payment/payment';
+import { resizeFrameForPath } from '../services/frame';
 
 const Popup: React.FC = () => {
   const [initialEntries, setInitialEntries] = useState(['/shop']);
@@ -30,6 +31,7 @@ const Popup: React.FC = () => {
       setMerchants(allMerchants);
       setSupportedMerchant(merchant);
       setLoaded(true);
+      resizeFrameForPath(initialPath);
     };
     getStartPage();
   }, []);

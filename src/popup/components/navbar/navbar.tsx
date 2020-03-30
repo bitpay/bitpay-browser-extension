@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
 import { withRouter } from 'react-router-dom';
 import { browser } from 'webextension-polyfill-ts';
+import { resizeFrameForPath, resizeFrame, FrameDimensions } from '../../../services/frame';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Navbar: React.FC<any> = ({ history, location }) => {
   const [collapsed, setCollapsed] = useState(false);
   const goBack = (): void => {
+    const { pathname } = history.entries[history.index - 1];
+    resizeFrameForPath(pathname);
     history.goBack();
   };
   const collapse = (): void => {
     setCollapsed(true);
-    browser.runtime.sendMessage({ name: 'POPUP_COLLAPSED' });
+    resizeFrame(FrameDimensions.collapsedHeight);
   };
   const expand = (): void => {
     setCollapsed(false);
-    browser.runtime.sendMessage({ name: 'POPUP_EXPANDED' });
+    resizeFrameForPath(location.pathname);
   };
   const close = (): void => {
     browser.runtime.sendMessage({ name: 'POPUP_CLOSED' });
