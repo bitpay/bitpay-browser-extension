@@ -2,7 +2,7 @@ import { browser } from 'webextension-polyfill-ts';
 
 export enum FrameDimensions {
   collapsedHeight = '47px',
-  height = '350px',
+  height = '381px',
   shopTabHeight = '529px',
   width = '300px'
 }

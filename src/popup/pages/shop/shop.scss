@@ -1,26 +1,26 @@
 .shop-page {
   padding: 10px;
-}
 
-.category-divider {
-  background-color: rgba(black, 0.05);
-  height: 1px;
-  width: 90%;
-  margin: 24px auto;
-}
-
-.list-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px 12px 16px;
-  font-weight: 500;
-  font-size: 13px;
-  color: rgba(#434d5a, 0.75);
-
-  &__action {
+  &__section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px 12px 16px;
     font-weight: 500;
-    font-size: 12px;
-    color: #4f6ef7;
+    font-size: 13px;
+    color: rgba(#434d5a, 0.75);
+
+    &--action {
+      font-weight: 500;
+      font-size: 12px;
+      color: #4f6ef7;
+    }
+  }
+
+  &__divider {
+    background-color: rgba(black, 0.05);
+    height: 1px;
+    width: 90%;
+    margin: 24px auto;
   }
 }
