@@ -9,28 +9,34 @@ import { resizeFrame, FrameDimensions } from '../../../services/frame';
 
 const Shop: React.FC<{ merchants: Merchant[] }> = ({ merchants }) => (
   <div className="shop-page">
-    <div className="list-header">
+    <div className="shop-page__section-header">
       Popular Brands
-      {/* <div className="list-header__action">See All</div> */}
+      {/* <div className="shop-page__section-header--action">See All</div> */}
     </div>
     {merchants
       .filter(merchant => merchant.featured)
       .map(merchant => (
         <Link
-          to={`brand/${merchant.name}`}
+          to={{
+            pathname: `/brand/${merchant.name}`,
+            state: { merchant }
+          }}
           key={merchant.name}
           onClick={(): void => resizeFrame(FrameDimensions.height)}
         >
           <MerchantCell key={merchant.name} merchant={merchant} />
         </Link>
       ))}
-    <div className="category-divider" />
-    <div className="list-header">Shop {merchants?.length} Brands</div>
+    <div className="shop-page__divider" />
+    <div className="shop-page__section-header">Shop {merchants?.length} Brands</div>
     {merchants
       .filter(merchant => !merchant.featured)
       .map(merchant => (
         <Link
-          to={`brand/${merchant.name}`}
+          to={{
+            pathname: `/brand/${merchant.name}`,
+            state: { merchant }
+          }}
           key={merchant.name}
           onClick={(): void => resizeFrame(FrameDimensions.height)}
         >

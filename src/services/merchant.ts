@@ -11,6 +11,30 @@ export interface Merchant extends DirectIntegration {
   giftCards: CardConfig[];
 }
 
+export const currencySymbols: Record<string, string> = {
+  USD: '$',
+  GBP: '£',
+  EUR: '€',
+  JPY: '¥',
+  INR: '₹',
+  CAD: 'C$',
+  PHP: '₱',
+  BRL: 'R$'
+};
+
+export function spreadAmounts(values: Array<number>, currencySymbol: string | undefined, currency: string): string {
+  let caption = '';
+  values.forEach((value: number, index: number) => {
+    caption = currencySymbol
+      ? caption + currencySymbol + value.toString()
+      : `${caption + value.toString()} ${currency}`;
+    if (values.length - index >= 2) {
+      caption += ', ';
+    }
+  });
+  return caption;
+}
+
 export function getBitPayMerchantFromHost(host: string, merchants: Merchant[]): Merchant | undefined {
   const bareHost = host.replace(/^www\./, '');
   const hasDomainMatch = (domains: string[] = []): boolean =>

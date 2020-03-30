@@ -1,30 +1,6 @@
 import React from 'react';
 import './merchant-cell.scss';
-import { Merchant } from '../../../services/merchant';
-
-const currencySymbols: Record<string, string> = {
-  USD: '$',
-  GBP: '£',
-  EUR: '€',
-  JPY: '¥',
-  INR: '₹',
-  CAD: 'C$',
-  PHP: '₱',
-  BRL: 'R$'
-};
-
-function spreadAmounts(values: Array<number>, currencySymbol: string | undefined, currency: string): string {
-  let caption = '';
-  values.forEach((value: number, index: number) => {
-    caption = currencySymbol
-      ? caption + currencySymbol + value.toString()
-      : `${caption + value.toString()} ${currency}`;
-    if (values.length - index >= 2) {
-      caption += ', ';
-    }
-  });
-  return caption;
-}
+import { Merchant, currencySymbols, spreadAmounts } from '../../../services/merchant';
 
 const MerchantCell: React.FC<{ merchant: Merchant }> = ({ merchant }) => {
   const cardConfig = merchant.giftCards[0];
@@ -40,7 +16,18 @@ const MerchantCell: React.FC<{ merchant: Merchant }> = ({ merchant }) => {
             <>
               {cardConfig.minAmount && cardConfig.maxAmount && (
                 <>
-                  ${merchant.giftCards[0].minAmount} - ${merchant.giftCards[0].maxAmount}
+                  {currencySymbols[cardConfig.currency] ? (
+                    <>
+                      {currencySymbols[cardConfig.currency]}
+                      {merchant.giftCards[0].minAmount} - {currencySymbols[cardConfig.currency]}
+                      {merchant.giftCards[0].maxAmount}
+                    </>
+                  ) : (
+                    <>
+                      {merchant.giftCards[0].minAmount} {cardConfig.currency} - {merchant.giftCards[0].maxAmount}{' '}
+                      {cardConfig.currency}
+                    </>
+                  )}
                 </>
               )}
               {cardConfig.supportedAmounts && (
