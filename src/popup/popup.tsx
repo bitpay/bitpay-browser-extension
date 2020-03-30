@@ -9,12 +9,9 @@ import Shop from './pages/shop/shop';
 import './styles.scss';
 import Tabs from './components/tabs/tabs';
 import Navbar from './components/navbar/navbar';
-import { getMerchants, Merchant, getBitPayMerchantFromHost } from '../services/merchant';
-import { CardConfig } from '../services/gift-card.types';
+import { Merchant, getBitPayMerchantFromHost, fetchCachedMerchants } from '../services/merchant';
 import Amount from './pages/amount/amount';
 import Payment from './pages/payment/payment';
-import { get } from '../services/storage';
-import { getDirectIntegrations } from '../services/directory';
 
 console.log('parent', window.location);
 
@@ -26,9 +23,7 @@ const Popup: React.FC = () => {
 
   useEffect(() => {
     const getStartPage = async (): Promise<void> => {
-      const directIntegrations = await getDirectIntegrations();
-      const availableGiftCardBrands = await get<CardConfig[]>('availableGiftCards');
-      const allMerchants = getMerchants(directIntegrations, availableGiftCardBrands);
+      const allMerchants = await fetchCachedMerchants();
       const parent = new URLSearchParams(window.location.search).get('url') as string;
       const { host } = new URL(parent);
       const merchant = getBitPayMerchantFromHost(host, allMerchants);
