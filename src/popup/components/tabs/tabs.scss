@@ -1,10 +1,17 @@
 .tab-bar {
+  height: 50px;
+  flex-shrink: 0;
   display: flex;
   width: 100%;
-  justify-content: space-between;
   background-color: white;
-  padding: 14px 64px;
   border-top: 1px solid rgba(black, 0.05);
+  padding: 0 20px;
+
+  > a {
+    display: flex;
+    flex-grow: 1;
+    justify-content: center;
+  }
 
   .active {
     display: none;
