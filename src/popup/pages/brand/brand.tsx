@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './brand.scss';
 
 import { Link } from 'react-router-dom';
@@ -8,6 +8,14 @@ import { currencySymbols, spreadAmounts } from '../../../services/merchant';
 const Brand: React.FC<any> = ({ match: { params }, location }) => {
   const { merchant } = location.state;
   const cardConfig = merchant.giftCards[0];
+  if (!cardConfig.description) {
+    cardConfig.description = cardConfig.terms;
+    cardConfig.terms = null;
+  }
+  const [expandText, setExpandText] = useState(false);
+  function showText(): void {
+    setExpandText(true);
+  }
   return (
     <div className="brand-page">
       <div className="brand-page__header">
@@ -49,16 +57,34 @@ const Brand: React.FC<any> = ({ match: { params }, location }) => {
         </div>
       </div>
 
-      <div className="brand-page__body" style={{ marginBottom: '80px' }}>
+      <div className="brand-page__body">
         <div className="brand-page__body__divider" style={{ margin: '2px 8px 18px' }} />
         <div className="brand-page__body__content">
           <div className="brand-page__body__content__title">
             {merchant.hasDirectIntegration ? <>Payment Instructions</> : <>About</>}
           </div>
-          <div className="brand-page__body__content__text">
-            {merchant.hasDirectIntegration ? <>{merchant.instructions}</> : <>{cardConfig.terms}</>}
+          <div
+            className={`brand-page__body__content__text${expandText ? ' brand-page__body__content__text--expand' : ''}`}
+          >
+            {merchant.hasDirectIntegration ? <>{merchant.instructions}</> : <>{cardConfig.description}</>}
+            {!expandText && (
+              <button type="button" onClick={showText} className="brand-page__body__content__text--action">
+                more
+              </button>
+            )}
           </div>
         </div>
+        {expandText && cardConfig.terms && (
+          <>
+            <div className="brand-page__body__divider" style={{ margin: '-60px 8px 18px' }} />
+            <div className="brand-page__body__content">
+              <div className="brand-page__body__content__title">Terms & Conditions</div>
+              <div className="brand-page__body__content__text brand-page__body__content__text--expand">
+                {cardConfig.terms}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="action-button__footer">
