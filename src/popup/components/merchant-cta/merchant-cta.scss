@@ -1,0 +1,58 @@
+.merchant-cta {
+  box-shadow: 0 2px 5px 1px rgba(48, 49, 51, 0.1);
+  border-radius: 8px;
+  margin: 0 12px;
+  padding: 14px;
+
+  $max-caption-width: 192px;
+
+  &__content {
+    display: flex;
+    align-items: center;
+    margin-bottom: 13px;
+
+    > img {
+      border-radius: 50%;
+      height: 39px;
+      margin-right: 17px;
+      width: 39px;
+    }
+
+    &__text {
+      div {
+        max-width: $max-caption-width;
+      }
+    }
+
+    &__merchant {
+      font-size: 16px;
+      color: #434d5a;
+      font-weight: bold;
+    }
+
+    &__caption {
+      opacity: 0.75;
+      font-size: 13px;
+      color: #434d5a;
+    }
+
+    &__promo {
+      font-size: 13px;
+      color: #ff9902; //#30cfa4;
+      // color: #30cfa4;
+      font-weight: 500;
+    }
+  }
+  > a {
+    display: block;
+    text-align: center;
+    background: #4f6ef7;
+    width: 100%;
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    background: #4f6ef7;
+    border-radius: 6px;
+    padding: 8px 0;
+  }
+}
