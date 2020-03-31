@@ -17,7 +17,7 @@ const Brand: React.FC<any> = ({ match: { params }, location }) => {
     let website = link;
     const detectProtocolPresent = /^https?:\/\//i;
     if (!detectProtocolPresent.test(link)) {
-      website = `http://${link}`;
+      website = `https://${link}`;
     }
     browser.tabs.update({
       url: website
