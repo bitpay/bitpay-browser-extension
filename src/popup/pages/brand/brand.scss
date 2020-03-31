@@ -10,7 +10,8 @@
     padding: 16px 18px;
 
     &__icon {
-      width: 72px;
+      min-width: 72px;
+      max-width: 72px;
       border-radius: 50vh;
       margin-right: 20px;
     }
@@ -39,6 +40,7 @@
     &__divider {
       background-color: rgba(black, 0.05);
       height: 1px;
+      margin: 18px 8px;
     }
     &__content {
       margin: auto 12px;
@@ -76,7 +78,6 @@
           height: unset;
           overflow: visible;
           word-break: break-word;
-          margin-bottom: 80px;
         }
       }
     }

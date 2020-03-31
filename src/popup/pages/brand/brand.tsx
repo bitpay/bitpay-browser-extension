@@ -57,8 +57,8 @@ const Brand: React.FC<any> = ({ match: { params }, location }) => {
         </div>
       </div>
 
-      <div className="brand-page__body">
-        <div className="brand-page__body__divider" style={{ margin: '2px 8px 18px' }} />
+      <div className="brand-page__body" style={{ paddingBottom: '100px' }}>
+        <div className="brand-page__body__divider" style={{ marginTop: '2px' }} />
         <div className="brand-page__body__content">
           <div className="brand-page__body__content__title">
             {merchant.hasDirectIntegration ? <>Payment Instructions</> : <>About</>}
@@ -76,7 +76,7 @@ const Brand: React.FC<any> = ({ match: { params }, location }) => {
         </div>
         {expandText && cardConfig.terms && (
           <>
-            <div className="brand-page__body__divider" style={{ margin: '-60px 8px 18px' }} />
+            <div className="brand-page__body__divider" />
             <div className="brand-page__body__content">
               <div className="brand-page__body__content__title">Terms & Conditions</div>
               <div className="brand-page__body__content__text brand-page__body__content__text--expand">
