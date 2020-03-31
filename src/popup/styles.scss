@@ -5,6 +5,10 @@
 @import "../popup/components/tabs/tabs";
 @import "../popup/components/merchant-cta/merchant-cta";
 
+* {
+  font-family: "Heebo", sans-serif;
+}
+
 body {
   color: $black;
   background-color: white;
@@ -16,7 +20,6 @@ body,
   display: flex;
   flex-direction: column;
   height: 100%;
-  font-family: "Heebo", sans-serif;
   overflow: hidden;
 
   .header-bar + div {
