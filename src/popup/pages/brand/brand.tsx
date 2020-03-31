@@ -73,7 +73,7 @@ const Brand: React.FC<any> = ({ match: { params }, location }) => {
         </div>
       </div>
 
-      <div className="brand-page__body" style={{ paddingBottom: '100px' }}>
+      <div className="brand-page__body" style={{ paddingBottom: merchant.cta || cardConfig ? '96px' : 'auto' }}>
         <div className="brand-page__body__divider" style={{ marginTop: '2px' }} />
         <div className="brand-page__body__content">
           <div className="brand-page__body__content__title">
