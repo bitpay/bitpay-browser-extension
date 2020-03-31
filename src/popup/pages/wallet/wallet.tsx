@@ -24,11 +24,7 @@ const Wallet: React.FC<{ supportedMerchant?: Merchant }> = ({ supportedMerchant 
   }, []);
   return (
     <div className="wallet">
-      {supportedMerchant ? (
-        <>
-          <MerchantCta merchant={supportedMerchant} />
-        </>
-      ) : null}
+      <MerchantCta merchant={supportedMerchant} />
       <div className="wallet-codes">
         {activeGiftCards.length && supportedGiftCards.length ? (
           <WalletCards activeCards={activeGiftCards} supportedCards={supportedGiftCards} />

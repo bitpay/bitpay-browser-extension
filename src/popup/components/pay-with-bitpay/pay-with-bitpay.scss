@@ -1,0 +1,30 @@
+.pay-with-bitpay {
+  display: flex;
+  justify-content: center;
+  .awaiting-payment {
+    font-weight: 500;
+    height: 60px;
+    width: 270px;
+    margin-top: 0;
+    color: #4f6ef7;
+
+    > img {
+      animation: spin 1s linear infinite;
+      margin-right: 12px;
+      margin-top: -2px;
+    }
+  }
+  img {
+    display: block;
+    cursor: pointer;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotateZ(0);
+  }
+  100% {
+    transform: rotateZ(360deg);
+  }
+}

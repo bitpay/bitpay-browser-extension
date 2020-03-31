@@ -13,10 +13,12 @@ import { Merchant, getBitPayMerchantFromHost, fetchCachedMerchants } from '../se
 import Amount from './pages/amount/amount';
 import Payment from './pages/payment/payment';
 import { resizeFrameForPath } from '../services/frame';
+import { get } from '../services/storage';
 
 const Popup: React.FC = () => {
   const [initialEntries, setInitialEntries] = useState(['/shop']);
   const [loaded, setLoaded] = useState(false);
+  const [clientId, setClientId] = useState('' as string);
   const [merchants, setMerchants] = useState([] as Merchant[]);
   const [supportedMerchant, setSupportedMerchant] = useState(undefined as Merchant | undefined);
 
@@ -30,6 +32,7 @@ const Popup: React.FC = () => {
       setInitialEntries([initialPath || '/shop']);
       setMerchants(allMerchants);
       setSupportedMerchant(merchant);
+      setClientId(await get<string>('clientId'));
       setLoaded(true);
       resizeFrameForPath(initialPath);
     };
@@ -41,7 +44,7 @@ const Popup: React.FC = () => {
         <Router initialEntries={initialEntries}>
           <Navbar />
           <Switch>
-            <Route path="/amount/:brand" component={Amount} />
+            <Route path="/amount/:brand" render={(props): JSX.Element => <Amount clientId={clientId} {...props} />} />
             <Route path="/brand/:brand" component={Brand} />
             <Route path="/cards/:brand" component={Cards} />
             <Route path="/card/:id" component={Card} />

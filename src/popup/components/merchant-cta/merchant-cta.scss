@@ -5,6 +5,8 @@
   padding: 14px;
 
   $max-caption-width: 192px;
+  overflow: hidden;
+  flex-shrink: 0;
 
   &__content {
     display: flex;
@@ -16,12 +18,6 @@
       height: 39px;
       margin-right: 17px;
       width: 39px;
-    }
-
-    &__text {
-      div {
-        max-width: $max-caption-width;
-      }
     }
 
     &__merchant {
@@ -54,5 +50,34 @@
     background: #4f6ef7;
     border-radius: 6px;
     padding: 8px 0;
+
+    &.zero {
+      background: #eef1ff;
+      color: #4f6ef7;
+      font-size: 16px;
+      font-weight: 500;
+      margin-top: 15px;
+      padding: 10px 0;
+    }
+  }
+
+  &__zero {
+    &__hero {
+      margin: -14px;
+      margin-bottom: 0;
+      max-width: 100%;
+      max-width: calc(100% + 28px);
+    }
+    &__title {
+      font-size: 18px;
+      color: #303133;
+      font-weight: 600;
+      margin: 6px 0;
+    }
+    &__description {
+      font-size: 13px;
+      color: #434d5a;
+      margin: 6px 0;
+    }
   }
 }

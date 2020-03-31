@@ -1,6 +1,7 @@
 import React from 'react';
 import './merchant-cell.scss';
-import { Merchant, currencySymbols, spreadAmounts } from '../../../services/merchant';
+import { Merchant } from '../../../services/merchant';
+import CardDenoms from '../card-denoms/card-denoms';
 
 const MerchantCell: React.FC<{ merchant: Merchant }> = ({ merchant }) => {
   const cardConfig = merchant.giftCards[0];
@@ -10,37 +11,7 @@ const MerchantCell: React.FC<{ merchant: Merchant }> = ({ merchant }) => {
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <div className="MerchantCell__Title">{merchant.displayName}</div>
         <div className="MerchantCell__Caption">
-          {merchant.hasDirectIntegration ? (
-            <>{merchant.caption}</>
-          ) : (
-            <>
-              {cardConfig.minAmount && cardConfig.maxAmount && (
-                <>
-                  {currencySymbols[cardConfig.currency] ? (
-                    <>
-                      {currencySymbols[cardConfig.currency]}
-                      {merchant.giftCards[0].minAmount} - {currencySymbols[cardConfig.currency]}
-                      {merchant.giftCards[0].maxAmount}
-                    </>
-                  ) : (
-                    <>
-                      {merchant.giftCards[0].minAmount} {cardConfig.currency} - {merchant.giftCards[0].maxAmount}{' '}
-                      {cardConfig.currency}
-                    </>
-                  )}
-                </>
-              )}
-              {cardConfig.supportedAmounts && (
-                <>
-                  {spreadAmounts(
-                    cardConfig.supportedAmounts,
-                    currencySymbols[cardConfig.currency],
-                    cardConfig.currency
-                  )}
-                </>
-              )}
-            </>
-          )}
+          {merchant.hasDirectIntegration ? <>{merchant.caption}</> : <CardDenoms cardConfig={cardConfig} />}
         </div>
       </div>
     </div>

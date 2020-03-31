@@ -38,7 +38,7 @@
     width: calc(100% - 26px);
     border-top-left-radius: 11px;
     border-top-right-radius: 11px;
-    padding-right: 20px;
+    padding-right: 16px;
     height: 45px;
 
     .light & {
@@ -49,6 +49,7 @@
     > img {
       max-height: 47px;
       margin-top: -2px;
+      margin-left: 3px;
     }
 
     &__balance {

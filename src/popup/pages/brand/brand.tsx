@@ -88,7 +88,7 @@ const Brand: React.FC<any> = ({ match: { params }, location }) => {
       </div>
 
       <div className="action-button__footer">
-        <Link className="action-button" to={`/amount/${params.brand}`}>
+        <Link className="action-button" to={{ pathname: `/amount/${params.brand}`, state: { merchant } }}>
           Buy Credits
         </Link>
       </div>
