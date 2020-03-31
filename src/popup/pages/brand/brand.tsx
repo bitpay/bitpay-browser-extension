@@ -14,14 +14,28 @@ const Brand: React.FC<any> = ({ match: { params }, location }) => {
   }
   const [expandText, setExpandText] = useState(false);
   function navigatePage(link: string): void {
+    let website = link;
+    const detectProtocolPresent = /^https?:\/\//i;
+    if (!detectProtocolPresent.test(link)) {
+      website = `http://${link}`;
+    }
     browser.tabs.update({
-      url: link
+      url: website
     });
   }
   return (
     <div className="brand-page">
       <div className="brand-page__header">
-        <img className="brand-page__header__icon" alt={params.brand} src={merchant.icon} />
+        <div className="brand-page__header__icon--wrapper">
+          <img className="brand-page__header__icon" alt={params.brand} src={merchant.icon} />
+          <button
+            className="brand-page__header__icon--hover"
+            onClick={(): void => navigatePage(merchant.link)}
+            type="button"
+          >
+            <img alt="go to website" src="../assets/icons/link-icon.svg" />
+          </button>
+        </div>
         <div className="brand-page__header__block">
           <div className="brand-page__header__block__title">{merchant.displayName}</div>
           <div className="brand-page__header__block__caption">

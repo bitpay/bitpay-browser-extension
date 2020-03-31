@@ -14,6 +14,31 @@
       max-width: 72px;
       border-radius: 50vh;
       margin-right: 20px;
+
+      &--hover {
+        position: absolute;
+        top: 0;
+        left: 0;
+        min-width: 72px;
+        max-width: 72px;
+        height: 72px;
+        border-radius: 50vh;
+        background-color: rgba(#182026, 0.75);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 250ms ease-in-out;
+      }
+      &--wrapper {
+        position: relative;
+        &:hover {
+          .brand-page__header__icon--hover {
+            opacity: 1;
+          }
+        }
+      }
     }
 
     &__block {
