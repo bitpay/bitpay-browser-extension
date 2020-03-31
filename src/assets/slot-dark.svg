@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="308px" height="64px" viewBox="0 0 308 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 64 (93537) - https://sketch.com -->
+    <title>grey slot</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="13" width="299.9992" height="15"></rect>
+        <filter x="-2.3%" y="-60.0%" width="104.7%" height="193.3%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="-2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.100223995 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Main" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Wallet---No-Hit---No-Promo" transform="translate(-1366.000000, -260.000000)" fill-rule="nonzero">
+            <g id="app" transform="translate(1370.000000, 110.000000)">
+                <g id="wallet" transform="translate(0.000000, 74.000000)">
+                    <g id="Group-6" transform="translate(0.000000, 46.000000)">
+                        <g id="grey-slot" transform="translate(0.000000, 30.000000)">
+                            <g id="shadow">
+                                <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+                                <use fill="#FFFFFF" xlink:href="#path-1"></use>
+                            </g>
+                            <path d="M8,63.016 C3.581722,63.016 -1.8189894e-12,58.5388475 -1.8189894e-12,53.016 L-1.8189894e-12,23.016 C-1.8189894e-12,19.3341017 -1.8189894e-12,16.0007683 -1.8189894e-12,13.016 L105.3856,13.016 C118.0904,11.049 132.8856,0 150.0704,0 C167.9512,0 180.9368,11.688 195.7904,13.017 L300,13.016 C300,16.001435 300,19.3351017 300,23.017 L300,53.017 C300,58.5398475 296.418278,63.017 292,63.017 L8,63.016 Z" id="Path" fill="#FFFFFF"></path>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,51 +1,46 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { get } from '../../../services/storage';
-import { GiftCard } from '../../../services/gift-card.types';
-import { groupBy } from '../../../services/utils';
+import { GiftCard, CardConfig } from '../../../services/gift-card.types';
 import { Merchant } from '../../../services/merchant';
+import MerchantCta from '../../components/merchant-cta/merchant-cta';
+import WalletCards from '../../components/wallet-cards/wallet-cards';
+import './wallet.scss';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Wallet: React.FC<{ supportedMerchant?: Merchant }> = ({ supportedMerchant }) => {
-  const [activeGiftCardsByBrand, setActiveGiftCardsByBrand] = useState({} as { [brand: string]: GiftCard[] });
+  const [activeGiftCards, setActiveGiftCards] = useState([] as GiftCard[]);
+  const [supportedGiftCards, setSupportedGiftCards] = useState([] as CardConfig[]);
+
   useEffect(() => {
     const fetchActiveGiftCards = async (): Promise<void> => {
-      const purchasedGiftCards = (await get<GiftCard[]>('purchasedGiftCards')) || [];
-      const cardsByBrand = groupBy(purchasedGiftCards, 'name') as { [brand: string]: GiftCard[] };
-      setActiveGiftCardsByBrand(cardsByBrand);
+      const [purchasedCards, supportedCards] = await Promise.all<GiftCard[], CardConfig[]>([
+        get<GiftCard[]>('purchasedGiftCards'),
+        get<CardConfig[]>('availableGiftCards')
+      ]);
+      setActiveGiftCards((purchasedCards || []).filter(card => !card.archived));
+      setSupportedGiftCards(supportedCards);
     };
     fetchActiveGiftCards();
   }, []);
   return (
-    <div>
-      <div>Wallet</div>
+    <div className="wallet">
       {supportedMerchant ? (
-        <div>
-          Yay! You can pay {supportedMerchant.displayName} with BitPay!
-          <div>
-            <Link to={`/brand/${supportedMerchant.name}`}>Learn More</Link>
-          </div>
-        </div>
+        <>
+          <MerchantCta merchant={supportedMerchant} />
+        </>
       ) : null}
-      {Object.keys(activeGiftCardsByBrand).map(brand => {
-        const cards = activeGiftCardsByBrand[brand];
-        const pathname = cards.length > 1 ? `/cards/${brand}` : `/card/${cards[0].invoiceId}`;
-        return (
-          <Link
-            to={{
-              pathname,
-              state: {
-                ...(cards.length > 1 ? { cards } : { card: cards[0] })
-              }
-            }}
-            key={brand}
-          >
+      <div className="wallet-codes">
+        {activeGiftCards.length && supportedGiftCards.length ? (
+          <WalletCards activeCards={activeGiftCards} supportedCards={supportedGiftCards} />
+        ) : (
+          <div className="wallet-codes__zero-state">
             <div>
-              {brand} - ${cards.reduce((sum, giftCard) => giftCard.amount + sum, 0)}
+              <div className="wallet-codes__zero-state__title">No Codes Yet</div>
+              <div className="wallet-codes__zero-state__subtitle">Your purchased credits will show up here.</div>
             </div>
-          </Link>
-        );
-      })}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

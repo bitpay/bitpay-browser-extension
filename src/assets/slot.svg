@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="300" height="67" viewBox="0 0 300 67">
+  <defs>
+    <path id="white-flap-light-a" d="M8,69.0159051 C3.581722,69.0159051 0,64.1136799 0,58.0664787 L0,25.2181997 C0,21.1867322 0,17.5369234 0,14.2687733 L105.3856,14.2687733 C118.0904,12.1150212 132.8856,0.017 150.0704,0.017 C167.9512,0.017 180.9368,12.8146895 195.7904,14.2698683 L300,14.2687733 C300,17.5376534 300,21.1878272 300,25.2192946 L300,58.0675737 C300,64.1147748 296.418278,69.017 292,69.017 L8,69.0159051 Z"/>
+    <rect id="white-flap-light-d" width="299.999" height="15" x="0" y="19"/>
+    <filter id="white-flap-light-c" width="104.7%" height="193.3%" x="-2.3%" y="-60%" filterUnits="objectBoundingBox">
+      <feOffset dy="-2" in="SourceAlpha" result="shadowOffsetOuter1"/>
+      <feGaussianBlur in="shadowOffsetOuter1" result="shadowBlurOuter1" stdDeviation="2"/>
+      <feColorMatrix in="shadowBlurOuter1" values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.03 0"/>
+    </filter>
+    <path id="white-flap-light-f" d="M8,69.016 C3.581722,69.016 0,64.5388475 0,59.016 L0,29.016 C0,25.3341017 0,22.0007683 0,19.016 L105.3856,19.016 C118.0904,17.049 132.8856,6 150.0704,6 C167.9512,6 180.9368,17.688 195.7904,19.017 L300,19.016 C300,22.001435 300,25.3351017 300,29.017 L300,59.017 C300,64.5398475 296.418278,69.017 292,69.017 L8,69.016 Z"/>
+    <filter id="white-flap-light-e" width="102.3%" height="111.1%" x="-1.2%" y="-7.1%" filterUnits="objectBoundingBox">
+      <feOffset dy="-1" in="SourceAlpha" result="shadowOffsetOuter1"/>
+      <feGaussianBlur in="shadowOffsetOuter1" result="shadowBlurOuter1" stdDeviation="1"/>
+      <feColorMatrix in="shadowBlurOuter1" values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.05 0"/>
+    </filter>
+  </defs>
+  <g fill="none" fill-rule="evenodd" transform="translate(0 -3)">
+    <mask id="white-flap-light-b" fill="#fff">
+      <use xlink:href="#white-flap-light-a"/>
+    </mask>
+    <g fill-rule="nonzero" mask="url(#white-flap-light-b)">
+      <use fill="#000" filter="url(#white-flap-light-c)" xlink:href="#white-flap-light-d"/>
+      <use fill="#FFF" xlink:href="#white-flap-light-d"/>
+    </g>
+    <g fill-rule="nonzero" mask="url(#white-flap-light-b)">
+      <use fill="#000" filter="url(#white-flap-light-e)" xlink:href="#white-flap-light-f"/>
+      <use fill="#FFF" xlink:href="#white-flap-light-f"/>
+    </g>
+  </g>
+</svg>

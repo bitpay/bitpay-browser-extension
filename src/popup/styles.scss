@@ -3,6 +3,7 @@
 @import "../styles/variables";
 @import "../popup/components/navbar/navbar";
 @import "../popup/components/tabs/tabs";
+@import "../popup/components/merchant-cta/merchant-cta";
 
 body {
   color: $black;
@@ -20,7 +21,15 @@ body,
 
   .header-bar + div {
     flex-grow: 1;
+    overflow-x: hidden;
     overflow-y: auto;
+  }
+
+  .ellipsis {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
