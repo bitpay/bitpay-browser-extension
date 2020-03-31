@@ -1,0 +1,72 @@
+.wallet-cards {
+  $header-color: rgba(0, 0, 0, 0.2);
+  padding-bottom: 20px;
+  &__header {
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 500;
+    color: $header-color;
+    margin: 26px 0;
+    margin-left: 13px;
+
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-right: 20px;
+
+    &:after {
+      content: "";
+      border-top: 2px solid rgba(0, 0, 0, 0.05);
+      margin: 0 20px 0 0;
+      flex: 1 0 20px;
+      margin: 0 0 0 15px;
+    }
+  }
+}
+
+.wallet-card {
+  margin-bottom: 2px;
+  &__card {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    background: #221e20;
+    margin: 0 auto;
+    overflow: hidden;
+    width: calc(100% - 26px);
+    border-top-left-radius: 11px;
+    border-top-right-radius: 11px;
+    padding-right: 20px;
+    height: 45px;
+
+    .light & {
+      box-shadow: 0 1px 12px rgba(0, 0, 0, 0.07);
+    }
+
+    > img {
+      max-height: 47px;
+      margin-top: -2px;
+    }
+
+    &__balance {
+      flex-grow: 1;
+      text-align: right;
+      color: white;
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: -2px;
+
+      .light & {
+        color: black;
+      }
+    }
+  }
+  &__slot {
+    margin-left: -3px;
+    margin-top: -15px;
+    height: 30px;
+    overflow: hidden;
+  }
+}
