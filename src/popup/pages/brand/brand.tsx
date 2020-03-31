@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './brand.scss';
 import { browser } from 'webextension-polyfill-ts';
 import { Link } from 'react-router-dom';
-import { currencySymbols, spreadAmounts } from '../../../services/merchant';
+import { currencySymbols, spreadAmounts, formatDiscount } from '../../../services/merchant';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Brand: React.FC<any> = ({ match: { params }, location }) => {
@@ -58,18 +58,21 @@ const Brand: React.FC<any> = ({ match: { params }, location }) => {
                     )}
                   </>
                 )}
-                {cardConfig.supportedAmounts && (
-                  <>
-                    {spreadAmounts(
-                      cardConfig.supportedAmounts,
-                      currencySymbols[cardConfig.currency],
-                      cardConfig.currency
-                    )}
-                  </>
-                )}
+                {cardConfig.supportedAmounts && <>{spreadAmounts(cardConfig.supportedAmounts, cardConfig.currency)}</>}
               </>
             )}
           </div>
+          {merchant.discount && (
+            <div
+              className="brand-page__header__block__discount"
+              style={{ color: merchant.theme, borderColor: merchant.theme }}
+            >
+              <span style={{ transform: 'translateY(-0.5px)' }}>
+                {formatDiscount(merchant.discount, cardConfig ? cardConfig.currency : merchant.discount.currency)} Off
+                Every Purchase
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
