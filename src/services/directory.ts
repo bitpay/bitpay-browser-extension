@@ -9,6 +9,7 @@ export interface DirectIntegrationApiObject {
   discount?: {
     type: string;
     amount: number;
+    currency?: string;
   };
   theme: string;
   instructions: string;
