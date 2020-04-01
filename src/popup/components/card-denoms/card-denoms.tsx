@@ -19,9 +19,7 @@ const CardDenoms: React.FC<{ cardConfig: CardConfig }> = ({ cardConfig }) => (
         )}
       </>
     )}
-    {cardConfig.supportedAmounts && (
-      <>{spreadAmounts(cardConfig.supportedAmounts, currencySymbols[cardConfig.currency], cardConfig.currency)}</>
-    )}
+    {cardConfig.supportedAmounts && <>{spreadAmounts(cardConfig.supportedAmounts, cardConfig.currency)}</>}
   </>
 );
 

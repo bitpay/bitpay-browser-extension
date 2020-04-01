@@ -22,7 +22,8 @@ export const currencySymbols: Record<string, string> = {
   BRL: 'R$'
 };
 
-export function spreadAmounts(values: Array<number>, currencySymbol: string | undefined, currency: string): string {
+export function spreadAmounts(values: Array<number>, currency: string): string {
+  const currencySymbol = currencySymbols[currency];
   let caption = '';
   values.forEach((value: number, index: number) => {
     caption = currencySymbol
@@ -33,6 +34,21 @@ export function spreadAmounts(values: Array<number>, currencySymbol: string | un
     }
   });
   return caption;
+}
+
+export function formatDiscount(
+  discount: { type: string; amount: number; currency?: string },
+  currency?: string
+): string {
+  if (discount.type === 'percentage') {
+    return `${discount.amount.toString()}%`;
+  }
+  if (discount.type === 'flatrate' && currency) {
+    return currencySymbols[currency]
+      ? `${currencySymbols[currency]}${discount.amount.toString()}`
+      : `${discount.amount.toString()} ${currency}`;
+  }
+  return discount.amount.toString();
 }
 
 export function getBitPayMerchantFromHost(host: string, merchants: Merchant[]): Merchant | undefined {

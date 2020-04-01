@@ -14,10 +14,36 @@
       max-width: 72px;
       border-radius: 50vh;
       margin-right: 20px;
+
+      &--hover {
+        position: absolute;
+        top: 0;
+        left: 0;
+        min-width: 72px;
+        max-width: 72px;
+        height: 72px;
+        border-radius: 50vh;
+        background-color: rgba(#182026, 0.75);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 250ms ease-in-out;
+      }
+      &--wrapper {
+        position: relative;
+        &:hover {
+          .brand-page__header__icon--hover {
+            opacity: 1;
+          }
+        }
+      }
     }
 
     &__block {
       display: flex;
+      align-items: flex-start;
       flex-direction: column;
       margin-top: 6px;
 
@@ -31,6 +57,22 @@
         font-weight: 400;
         font-size: 13px;
         color: rgba(#434d5a, 0.75);
+        padding-right: 4px;
+      }
+
+      &__discount {
+        background: #ffffff;
+        border-radius: 25vh;
+        padding: 3px 12px;
+        font-weight: 500;
+        font-size: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 14px;
+        transform: translateX(-4px);
+        color: #4f6ef7;
+        border: 1.5px solid #4f6ef7;
       }
     }
   }
