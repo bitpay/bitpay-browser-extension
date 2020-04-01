@@ -30,7 +30,7 @@ const MerchantCta: React.FC<{ merchant?: Merchant }> = ({ merchant }) => {
               )}
             </div>
           </div>
-          <Link to={{ pathname: ctaPath, state: { merchant } }}>
+          <Link to={{ pathname: ctaPath, state: { merchant, cardConfig: merchant.giftCards[0] } }}>
             {merchant.hasDirectIntegration ? <>Learn More</> : <>Buy Now</>}
           </Link>
         </div>

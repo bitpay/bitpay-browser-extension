@@ -2,17 +2,15 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Merchant } from '../../../services/merchant';
 import './amount.scss';
 import CardDenoms from '../../components/card-denoms/card-denoms';
 import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
-import { GiftCardInvoiceParams } from '../../../services/gift-card.types';
+import { GiftCardInvoiceParams, CardConfig } from '../../../services/gift-card.types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Amount: React.FC<any> = ({ location, clientId, history }) => {
   console.log('clientId', clientId);
-  const merchant = location.state.merchant as Merchant;
-  const cardConfig = merchant.giftCards[0];
+  const { cardConfig } = location.state as { cardConfig: CardConfig };
   const hasFixedDenoms = cardConfig.supportedAmounts && cardConfig.supportedAmounts[0];
   const initialAmount =
     cardConfig.supportedAmounts && cardConfig.supportedAmounts[0] ? cardConfig.supportedAmounts[0] : 0;
@@ -52,7 +50,7 @@ const Amount: React.FC<any> = ({ location, clientId, history }) => {
   return (
     <div className="amount-page">
       <div className="amount-page__title">
-        <div className="amount-page__merchant-name">{merchant.displayName}</div>
+        <div className="amount-page__merchant-name">{cardConfig.displayName}</div>
         {hasDiscount ? <div className="amount-page__promo">3% Off Each Purchase</div> : null}
       </div>
       <div className="amount-page__amount-box__wrapper">
@@ -73,7 +71,7 @@ const Amount: React.FC<any> = ({ location, clientId, history }) => {
           <Link
             className="action-button"
             to={{
-              pathname: `/payment/${merchant.name}`,
+              pathname: `/payment/${cardConfig.name}`,
               state: {
                 amount: 1,
                 currency: 'USD'

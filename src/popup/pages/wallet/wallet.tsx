@@ -5,6 +5,7 @@ import { Merchant } from '../../../services/merchant';
 import MerchantCta from '../../components/merchant-cta/merchant-cta';
 import WalletCards from '../../components/wallet-cards/wallet-cards';
 import './wallet.scss';
+import { sortByDescendingDate } from '../../../services/gift-card';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Wallet: React.FC<{ supportedMerchant?: Merchant }> = ({ supportedMerchant }) => {
@@ -17,7 +18,7 @@ const Wallet: React.FC<{ supportedMerchant?: Merchant }> = ({ supportedMerchant 
         get<GiftCard[]>('purchasedGiftCards'),
         get<CardConfig[]>('availableGiftCards')
       ]);
-      setActiveGiftCards((purchasedCards || []).filter(card => !card.archived));
+      setActiveGiftCards((purchasedCards || []).filter(card => !card.archived).sort(sortByDescendingDate));
       setSupportedGiftCards(supportedCards);
     };
     fetchActiveGiftCards();

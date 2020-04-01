@@ -22,12 +22,13 @@ const WalletCards: React.FC<{ activeCards: GiftCard[]; supportedCards: CardConfi
             to={{
               pathname,
               state: {
+                cardConfig,
                 ...(cards.length > 1 ? { cards } : { card: cards[0] })
               }
             }}
             key={brand}
           >
-            <WalletCard cards={cards} cardConfig={cardConfig} />
+            <WalletCard type="pocket" cards={cards} cardConfig={cardConfig} />
           </Link>
         );
       })}

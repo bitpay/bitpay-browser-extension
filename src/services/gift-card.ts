@@ -118,3 +118,7 @@ export async function redeemGiftCard(data: Partial<GiftCard>): Promise<GiftCard>
 export function fetchAvailableCards(): Promise<CardConfig[]> {
   return fetchAvailableCardMap().then(availableCardMap => getCardConfigFromApiConfigMap(availableCardMap));
 }
+
+export function sortByDescendingDate(a: GiftCard, b: GiftCard): 1 | -1 {
+  return a.date < b.date ? 1 : -1;
+}

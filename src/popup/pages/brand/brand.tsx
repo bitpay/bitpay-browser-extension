@@ -117,7 +117,7 @@ const Brand: React.FC<any> = ({ match: { params }, location }) => {
               {merchant.cta.displayText}
             </button>
           ) : (
-            <Link className="action-button" to={{ pathname: `/amount/${params.brand}`, state: { merchant } }}>
+            <Link className="action-button" to={{ pathname: `/amount/${params.brand}`, state: { cardConfig } }}>
               Buy Credits
             </Link>
           )}
