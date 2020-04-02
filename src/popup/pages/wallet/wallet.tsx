@@ -30,11 +30,9 @@ const Wallet: React.FC<{ supportedMerchant?: Merchant }> = ({ supportedMerchant 
         {activeGiftCards.length && supportedGiftCards.length ? (
           <WalletCards activeCards={activeGiftCards} supportedCards={supportedGiftCards} />
         ) : (
-          <div className="wallet-codes__zero-state">
-            <div>
-              <div className="wallet-codes__zero-state__title">No Codes Yet</div>
-              <div className="wallet-codes__zero-state__subtitle">Your purchased credits will show up here.</div>
-            </div>
+          <div className="zero-state" style={{ height: '100%' }}>
+            <div className="zero-state__title">No Codes Yet</div>
+            <div className="zero-state__subtitle">Your purchased credits will show up here</div>
           </div>
         )}
       </div>
