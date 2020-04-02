@@ -19,48 +19,50 @@ const Shop: React.FC<{ merchants: Merchant[] }> = ({ merchants }) => {
   return (
     <div className="shop-page">
       <SearchBar output={setSearchVal} value={searchVal} />
-      {!searchVal && (
-        <>
-          <div className="shop-page__section-header">Popular Brands</div>
-          {featuredMerchants.map(merchant => (
-            <Link
-              to={{
-                pathname: `/brand/${merchant.name}`,
-                state: { merchant }
-              }}
-              key={merchant.name}
-              onClick={(): void => resizeFrame(FrameDimensions.height)}
-            >
-              <MerchantCell key={merchant.name} merchant={merchant} />
-            </Link>
-          ))}
-          <div className="shop-page__divider" />
-        </>
-      )}
-      {filteredMerchants.length > 0 ? (
-        <>
-          <div className="shop-page__section-header">
-            {searchVal ? <>Search Results</> : <>Shop {merchants?.length} Brands</>}
+      <div className="shop-page__content">
+        {!searchVal && (
+          <>
+            <div className="shop-page__section-header">Popular Brands</div>
+            {featuredMerchants.map(merchant => (
+              <Link
+                to={{
+                  pathname: `/brand/${merchant.name}`,
+                  state: { merchant }
+                }}
+                key={merchant.name}
+                onClick={(): void => resizeFrame(FrameDimensions.height)}
+              >
+                <MerchantCell key={merchant.name} merchant={merchant} />
+              </Link>
+            ))}
+            <div className="shop-page__divider" />
+          </>
+        )}
+        {filteredMerchants.length > 0 ? (
+          <>
+            <div className="shop-page__section-header">
+              {searchVal ? <>Search Results</> : <>Shop {merchants?.length} Brands</>}
+            </div>
+            {filteredMerchants.map(merchant => (
+              <Link
+                to={{
+                  pathname: `/brand/${merchant.name}`,
+                  state: { merchant }
+                }}
+                key={merchant.name}
+                onClick={(): void => resizeFrame(FrameDimensions.height)}
+              >
+                <MerchantCell key={merchant.name} merchant={merchant} />
+              </Link>
+            ))}
+          </>
+        ) : (
+          <div className="zero-state" style={{ height: '75%' }}>
+            <div className="zero-state__title">No Results</div>
+            <div className="zero-state__subtitle">Please try searching something else</div>
           </div>
-          {filteredMerchants.map(merchant => (
-            <Link
-              to={{
-                pathname: `/brand/${merchant.name}`,
-                state: { merchant }
-              }}
-              key={merchant.name}
-              onClick={(): void => resizeFrame(FrameDimensions.height)}
-            >
-              <MerchantCell key={merchant.name} merchant={merchant} />
-            </Link>
-          ))}
-        </>
-      ) : (
-        <div className="zero-state" style={{ height: '75%' }}>
-          <div className="zero-state__title">No Results</div>
-          <div className="zero-state__subtitle">Please try searching something else</div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
