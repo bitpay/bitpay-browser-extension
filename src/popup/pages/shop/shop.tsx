@@ -58,7 +58,7 @@ const Shop: React.FC<{ merchants: Merchant[] }> = ({ merchants }) => {
       ) : (
         <div className="zero-state" style={{ height: '75%' }}>
           <div className="zero-state__title">No Results</div>
-          <div className="zero-state__subtitle">Please trying searching something else</div>
+          <div className="zero-state__subtitle">Please try searching something else</div>
         </div>
       )}
     </div>
