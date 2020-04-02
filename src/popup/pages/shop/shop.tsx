@@ -10,14 +10,12 @@ import { resizeFrame, FrameDimensions } from '../../../services/frame';
 const Shop: React.FC<{ merchants: Merchant[] }> = ({ merchants }) => {
   const [searchVal, setSearchVal] = useState('' as string);
   const featuredMerchants = merchants.filter(merchant => merchant.featured);
-  function filteredMerchants(): Merchant[] {
-    return merchants.filter(merchant =>
-      searchVal
-        ? merchant.name.toLowerCase().includes(searchVal.toLowerCase()) ||
-          merchant.tags.find(category => category.includes(searchVal.toLowerCase()))
-        : !merchant.featured
-    );
-  }
+  const filteredMerchants = merchants.filter(merchant =>
+    searchVal
+      ? merchant.name.toLowerCase().includes(searchVal.toLowerCase()) ||
+        merchant.tags.find(category => category.includes(searchVal.toLowerCase()))
+      : !merchant.featured
+  );
   return (
     <div className="shop-page">
       <SearchBar output={setSearchVal} />
@@ -39,12 +37,12 @@ const Shop: React.FC<{ merchants: Merchant[] }> = ({ merchants }) => {
           <div className="shop-page__divider" />
         </>
       )}
-      {filteredMerchants().length > 0 ? (
+      {filteredMerchants.length > 0 ? (
         <>
           <div className="shop-page__section-header">
             {searchVal ? <>Search Results</> : <>Shop {merchants?.length} Brands</>}
           </div>
-          {filteredMerchants().map(merchant => (
+          {filteredMerchants.map(merchant => (
             <Link
               to={{
                 pathname: `/brand/${merchant.name}`,
