@@ -18,7 +18,7 @@ const Shop: React.FC<{ merchants: Merchant[] }> = ({ merchants }) => {
   );
   return (
     <div className="shop-page">
-      <SearchBar output={setSearchVal} />
+      <SearchBar output={setSearchVal} value={searchVal} />
       {!searchVal && (
         <>
           <div className="shop-page__section-header">Popular Brands</div>
