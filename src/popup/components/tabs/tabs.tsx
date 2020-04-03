@@ -1,9 +1,7 @@
 import React from 'react';
-import { NavLink, withRouter } from 'react-router-dom';
-import { resizeFrameForPath } from '../../../services/frame';
+import { NavLink, withRouter, RouteComponentProps } from 'react-router-dom';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Tabs: React.FC<any> = ({ location: { pathname } }) => {
+const Tabs: React.FC<RouteComponentProps> = ({ location: { pathname } }) => {
   const routesVisible = ['/wallet', '/shop', '/settings'];
   const shouldShow = routesVisible.includes(pathname);
 
@@ -13,7 +11,7 @@ const Tabs: React.FC<any> = ({ location: { pathname } }) => {
         <img className="inactive" alt="wallet" src="../assets/icons/wallet-icon.svg" />
         <img className="active" alt="wallet" src="../assets/icons/wallet-icon--active.svg" />
       </NavLink>
-      <NavLink to="/shop" activeClassName="is-active" onClick={(): void => resizeFrameForPath('/shop')}>
+      <NavLink to="/shop" activeClassName="is-active">
         <img className="inactive" alt="shop" src="../assets/icons/shop-icon.svg" />
         <img className="active" alt="shop" src="../assets/icons/shop-icon--active.svg" />
       </NavLink>

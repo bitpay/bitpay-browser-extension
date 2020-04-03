@@ -1,28 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { get } from '../../../services/storage';
+import React, { useRef, useEffect } from 'react';
+import './wallet.scss';
 import { GiftCard, CardConfig } from '../../../services/gift-card.types';
 import { Merchant } from '../../../services/merchant';
 import MerchantCta from '../../components/merchant-cta/merchant-cta';
 import WalletCards from '../../components/wallet-cards/wallet-cards';
-import './wallet.scss';
 import { sortByDescendingDate } from '../../../services/gift-card';
+import { resizeToFitPage } from '../../../services/frame';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Wallet: React.FC<{ supportedMerchant?: Merchant }> = ({ supportedMerchant }) => {
-  const [activeGiftCards, setActiveGiftCards] = useState([] as GiftCard[]);
-  const [supportedGiftCards, setSupportedGiftCards] = useState([] as CardConfig[]);
-
+const Wallet: React.FC<{
+  supportedMerchant?: Merchant;
+  supportedGiftCards: CardConfig[];
+  purchasedGiftCards: GiftCard[];
+}> = ({ supportedMerchant, supportedGiftCards, purchasedGiftCards }) => {
+  const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const fetchActiveGiftCards = async (): Promise<void> => {
-      const [purchasedCards, supportedCards] = await Promise.all<GiftCard[], CardConfig[]>([
-        get<GiftCard[]>('purchasedGiftCards'),
-        get<CardConfig[]>('availableGiftCards')
-      ]);
-      setActiveGiftCards((purchasedCards || []).filter(card => !card.archived).sort(sortByDescendingDate));
-      setSupportedGiftCards(supportedCards);
-    };
-    fetchActiveGiftCards();
-  }, []);
+    resizeToFitPage(ref, 70);
+  }, [ref]);
+  const activeGiftCards = purchasedGiftCards.filter(card => !card.archived).sort(sortByDescendingDate);
   return (
     <div className="wallet">
       <MerchantCta merchant={supportedMerchant} slimCTA />

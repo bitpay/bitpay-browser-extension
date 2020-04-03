@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="13px" height="3px" viewBox="0 0 13 3" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 64 (93537) - https://sketch.com -->
+    <title>3 dots</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Main" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.496651786">
+        <g id="Wallet---Scope-into-Brand---Scope-Card---Menu" transform="translate(-1641.000000, -174.000000)" fill="#303133">
+            <g id="app" transform="translate(1370.000000, 110.000000)">
+                <g id="3-dots" transform="translate(277.500000, 65.500000) rotate(90.000000) translate(-277.500000, -65.500000) translate(276.000000, 59.000000)">
+                    <circle id="Oval" cx="1.5" cy="1.5" r="1.5"></circle>
+                    <circle id="Oval" cx="1.5" cy="6.5" r="1.5"></circle>
+                    <circle id="Oval" cx="1.5" cy="11.5" r="1.5"></circle>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -8,7 +8,7 @@ import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
 import { GiftCardInvoiceParams, CardConfig } from '../../../services/gift-card.types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Amount: React.FC<any> = ({ location, clientId, history }) => {
+const Amount: React.FC<any> = ({ location, clientId, history, updatePurchasedGiftCards }) => {
   console.log('clientId', clientId);
   const { cardConfig } = location.state as { cardConfig: CardConfig };
   const hasFixedDenoms = cardConfig.supportedAmounts && cardConfig.supportedAmounts[0];
@@ -46,7 +46,8 @@ const Amount: React.FC<any> = ({ location, clientId, history }) => {
     const newAmount = newValue > maxAmount ? maxAmount : newValue < minAmount ? minAmount : newValue;
     setAmount(parseFloat(newAmount.toFixed(2)));
   };
-  const changeAmount = (delta: number) => (hasFixedDenoms ? changeFixedAmount(delta) : changeVariableAmount(delta));
+  const changeAmount = (delta: number): void =>
+    hasFixedDenoms ? changeFixedAmount(delta) : changeVariableAmount(delta);
   return (
     <div className="amount-page">
       <div className="amount-page__title">
@@ -57,7 +58,7 @@ const Amount: React.FC<any> = ({ location, clientId, history }) => {
         <div className="amount-page__amount-box">
           <div className="amount-page__amount-box__currency">USD</div>
           <div className="amount-page__amount-box__amount">
-            <img src="../../assets/icons/decrement-icon.svg" alt="minus" onClick={() => changeAmount(-0.01)} />
+            <img src="../../assets/icons/decrement-icon.svg" alt="minus" onClick={(): void => changeAmount(-0.01)} />
             <div
               className="amount-page__amount-box__amount__value"
               style={{
@@ -66,7 +67,7 @@ const Amount: React.FC<any> = ({ location, clientId, history }) => {
             >
               {amount}
             </div>
-            <img src="../../assets/icons/increment-icon.svg" alt="minus" onClick={() => changeAmount(0.01)} />
+            <img src="../../assets/icons/increment-icon.svg" alt="minus" onClick={(): void => changeAmount(0.01)} />
           </div>
           <div className="amount-page__amount-box__denoms">
             <CardDenoms cardConfig={cardConfig} />
@@ -88,7 +89,12 @@ const Amount: React.FC<any> = ({ location, clientId, history }) => {
             Continue
           </Link>
         ) : (
-          <PayWithBitpay invoiceParams={{ ...invoiceParams, amount }} history={history} />
+          <PayWithBitpay
+            invoiceParams={{ ...invoiceParams, amount }}
+            cardConfig={cardConfig}
+            history={history}
+            updatePurchasedGiftCards={updatePurchasedGiftCards}
+          />
         )}
       </div>
     </div>

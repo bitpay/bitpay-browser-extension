@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './shop.scss';
 
 import { Link } from 'react-router-dom';
 import SearchBar from '../../components/search-bar/search-bar';
 import MerchantCell from '../../components/merchant-cell/merchant-cell';
 import { Merchant } from '../../../services/merchant';
-import { resizeFrame, FrameDimensions } from '../../../services/frame';
+import { resizeToFitPage } from '../../../services/frame';
 
 const Shop: React.FC<{ merchants: Merchant[] }> = ({ merchants }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    resizeToFitPage(ref);
+  }, [ref]);
+
   const [searchVal, setSearchVal] = useState('' as string);
   const featuredMerchants = merchants.filter(merchant => merchant.featured);
   const filteredMerchants = merchants.filter(merchant =>
@@ -16,8 +21,9 @@ const Shop: React.FC<{ merchants: Merchant[] }> = ({ merchants }) => {
         merchant.tags.find(category => category.includes(searchVal.toLowerCase()))
       : !merchant.featured
   );
+
   return (
-    <div className="shop-page">
+    <div className="shop-page" ref={ref}>
       <SearchBar output={setSearchVal} value={searchVal} />
       <div className="shop-page__content">
         {!searchVal && (

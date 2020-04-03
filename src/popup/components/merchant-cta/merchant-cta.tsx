@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Merchant } from '../../../services/merchant';
 import CardDenoms from '../card-denoms/card-denoms';
 import SuperToast from '../super-toast/super-toast';
-import { resizeFrameForPath } from '../../../services/frame';
 
 const MerchantCta: React.FC<{ merchant?: Merchant; slimCTA: boolean }> = ({ merchant, slimCTA }) => {
   const ctaPath = merchant && (merchant.hasDirectIntegration ? `/brand/${merchant.name}` : `/amount/${merchant.name}`);
@@ -39,7 +38,7 @@ const MerchantCta: React.FC<{ merchant?: Merchant; slimCTA: boolean }> = ({ merc
         <>
           {slimCTA ? (
             <>
-              <Link to={{ pathname: '/shop' }} onClick={(): void => resizeFrameForPath('/shop')}>
+              <Link to={{ pathname: '/shop' }}>
                 <SuperToast
                   title="Spend Crypto Instantly"
                   caption="Purchase store credit at more than a 100+ major retailers"
@@ -54,7 +53,7 @@ const MerchantCta: React.FC<{ merchant?: Merchant; slimCTA: boolean }> = ({ merc
               <div className="merchant-cta__zero__description">
                 Purchase store credit with BTC, BCH, ETH and more at 100+ major retailers.
               </div>
-              <Link className="zero" to={{ pathname: '/shop' }} onClick={(): void => resizeFrameForPath('/shop')}>
+              <Link className="zero" to={{ pathname: '/shop' }}>
                 View All Brands
               </Link>
             </div>

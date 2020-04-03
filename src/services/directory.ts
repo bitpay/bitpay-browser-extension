@@ -1,6 +1,10 @@
 export interface DirectIntegrationApiObject {
   displayName: string;
   caption: string;
+  cta?: {
+    displayText: string;
+    link: string;
+  };
   icon: string;
   link: string;
   displayLink: string;
