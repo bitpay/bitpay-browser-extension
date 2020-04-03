@@ -14,8 +14,8 @@ function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string
   `;
   const outerFrameStyles = `
     ${innerFrameStyles}
-    width: ${FrameDimensions.width};
-    height: ${FrameDimensions.height}; 
+    width: ${FrameDimensions.width}px;
+    height: ${FrameDimensions.height}px; 
     position: fixed;
     top: 10px;
     right: 10px;
@@ -55,8 +55,8 @@ function addIframe(frame: HTMLIFrameElement): void {
   document.body.appendChild(frame);
 }
 
-function resizeIframe(frame: HTMLIFrameElement, height: string = FrameDimensions.height): void {
-  frame.style.height = height;
+function resizeIframe(frame: HTMLIFrameElement, height: number = FrameDimensions.height): void {
+  frame.style.height = `${height}px`;
 }
 
 browser.runtime.onMessage.addListener(message => {

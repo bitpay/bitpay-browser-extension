@@ -3,23 +3,28 @@ import { Link } from 'react-router-dom';
 import { GiftCard, CardConfig } from '../../../services/gift-card.types';
 import './cards.scss';
 import WalletCard from '../../components/wallet-cards/wallet-card';
+import { sortByDescendingDate } from '../../../services/gift-card';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Cards: React.FC<any> = ({ location }) => {
-  const { cards, cardConfig } = location.state as { cards: GiftCard[]; cardConfig: CardConfig };
+const Cards: React.FC<any> = ({ location, purchasedGiftCards }) => {
+  const { cardConfig } = location.state as { cards: GiftCard[]; cardConfig: CardConfig };
+  const cards = (purchasedGiftCards as GiftCard[])
+    .filter(card => card.name === cardConfig.name && !card.archived)
+    .sort(sortByDescendingDate);
   return (
     <>
       <div className="cards-page">
         <WalletCard type="brand-box" cards={cards} cardConfig={cardConfig} />
-        {cards.map(card => (
+        {cards.map((card, index) => (
           <Link
             to={{
               pathname: `/card/${card.invoiceId}`,
               state: {
-                card
+                card,
+                cardConfig
               }
             }}
-            key={card.invoiceId}
+            key={index}
           >
             <WalletCard type="card-box" cards={[card]} cardConfig={cardConfig} />
           </Link>

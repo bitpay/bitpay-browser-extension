@@ -6,7 +6,8 @@ import {
   GiftCardActivationFee,
   ApiCard,
   GiftCardInvoiceParams,
-  GiftCardOrder
+  GiftCardOrder,
+  Invoice
 } from './gift-card.types';
 import { post } from './utils';
 
@@ -113,6 +114,11 @@ export async function redeemGiftCard(data: Partial<GiftCard>): Promise<GiftCard>
       return { ...data, status: 'PENDING' };
     });
   return giftCard as GiftCard;
+}
+
+export async function getBitPayInvoice(id: string): Promise<Invoice> {
+  const { data } = await fetch(`${process.env.API_ORIGIN}/invoices/${id}`).then(res => res.json());
+  return data;
 }
 
 export function fetchAvailableCards(): Promise<CardConfig[]> {

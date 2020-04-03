@@ -1,25 +1,32 @@
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import React, { useState } from 'react';
+import { RouteComponentProps } from 'react-router-dom';
 import { browser } from 'webextension-polyfill-ts';
-import { GiftCard } from '../../../services/gift-card.types';
+import { GiftCard, CardConfig, GiftCardInvoiceParams } from '../../../services/gift-card.types';
 import './pay-with-bitpay.scss';
 import { get, set } from '../../../services/storage';
-import { createBitPayInvoice, redeemGiftCard } from '../../../services/gift-card';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const PayWithBitpay: React.FC<any> = ({ invoiceParams, history }) => {
+import { createBitPayInvoice, redeemGiftCard, getBitPayInvoice } from '../../../services/gift-card';
+
+const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
+  cardConfig: CardConfig;
+  invoiceParams: GiftCardInvoiceParams;
+  updatePurchasedGiftCards: (cards: GiftCard[]) => void;
+}> = ({ cardConfig, invoiceParams, history, updatePurchasedGiftCards }) => {
   const [awaitingPayment, setAwaitingPayment] = useState(false);
   const { amount, currency } = invoiceParams;
   console.log('invoiceParams', invoiceParams);
   const saveGiftCard = async (card: GiftCard): Promise<void> => {
     const purchasedGiftCards = (await get<GiftCard[]>('purchasedGiftCards')) || [];
-    await set<GiftCard[]>('purchasedGiftCards', [...purchasedGiftCards, card]);
+    const newPurchasedGiftCards = [...purchasedGiftCards, card];
+    updatePurchasedGiftCards(newPurchasedGiftCards);
+    await set<GiftCard[]>('purchasedGiftCards', newPurchasedGiftCards);
   };
   const showCard = (card: GiftCard): void => {
+    if (!history) return;
     history.goBack();
     history.goBack();
     // history.goBack();
     history.push(`/wallet`);
-    history.push({ pathname: `/card/${card.invoiceId}`, state: { card } });
+    history.push({ pathname: `/card/${card.invoiceId}`, state: { card, cardConfig } });
   };
   const launchInvoice = async (): Promise<void> => {
     setAwaitingPayment(true);
@@ -32,18 +39,26 @@ const PayWithBitpay: React.FC<any> = ({ invoiceParams, history }) => {
       setAwaitingPayment(false);
       return;
     }
-    const giftCard = await redeemGiftCard({
-      currency,
-      date: new Date().toISOString(),
-      amount,
-      clientId: invoiceParams.clientId,
-      accessKey,
-      invoiceId,
-      name: invoiceParams.brand,
-      totalDiscount
-    });
-    await saveGiftCard(giftCard);
-    showCard(giftCard);
+    const [invoice, giftCard] = await Promise.all([
+      getBitPayInvoice(invoiceId),
+      redeemGiftCard({
+        currency,
+        date: new Date().toISOString(),
+        amount,
+        clientId: invoiceParams.clientId,
+        accessKey,
+        invoiceId,
+        name: invoiceParams.brand,
+        totalDiscount
+      })
+    ]);
+    console.log('invoice', invoice);
+    const finalGiftCard = {
+      ...giftCard,
+      invoice
+    } as GiftCard;
+    await saveGiftCard(finalGiftCard);
+    showCard(finalGiftCard);
   };
   return (
     <>
@@ -55,9 +70,9 @@ const PayWithBitpay: React.FC<any> = ({ invoiceParams, history }) => {
             </div>
           </>
         ) : (
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-          // eslint-disable-next-line jsx-a11y/click-events-have-key-events
-          <img src="../../assets/pay-with-bitpay.svg" alt="Pay with BitPay" onClick={launchInvoice} />
+          <button type="button" onClick={launchInvoice}>
+            <img src="../../assets/pay-with-bitpay.svg" alt="Pay with BitPay" />
+          </button>
         )}
       </div>
     </>

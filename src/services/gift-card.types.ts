@@ -64,12 +64,14 @@ export interface GiftCard {
   date: string;
   displayName: string;
   invoiceId: string;
-  invoiceTime?: number;
   name: string;
   pin?: string;
   status: string;
   clientId: string;
   totalDiscount?: number;
+  discounts?: GiftCardDiscount[];
+  balanceHistory?: [{ date: string; amount: number }];
+  invoice: Invoice;
 }
 
 export type GiftCardSaveParams = Partial<{
@@ -116,4 +118,12 @@ export interface AvailableCardMap {
 
 export interface CardConfigMap {
   [cardName: string]: CardConfig;
+}
+
+export interface Invoice {
+  paymentTotals: { [currency: string]: number };
+  paymentDisplayTotals: { [currency: string]: string };
+  amountPaid: number;
+  displayAmountPaid: string;
+  transactionCurrency: string;
 }
