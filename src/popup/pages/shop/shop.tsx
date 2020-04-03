@@ -36,7 +36,6 @@ const Shop: React.FC<{ merchants: Merchant[] }> = ({ merchants }) => {
                   state: { merchant }
                 }}
                 key={merchant.name}
-                onClick={(): void => resizeFrame(FrameDimensions.height)}
               >
                 <MerchantCell key={merchant.name} merchant={merchant} />
               </Link>
@@ -56,7 +55,6 @@ const Shop: React.FC<{ merchants: Merchant[] }> = ({ merchants }) => {
                   state: { merchant }
                 }}
                 key={merchant.name}
-                onClick={(): void => resizeFrame(FrameDimensions.height)}
               >
                 <MerchantCell key={merchant.name} merchant={merchant} />
               </Link>
