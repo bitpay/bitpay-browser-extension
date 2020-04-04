@@ -14,21 +14,23 @@ const Wallet: React.FC<{
 }> = ({ supportedMerchant, supportedGiftCards, purchasedGiftCards }) => {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    resizeToFitPage(ref, 70);
+    resizeToFitPage(ref, 100);
   }, [ref]);
   const activeGiftCards = purchasedGiftCards.filter(card => !card.archived).sort(sortByDescendingDate);
   return (
     <div className="wallet">
-      <MerchantCta merchant={supportedMerchant} slimCTA />
-      <div className="wallet-codes">
-        {activeGiftCards.length && supportedGiftCards.length ? (
-          <WalletCards activeCards={activeGiftCards} supportedCards={supportedGiftCards} />
-        ) : (
-          <div className="zero-state" style={{ height: '100%' }}>
-            <div className="zero-state__title">No Codes Yet</div>
-            <div className="zero-state__subtitle">Your purchased credits will show up here</div>
-          </div>
-        )}
+      <div ref={ref}>
+        <MerchantCta merchant={supportedMerchant} slimCTA />
+        <div className="wallet-codes">
+          {activeGiftCards.length && supportedGiftCards.length ? (
+            <WalletCards activeCards={activeGiftCards} supportedCards={supportedGiftCards} />
+          ) : (
+            <div className="zero-state">
+              <div className="zero-state__title">No Codes Yet</div>
+              <div className="zero-state__subtitle">Your purchased credits will show up here</div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -3,7 +3,14 @@
   flex-direction: column;
   height: 100%;
   padding-top: 12px;
-}
-.wallet-codes {
-  flex-grow: 1;
+
+  .wallet-codes {
+    flex-grow: 1;
+
+    .zero-state {
+      height: 100%;
+      min-height: 180px;
+      margin-bottom: 20px;
+    }
+  }
 }
