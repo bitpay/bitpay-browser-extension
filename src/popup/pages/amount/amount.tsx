@@ -58,9 +58,16 @@ const Amount: React.FC<any> = ({ location, clientId, history, updatePurchasedGif
         <div className="amount-page__amount-box">
           <div className="amount-page__amount-box__currency">USD</div>
           <div className="amount-page__amount-box__amount">
-            <img src="../../assets/icons/minus-icon.png" alt="minus" onClick={(): void => changeAmount(-0.01)} />
-            <div className="amount-page__amount-box__amount__value">{amount}</div>
-            <img src="../../assets/icons/plus-icon.png" alt="minus" onClick={(): void => changeAmount(0.01)} />
+            <img src="../../assets/icons/decrement-icon.svg" alt="minus" onClick={(): void => changeAmount(-0.01)} />
+            <div
+              className="amount-page__amount-box__amount__value"
+              style={{
+                color: amount === 0 ? '#DFDFDF' : 'inherit'
+              }}
+            >
+              {amount}
+            </div>
+            <img src="../../assets/icons/increment-icon.svg" alt="minus" onClick={(): void => changeAmount(0.01)} />
           </div>
           <div className="amount-page__amount-box__denoms">
             <CardDenoms cardConfig={cardConfig} />

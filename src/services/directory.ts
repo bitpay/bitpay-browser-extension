@@ -13,7 +13,7 @@ export interface DirectIntegrationApiObject {
   discount?: {
     type: string;
     amount: number;
-    currency: string;
+    currency?: string;
   };
   theme: string;
   instructions: string;

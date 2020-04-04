@@ -15,7 +15,7 @@ function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string
   const outerFrameStyles = `
     ${innerFrameStyles}
     width: ${FrameDimensions.width}px;
-    height: ${FrameDimensions.height}px; 
+    height: ${FrameDimensions.collapsedHeight}px;
     position: fixed;
     top: 10px;
     right: 10px;

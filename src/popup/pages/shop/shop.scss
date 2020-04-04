@@ -1,5 +1,9 @@
 .shop-page {
-  padding: 10px;
+  position: relative;
+
+  &__content {
+    padding: 10px;
+  }
 
   &__section-header {
     display: flex;

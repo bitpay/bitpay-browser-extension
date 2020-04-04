@@ -1,14 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="300" height="70" viewBox="0 0 300 70">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="300" height="69" viewBox="0 0 300 69">
   <defs>
     <path id="slot-a" d="M8,72.0158575 C3.581722,72.0158575 0,66.9004921 0,60.5903691 L0,26.313904 C0,22.1071554 0,18.2986592 0,14.8884156 L105.3856,14.8884156 C118.0904,12.6410221 132.8856,0.017 150.0704,0.017 C167.9512,0.017 180.9368,13.3711108 195.7904,14.8895582 L300,14.8884156 C300,18.2994209 300,22.1082979 300,26.3150466 L300,60.5915116 C300,66.9016346 296.418278,72.017 292,72.017 L8,72.0158575 Z"/>
     <path id="slot-d" d="M8,72.016 C3.581722,72.016 0,67.5388475 0,62.016 L0,32.016 C0,28.3341017 0,25.0007683 0,22.016 L105.3856,22.016 C118.0904,20.049 132.8856,9 150.0704,9 C167.9512,9 180.9368,20.688 195.7904,22.017 L300,22.016 C300,25.001435 300,28.3351017 300,32.017 L300,62.017 C300,67.5398475 296.418278,72.017 292,72.017 L8,72.016 Z"/>
-    <filter id="slot-c" width="104.7%" height="122.2%" x="-2.3%" y="-14.3%" filterUnits="objectBoundingBox">
-      <feOffset dy="-2" in="SourceAlpha" result="shadowOffsetOuter1"/>
+    <filter id="slot-c" width="104.3%" height="120.6%" x="-2.2%" y="-11.9%" filterUnits="objectBoundingBox">
+      <feOffset dy="-1" in="SourceAlpha" result="shadowOffsetOuter1"/>
       <feGaussianBlur in="shadowOffsetOuter1" result="shadowBlurOuter1" stdDeviation="2"/>
-      <feColorMatrix in="shadowBlurOuter1" values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.035 0"/>
+      <feColorMatrix in="shadowBlurOuter1" values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.08 0"/>
     </filter>
   </defs>
-  <g fill="none" fill-rule="evenodd" transform="translate(0 -3)">
+  <g fill="none" fill-rule="evenodd" transform="translate(0 -4)">
     <mask id="slot-b" fill="#fff">
       <use xlink:href="#slot-a"/>
     </mask>
