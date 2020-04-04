@@ -6,6 +6,7 @@ import './amount.scss';
 import CardDenoms from '../../components/card-denoms/card-denoms';
 import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
 import { GiftCardInvoiceParams, CardConfig } from '../../../services/gift-card.types';
+import { getPrecision } from '../../../services/currency';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Amount: React.FC<any> = ({ location, clientId, history, updatePurchasedGiftCards }) => {
@@ -44,7 +45,7 @@ const Amount: React.FC<any> = ({ location, clientId, history, updatePurchasedGif
     const minAmount = cardConfig.minAmount as number;
     // eslint-disable-next-line no-nested-ternary
     const newAmount = newValue > maxAmount ? maxAmount : newValue < minAmount ? minAmount : newValue;
-    setAmount(parseFloat(newAmount.toFixed(2)));
+    setAmount(parseFloat(newAmount.toFixed(getPrecision(cardConfig.currency))));
   };
   const changeAmount = (delta: number): void =>
     hasFixedDenoms ? changeFixedAmount(delta) : changeVariableAmount(delta);

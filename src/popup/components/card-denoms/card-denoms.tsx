@@ -1,6 +1,7 @@
 import React from 'react';
-import { currencySymbols, spreadAmounts } from '../../../services/merchant';
+import { spreadAmounts } from '../../../services/merchant';
 import { CardConfig } from '../../../services/gift-card.types';
+import { currencySymbols } from '../../../services/currency';
 
 const CardDenoms: React.FC<{ cardConfig: CardConfig }> = ({ cardConfig }) => (
   <>

@@ -10,6 +10,7 @@ import './card.scss';
 import { formatDiscount } from '../../../services/merchant';
 import { set, get } from '../../../services/storage';
 import { resizeToFitPage } from '../../../services/frame';
+import { formatCurrency } from '../../../services/currency';
 
 const Card: React.FC<RouteComponentProps & { updatePurchasedGiftCards: (cards: GiftCard[]) => void }> = ({
   location,
@@ -83,7 +84,7 @@ const Card: React.FC<RouteComponentProps & { updatePurchasedGiftCards: (cards: G
         <div className="card-details__title">{cardConfig.displayName}</div>
         <div className="card-details__balance">
           <img src={cardConfig.icon} alt={`${cardConfig.displayName} logo`} />
-          {card.amount.toFixed(2)} {card.currency}
+          {formatCurrency(card.amount, card.currency, { hideSymbol: true })}
         </div>
         <div className="card-details__line-items">
           <div className="card-details__line-items__item">
@@ -93,7 +94,7 @@ const Card: React.FC<RouteComponentProps & { updatePurchasedGiftCards: (cards: G
           <div className="card-details__line-items__item">
             <div className="card-details__line-items__item__label">Credit Amount</div>
             <div className="card-details__line-items__item__value">
-              {card.amount.toFixed(2)} {card.currency}
+              {formatCurrency(card.amount, card.currency, { hideSymbol: true })}
             </div>
           </div>
           {card.discounts &&
@@ -103,7 +104,7 @@ const Card: React.FC<RouteComponentProps & { updatePurchasedGiftCards: (cards: G
                   {formatDiscount(discount, cardConfig.currency)} Discount
                 </div>
                 <div className="card-details__line-items__item__value">
-                  -{(0.05).toFixed(2)} {card.currency}
+                  -{formatCurrency(0.05, card.currency, { hideSymbol: true })}
                 </div>
               </div>
             ))}
@@ -112,7 +113,7 @@ const Card: React.FC<RouteComponentProps & { updatePurchasedGiftCards: (cards: G
               <div className="card-details__line-items__item">
                 <div className="card-details__line-items__item__label">Total Cost</div>
                 <div className="card-details__line-items__item__value">
-                  {(card.amount - (card.totalDiscount || 0.05)).toFixed(2)} {card.currency}
+                  {formatCurrency(card.amount - (card.totalDiscount || 0.05), card.currency, { hideSymbol: true })}
                 </div>
               </div>
             </>

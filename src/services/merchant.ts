@@ -3,6 +3,7 @@ import { sortByDisplayName } from './gift-card';
 import { removeProtocolAndWww } from './utils';
 import { DirectIntegration } from './directory';
 import { get } from './storage';
+import { currencySymbols } from './currency';
 
 export interface Merchant extends DirectIntegration {
   name: string;
@@ -10,17 +11,6 @@ export interface Merchant extends DirectIntegration {
   hasDirectIntegration: boolean;
   giftCards: CardConfig[];
 }
-
-export const currencySymbols: Record<string, string> = {
-  USD: '$',
-  GBP: '£',
-  EUR: '€',
-  JPY: '¥',
-  INR: '₹',
-  CAD: 'C$',
-  PHP: '₱',
-  BRL: 'R$'
-};
 
 export function spreadAmounts(values: Array<number>, currency: string): string {
   const currencySymbol = currencySymbols[currency];

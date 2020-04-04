@@ -2,6 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { GiftCard, CardConfig } from '../../../services/gift-card.types';
 import './wallet-card.scss';
+import { formatCurrency } from '../../../services/currency';
 
 const WalletCard: React.FC<{
   cards: GiftCard[];
@@ -29,7 +30,9 @@ const WalletCard: React.FC<{
         <div className="wallet-card">
           <div className="wallet-card__card" style={cardBackgroundStyle}>
             <img src={cardConfig.logo} alt={`${cardConfig.displayName} logo`} />
-            <div className="wallet-card__card__balance">${totalBalance}</div>
+            <div className="wallet-card__card__balance">
+              {formatCurrency(totalBalance, cardConfig.currency, { customPrecision: 'minimal' })}
+            </div>
           </div>
           <div className="wallet-card__slot">
             <img src="../../assets/slot.svg" alt="slot" />
@@ -45,7 +48,9 @@ const WalletCard: React.FC<{
               <div className="wallet-card--card-box__text__note">Purchased {formatDate(cards[0].date)}</div>
             </div>
           )}
-          <div className={`wallet-card--${type}__balance`}>${totalBalance}</div>
+          <div className={`wallet-card--${type}__balance`}>
+            {formatCurrency(totalBalance, cardConfig.currency, { customPrecision: 'minimal' })}
+          </div>
         </div>
       )}
     </div>
