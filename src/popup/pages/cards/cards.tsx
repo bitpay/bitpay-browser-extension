@@ -30,7 +30,7 @@ const Cards: React.FC<any> = ({ location, purchasedGiftCards }) => {
           </Link>
         ))}
       </div>
-      <div className="action-button__footer">
+      <div className="action-button__footer--fixed">
         <Link className="action-button" to={{ pathname: `/amount/${cardConfig.name}`, state: { cardConfig } }}>
           Top Up
         </Link>

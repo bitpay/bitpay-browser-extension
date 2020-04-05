@@ -78,19 +78,21 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
       </div>
       <div className="amount-page__cta">
         {hasDiscount || !email ? (
-          <Link
-            className="action-button"
-            to={{
-              pathname: `/payment/${cardConfig.name}`,
-              state: {
-                amount,
-                cardConfig,
-                invoiceParams
-              }
-            }}
-          >
-            Continue
-          </Link>
+          <div className="action-button__footer">
+            <Link
+              className="action-button"
+              to={{
+                pathname: `/payment/${cardConfig.name}`,
+                state: {
+                  amount,
+                  cardConfig,
+                  invoiceParams
+                }
+              }}
+            >
+              Continue
+            </Link>
+          </div>
         ) : (
           <PayWithBitpay
             invoiceParams={{ ...invoiceParams, amount }}

@@ -107,7 +107,7 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
         ) : null}
 
         {!archived && (cardConfig.redeemUrl || cardConfig.defaultClaimCodeType === 'link') ? (
-          <div style={{ margin: '20px 4px 0' }}>
+          <div className="action-button__footer" style={{ marginTop: '20px' }}>
             <button className="action-button" type="button" onClick={(): void => launchClaimLink()}>
               Redeem Now
             </button>

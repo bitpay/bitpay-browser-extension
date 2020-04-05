@@ -105,7 +105,7 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
         </div>
 
         {(merchant.cta || cardConfig) && (
-          <div className="action-button__footer">
+          <div className="action-button__footer--fixed">
             {merchant.hasDirectIntegration && merchant.cta ? (
               <button
                 className="action-button"
