@@ -75,7 +75,7 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
   };
   return (
     <div className="card-details">
-      <div ref={ref}>
+      <div className="card-details__content" ref={ref}>
         <button className="card-details__more" type="button" {...bindTrigger(popupState)}>
           <img src="../../assets/icons/dots.svg" alt="More" />
         </button>
@@ -100,21 +100,18 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
         <CardHeader cardConfig={cardConfig} card={card} />
         <LineItems cardConfig={cardConfig} card={card} />
         {cardConfig.defaultClaimCodeType !== 'link' ? (
-          <>
+          <div style={{ marginTop: '10px' }}>
             <CodeBox label="Claim Code" code={card.claimCode} />
             {card.pin ? <CodeBox label="Pin" code={card.pin} /> : null}
-          </>
+          </div>
         ) : null}
 
         {!archived && (cardConfig.redeemUrl || cardConfig.defaultClaimCodeType === 'link') ? (
-          <button
-            className="action-button"
-            type="button"
-            onClick={(): void => launchClaimLink()}
-            style={{ marginBottom: '-10px' }}
-          >
-            Redeem Now
-          </button>
+          <div style={{ margin: '20px 4px 0' }}>
+            <button className="action-button" type="button" onClick={(): void => launchClaimLink()}>
+              Redeem Now
+            </button>
+          </div>
         ) : null}
       </div>
     </div>
