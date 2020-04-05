@@ -46,7 +46,7 @@ const Archive: React.FC<{ purchasedGiftCards: GiftCard[]; supportedGiftCards: Ca
       ) : (
         <div className="zero-state">
           <div className="zero-state__title">No Archived Gift Cards</div>
-          <div className="zero-state__subtitle">You haven't archived any gift cards yet.</div>
+          <div className="zero-state__subtitle">You haven't archived any gift cards yet</div>
         </div>
       )}
     </div>
