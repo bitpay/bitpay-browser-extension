@@ -5,7 +5,6 @@ export enum ClaimCodeType {
 }
 
 export interface GiftCardDiscount {
-  hidden: boolean;
   code: string;
   type: 'flatrate' | 'percentage';
   amount: number;
@@ -51,25 +50,28 @@ export interface CardConfig extends CommonCardConfig {
   supportedAmounts?: number[];
 }
 
-export interface GiftCard {
-  accessKey: string;
+export interface UnsoldGiftCard {
   amount: number;
+  currency: string;
+  name: string;
+  discounts?: GiftCardDiscount[];
+}
+
+export interface GiftCard extends UnsoldGiftCard {
+  accessKey: string;
   archived: boolean;
   barcodeData?: string;
   barcodeFormat?: string;
   barcodeImage?: string;
   claimCode: string;
   claimLink?: string;
-  currency: string;
   date: string;
   displayName: string;
   invoiceId: string;
-  name: string;
   pin?: string;
   status: string;
   clientId: string;
   totalDiscount?: number;
-  discounts?: GiftCardDiscount[];
   balanceHistory?: [{ date: string; amount: number }];
   invoice: Invoice;
 }

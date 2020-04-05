@@ -36,6 +36,11 @@ body,
   }
 }
 
+button {
+  background: none;
+  cursor: pointer;
+}
+
 .action-button {
   display: flex;
   justify-content: center;
@@ -86,5 +91,64 @@ body,
     font-size: 12px;
     color: rgba(0, 0, 0, 0.25);
     margin-top: 4px;
+  }
+}
+
+@mixin placeholder {
+  &::-webkit-input-placeholder {
+    @content;
+  }
+  &:-moz-placeholder {
+    @content;
+  }
+  &::-moz-placeholder {
+    @content;
+  }
+  &:-ms-input-placeholder {
+    @content;
+  }
+}
+
+.input-group {
+  $input-border: 1px solid rgba(0, 0, 0, 0.05);
+  $left-padding: 15px;
+  &__label {
+    font-size: 12px;
+    color: #73808c;
+    text-transform: uppercase;
+    font-weight: 500;
+    border-bottom: $input-border;
+    padding-bottom: 12px;
+    padding-left: $left-padding;
+  }
+
+  &__input {
+    margin-left: $left-padding;
+    border-bottom: $input-border;
+    padding: $left-padding;
+    padding-left: 0;
+
+    > input {
+      font-size: 14px;
+      color: black;
+      width: 100%;
+
+      @include placeholder {
+        color: rgba(
+          $color: (
+            #434d5a
+          ),
+          $alpha: 0.5
+        );
+      }
+    }
+  }
+
+  &__caption {
+    font-size: 11px;
+    color: rgba(0, 0, 0, 0.4);
+    border-bottom: $input-border;
+    margin-bottom: 20px;
+    padding: $left-padding;
   }
 }

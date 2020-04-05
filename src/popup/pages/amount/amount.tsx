@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './amount.scss';
@@ -9,23 +7,22 @@ import { GiftCardInvoiceParams, CardConfig } from '../../../services/gift-card.t
 import { getPrecision } from '../../../services/currency';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Amount: React.FC<any> = ({ location, clientId, history, updatePurchasedGiftCards }) => {
-  console.log('clientId', clientId);
+const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchasedGiftCards }) => {
   const { cardConfig } = location.state as { cardConfig: CardConfig };
   const hasFixedDenoms = cardConfig.supportedAmounts && cardConfig.supportedAmounts[0];
   const initialAmount =
     cardConfig.supportedAmounts && cardConfig.supportedAmounts[0] ? cardConfig.supportedAmounts[0] : 0;
   const [amount, setAmount] = useState(initialAmount);
   const hasDiscount = false;
+  const discounts = (cardConfig.discounts || []).map(discount => discount.code);
   const invoiceParams: GiftCardInvoiceParams = {
     brand: cardConfig.name,
     currency: cardConfig.currency,
-    amount: 1,
+    amount: initialAmount,
     clientId,
-    discounts: [],
-    email: 'satoshi@nakamoto.com'
+    discounts,
+    email
   };
-  console.log('invoiceParams', invoiceParams);
   const changeFixedAmount = (delta: number): void => {
     const denoms = cardConfig.supportedAmounts as number[];
     const maxIndex = denoms.length - 1;
@@ -59,7 +56,9 @@ const Amount: React.FC<any> = ({ location, clientId, history, updatePurchasedGif
         <div className="amount-page__amount-box">
           <div className="amount-page__amount-box__currency">USD</div>
           <div className="amount-page__amount-box__amount">
-            <img src="../../assets/icons/decrement-icon.svg" alt="minus" onClick={(): void => changeAmount(-0.01)} />
+            <button type="button" onClick={(): void => changeAmount(-0.01)}>
+              <img src="../../assets/icons/decrement-icon.svg" alt="minus" />
+            </button>
             <div
               className="amount-page__amount-box__amount__value"
               style={{
@@ -68,7 +67,9 @@ const Amount: React.FC<any> = ({ location, clientId, history, updatePurchasedGif
             >
               {amount}
             </div>
-            <img src="../../assets/icons/increment-icon.svg" alt="minus" onClick={(): void => changeAmount(0.01)} />
+            <button type="button" onClick={(): void => changeAmount(0.01)}>
+              <img src="../../assets/icons/increment-icon.svg" alt="minus" />
+            </button>
           </div>
           <div className="amount-page__amount-box__denoms">
             <CardDenoms cardConfig={cardConfig} />
@@ -76,14 +77,15 @@ const Amount: React.FC<any> = ({ location, clientId, history, updatePurchasedGif
         </div>
       </div>
       <div className="amount-page__cta">
-        {hasDiscount ? (
+        {hasDiscount || !email ? (
           <Link
             className="action-button"
             to={{
               pathname: `/payment/${cardConfig.name}`,
               state: {
-                amount: 1,
-                currency: 'USD'
+                amount,
+                cardConfig,
+                invoiceParams
               }
             }}
           >
@@ -94,7 +96,7 @@ const Amount: React.FC<any> = ({ location, clientId, history, updatePurchasedGif
             invoiceParams={{ ...invoiceParams, amount }}
             cardConfig={cardConfig}
             history={history}
-            updatePurchasedGiftCards={updatePurchasedGiftCards}
+            setPurchasedGiftCards={setPurchasedGiftCards}
           />
         )}
       </div>

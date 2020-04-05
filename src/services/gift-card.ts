@@ -7,7 +7,8 @@ import {
   ApiCard,
   GiftCardInvoiceParams,
   GiftCardOrder,
-  Invoice
+  Invoice,
+  GiftCardDiscount
 } from './gift-card.types';
 import { post } from './utils';
 
@@ -128,3 +129,9 @@ export function fetchAvailableCards(): Promise<CardConfig[]> {
 export function sortByDescendingDate(a: GiftCard, b: GiftCard): 1 | -1 {
   return a.date < b.date ? 1 : -1;
 }
+
+export const getDiscountAmount = (amount: number, discount: GiftCardDiscount): number =>
+  discount.type === 'percentage' ? (discount.amount / 100) * amount : discount.amount;
+
+export const getTotalDiscount = (amount: number, discounts: GiftCardDiscount[] = []): number =>
+  discounts.reduce((sum, discount) => sum + getDiscountAmount(amount, discount), 0);

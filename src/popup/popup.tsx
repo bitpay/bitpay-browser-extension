@@ -19,26 +19,21 @@ import { sortByDescendingDate } from '../services/gift-card';
 const Popup: React.FC = () => {
   const [initialEntries, setInitialEntries] = useState(['/shop']);
   const [loaded, setLoaded] = useState(false);
-  const [clientId, setClientId] = useState('' as string);
+  const [clientId, setClientId] = useState('');
+  const [email, setEmail] = useState('');
   const [merchants, setMerchants] = useState([] as Merchant[]);
   const [supportedMerchant, setSupportedMerchant] = useState(undefined as Merchant | undefined);
   const [supportedGiftCards, setSupportedGiftCards] = useState([] as CardConfig[]);
   const [purchasedGiftCards, setPurchasedGiftCards] = useState([] as GiftCard[]);
 
-  const updatePurchasedGiftCards = async (cards: GiftCard[]): Promise<void> => {
-    setPurchasedGiftCards(cards);
-  };
-
   useEffect(() => {
     const getStartPage = async (): Promise<void> => {
-      const [allMerchants, allSupportedGiftCards, allPurchasedGiftCards] = await Promise.all([
+      const [allMerchants, allSupportedGiftCards, allPurchasedGiftCards, receiptEmail] = await Promise.all([
         fetchCachedMerchants(),
         get<CardConfig[]>('availableGiftCards'),
-        get<GiftCard[]>('purchasedGiftCards')
+        get<GiftCard[]>('purchasedGiftCards'),
+        get<string>('email')
       ]);
-      console.log('allMerchants', allMerchants);
-      console.log('allSupportedGiftCards', allSupportedGiftCards);
-      console.log('allPurchasedGiftCards', allPurchasedGiftCards);
       const parent = new URLSearchParams(window.location.search).get('url') as string;
       const { host } = new URL(parent);
       const merchant = getBitPayMerchantFromHost(host, allMerchants);
@@ -49,6 +44,7 @@ const Popup: React.FC = () => {
       setSupportedGiftCards(allSupportedGiftCards || []);
       setPurchasedGiftCards((allPurchasedGiftCards || []).sort(sortByDescendingDate));
       setClientId(await get<string>('clientId'));
+      setEmail(receiptEmail);
       setLoaded(true);
     };
     getStartPage();
@@ -62,7 +58,7 @@ const Popup: React.FC = () => {
             <Route
               path="/amount/:brand"
               render={(props): JSX.Element => (
-                <Amount clientId={clientId} updatePurchasedGiftCards={updatePurchasedGiftCards} {...props} />
+                <Amount clientId={clientId} email={email} setPurchasedGiftCards={setPurchasedGiftCards} {...props} />
               )}
             />
             <Route path="/brand/:brand" component={Brand} />
@@ -72,9 +68,20 @@ const Popup: React.FC = () => {
             />
             <Route
               path="/card/:id"
-              render={(props): JSX.Element => <Card updatePurchasedGiftCards={updatePurchasedGiftCards} {...props} />}
+              render={(props): JSX.Element => <Card setPurchasedGiftCards={setPurchasedGiftCards} {...props} />}
             />
-            <Route path="/payment/:brand" component={Payment} />
+            <Route
+              path="/payment/:brand"
+              render={(props): JSX.Element => (
+                <Payment
+                  clientId={clientId}
+                  email={email}
+                  setEmail={setEmail}
+                  setPurchasedGiftCards={setPurchasedGiftCards}
+                  {...props}
+                />
+              )}
+            />
             <Route path="/shop" render={(props): JSX.Element => <Shop merchants={merchants} {...props} />} />
             <Route path="/settings" component={Settings} />
             <Route

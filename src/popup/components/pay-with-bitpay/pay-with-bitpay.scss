@@ -14,6 +14,10 @@
       margin-top: -2px;
     }
   }
+  button.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
   img {
     display: block;
     cursor: pointer;
