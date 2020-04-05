@@ -2,11 +2,6 @@
 
 .settings {
   background: #f6f7fc;
-  padding-bottom: 40px;
-
-  &--edit {
-    padding-bottom: 96px;
-  }
 
   .zero-state {
     background: white;
@@ -41,6 +36,10 @@
   $cell-height: 52px;
 
   border-bottom: $input-border;
+
+  &:last-child {
+    margin-bottom: 18px;
+  }
 
   &__label {
     font-size: 12px;

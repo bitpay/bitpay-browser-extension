@@ -35,6 +35,7 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
     const url = cardConfig.defaultClaimCodeType === 'link' ? (card.claimLink as string) : redeemUrl;
     launchNewTab(url);
   };
+  const shouldShowRedeemButton = (): boolean => !!(cardConfig.redeemUrl || cardConfig.defaultClaimCodeType === 'link');
   const archive = async (): Promise<void> => {
     const cards = await get<GiftCard[]>('purchasedGiftCards');
     const newCards = cards.map(purchasedCard =>
@@ -52,8 +53,9 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
     );
     await set<GiftCard[]>('purchasedGiftCards', newCards);
     setPurchasedGiftCards(newCards);
-    setArchived(false);
-    resizeToFitPage(ref, 80);
+    const paddingBottom = shouldShowRedeemButton() ? 136 : 80;
+    resizeToFitPage(ref, paddingBottom);
+    setTimeout(() => setArchived(false), 300);
   };
   const handleMenuClick = (item: string): void => {
     switch (item) {
@@ -99,20 +101,20 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
         </Menu>
         <CardHeader cardConfig={cardConfig} card={card} />
         <LineItems cardConfig={cardConfig} card={card} />
-        {cardConfig.defaultClaimCodeType !== 'link' ? (
+        {cardConfig.defaultClaimCodeType !== 'link' && (
           <div style={{ marginTop: '10px' }}>
             <CodeBox label="Claim Code" code={card.claimCode} />
             {card.pin ? <CodeBox label="Pin" code={card.pin} /> : null}
           </div>
-        ) : null}
+        )}
 
-        {!archived && (cardConfig.redeemUrl || cardConfig.defaultClaimCodeType === 'link') ? (
+        {!archived && shouldShowRedeemButton() && (
           <div className="action-button__footer" style={{ marginTop: '20px' }}>
             <button className="action-button" type="button" onClick={(): void => launchClaimLink()}>
               Redeem Now
             </button>
           </div>
-        ) : null}
+        )}
       </div>
     </div>
   );

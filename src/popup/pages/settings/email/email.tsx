@@ -23,9 +23,9 @@ const Email: React.FC<{ email: string; setEmail: (email: string) => void; histor
     history.goBack();
   };
   return (
-    <>
+    <div className="settings">
       <form onSubmit={saveEmail}>
-        <div className="settings settings--edit">
+        <div>
           <div className="settings-group">
             <div className="settings-group__label">Email</div>
             <div className="settings-group__input--wrapper">
@@ -50,7 +50,7 @@ const Email: React.FC<{ email: string; setEmail: (email: string) => void; histor
           </button>
         </div>
       </form>
-    </>
+    </div>
   );
 };
 
