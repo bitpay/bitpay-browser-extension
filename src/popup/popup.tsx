@@ -36,9 +36,6 @@ const Popup: React.FC = () => {
         get<CardConfig[]>('availableGiftCards'),
         get<GiftCard[]>('purchasedGiftCards')
       ]);
-      console.log('allMerchants', allMerchants);
-      console.log('allSupportedGiftCards', allSupportedGiftCards);
-      console.log('allPurchasedGiftCards', allPurchasedGiftCards);
       const parent = new URLSearchParams(window.location.search).get('url') as string;
       const { host } = new URL(parent);
       const merchant = getBitPayMerchantFromHost(host, allMerchants);

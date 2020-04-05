@@ -1,0 +1,42 @@
+.code-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: #f4f6fa;
+  border-radius: 10px;
+  padding: 20px 0;
+  margin: 0 5px 15px;
+  cursor: pointer;
+
+  &__label {
+    font-size: 12px;
+    color: rgba($color: #434d5a, $alpha: 0.75);
+    margin-top: 5px;
+
+    &--action {
+      display: none;
+      color: #4f6ef7;
+      font-weight: 500;
+    }
+  }
+
+  &__value {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  &:last-child {
+    margin-bottom: 3px;
+  }
+
+  &:hover {
+    .code-box__label {
+      display: none;
+    }
+    .code-box__label--action {
+      display: block;
+    }
+  }
+}

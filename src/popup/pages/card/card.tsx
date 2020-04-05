@@ -11,6 +11,7 @@ import { formatDiscount } from '../../../services/merchant';
 import { set, get } from '../../../services/storage';
 import { resizeToFitPage } from '../../../services/frame';
 import { formatCurrency } from '../../../services/currency';
+import CodeBox from '../../components/code-box/code-box';
 
 const Card: React.FC<RouteComponentProps & { updatePurchasedGiftCards: (cards: GiftCard[]) => void }> = ({
   location,
@@ -131,16 +132,8 @@ const Card: React.FC<RouteComponentProps & { updatePurchasedGiftCards: (cards: G
         </div>
         {cardConfig.defaultClaimCodeType !== 'link' ? (
           <>
-            <div className="card-details__claim-box">
-              <div className="card-details__claim-box__value">{card.claimCode}</div>
-              <div className="card-details__claim-box__label">Claim Code</div>
-            </div>
-            {card.pin ? (
-              <div className="card-details__claim-box">
-                <div className="card-details__claim-box__value">{card.pin}</div>
-                <div className="card-details__claim-box__label">Pin</div>
-              </div>
-            ) : null}
+            <CodeBox label="Claim Code" code={card.claimCode} />
+            {card.pin ? <CodeBox label="Pin" code={card.pin} /> : null}
           </>
         ) : null}
 

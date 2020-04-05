@@ -23,7 +23,7 @@
         @at-root li#{&} {
           color: white;
           font-size: 12px;
-          justify-content: flex-end;
+          justify-content: flex-start;
           padding-right: 14px;
           padding-left: 14px;
           padding-top: 0;
@@ -104,11 +104,18 @@
     padding: 20px 0;
     margin: 0 5px;
     margin-bottom: 15px;
+    cursor: copy;
 
     &__label {
       font-size: 12px;
       color: rgba($color: #434d5a, $alpha: 0.75);
       margin-top: 5px;
+
+      &--action {
+        display: none;
+        color: #4f6ef7;
+        font-weight: 500;
+      }
     }
 
     &__value {
@@ -118,6 +125,15 @@
 
     &:last-child {
       margin-bottom: 3px;
+    }
+
+    &:hover {
+      .card-details__claim-box__label {
+        display: none;
+      }
+      .card-details__claim-box__label--action {
+        display: block;
+      }
     }
   }
 }
