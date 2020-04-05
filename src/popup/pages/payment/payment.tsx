@@ -1,70 +1,55 @@
-import React, { useState } from 'react';
-import { browser } from 'webextension-polyfill-ts';
-import { createBitPayInvoice, redeemGiftCard } from '../../../services/gift-card';
-import { get, set } from '../../../services/storage';
-import { GiftCard } from '../../../services/gift-card.types';
+/* eslint-disable jsx-a11y/no-autofocus */
+import React, { useRef, useEffect, useState } from 'react';
+import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
+import { GiftCardInvoiceParams, CardConfig, UnsoldGiftCard } from '../../../services/gift-card.types';
+import LineItems from '../../components/line-items/line-items';
+import CardHeader from '../../components/card-header/card-header';
+import './payment.scss';
+import { resizeToFitPage } from '../../../services/frame';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Payment: React.FC<any> = ({ match: { params }, location, history }) => {
-  const [awaitingPayment, setAwaitingPayment] = useState(false);
+const Payment: React.FC<any> = ({ location, history, setEmail, setPurchasedGiftCards }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const [email, setReceiptEmail] = useState('');
+
+  useEffect(() => {
+    resizeToFitPage(ref, 77);
+  }, [ref]);
   const amount = location.state.amount as number;
-  const currency = location.state.currency as string;
-  const saveGiftCard = async (card: GiftCard): Promise<void> => {
-    const purchasedGiftCards = (await get<GiftCard[]>('purchasedGiftCards')) || [];
-    await set<GiftCard[]>('purchasedGiftCards', [...purchasedGiftCards, card]);
+  const invoiceParams = location.state.invoiceParams as GiftCardInvoiceParams;
+  const cardConfig = location.state.cardConfig as CardConfig;
+  const card: UnsoldGiftCard = {
+    amount,
+    currency: invoiceParams.currency,
+    name: cardConfig.name,
+    discounts: cardConfig.discounts
   };
-  const showCard = (card: GiftCard): void => {
-    history.goBack();
-    history.goBack();
-    history.goBack();
-    history.push(`/wallet`);
-    history.push({ pathname: `/card/${card.invoiceId}`, state: { card } });
-  };
-  const launchInvoice = async (): Promise<void> => {
-    const clientId = await get<string>('clientId');
-    const { invoiceId, accessKey, totalDiscount } = await createBitPayInvoice({
-      brand: params.brand,
-      currency,
-      amount,
-      clientId,
-      discounts: [],
-      email: 'satoshi@nakamoto.com'
-    });
-    setAwaitingPayment(true);
-    const res = await browser.runtime.sendMessage({
-      name: 'LAUNCH_INVOICE',
-      invoiceId
-    });
-    if (res.data.status === 'closed') {
-      setAwaitingPayment(false);
-      return;
-    }
-    const giftCard = await redeemGiftCard({
-      currency,
-      date: new Date().toISOString(),
-      amount,
-      clientId,
-      accessKey,
-      invoiceId,
-      name: params.brand,
-      totalDiscount
-    });
-    await saveGiftCard(giftCard);
-    showCard(giftCard);
+  const onEmailChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    emailRef.current?.validity.valid ? setReceiptEmail(event.target.value) : setReceiptEmail('');
   };
   return (
-    <div>
-      <div>{params.brand}</div>
-      <div>
-        Pay me ${amount} {currency}:
+    <div className="payment">
+      <div ref={ref}>
+        <CardHeader cardConfig={cardConfig} card={card} />
+        {cardConfig.discounts && cardConfig.discounts.length ? <LineItems cardConfig={cardConfig} card={card} /> : null}
+        {!invoiceParams.email ? (
+          <div className="settings-group">
+            <div className="settings-group__label">Email</div>
+            <div className="settings-group__input">
+              <input type="email" placeholder="satoshi@bitpay.com" autoFocus onChange={onEmailChange} ref={emailRef} />
+            </div>
+            <div className="settings-group__caption">Email used for purchase receipts and communication</div>
+          </div>
+        ) : null}
+        <PayWithBitpay
+          invoiceParams={{ ...invoiceParams, amount, email }}
+          cardConfig={cardConfig}
+          history={history}
+          setEmail={setEmail}
+          setPurchasedGiftCards={setPurchasedGiftCards}
+        />
       </div>
-      {!awaitingPayment ? (
-        <button type="button" onClick={launchInvoice}>
-          Pay with BitPay
-        </button>
-      ) : (
-        <div>Awaiting payment...</div>
-      )}
     </div>
   );
 };

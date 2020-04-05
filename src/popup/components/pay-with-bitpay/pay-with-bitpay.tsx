@@ -9,28 +9,31 @@ import { createBitPayInvoice, redeemGiftCard, getBitPayInvoice } from '../../../
 const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
   cardConfig: CardConfig;
   invoiceParams: GiftCardInvoiceParams;
-  updatePurchasedGiftCards: (cards: GiftCard[]) => void;
-}> = ({ cardConfig, invoiceParams, history, updatePurchasedGiftCards }) => {
+  setEmail?: (email: string) => void;
+  setPurchasedGiftCards: (cards: GiftCard[]) => void;
+}> = ({ cardConfig, invoiceParams, history, setEmail, setPurchasedGiftCards }) => {
   const [awaitingPayment, setAwaitingPayment] = useState(false);
   const { amount, currency } = invoiceParams;
-  console.log('invoiceParams', invoiceParams);
   const saveGiftCard = async (card: GiftCard): Promise<void> => {
     const purchasedGiftCards = (await get<GiftCard[]>('purchasedGiftCards')) || [];
     const newPurchasedGiftCards = [...purchasedGiftCards, card];
-    updatePurchasedGiftCards(newPurchasedGiftCards);
+    setPurchasedGiftCards(newPurchasedGiftCards);
     await set<GiftCard[]>('purchasedGiftCards', newPurchasedGiftCards);
   };
   const showCard = (card: GiftCard): void => {
     if (!history) return;
     history.goBack();
     history.goBack();
-    // history.goBack();
     history.push(`/wallet`);
     history.push({ pathname: `/card/${card.invoiceId}`, state: { card, cardConfig } });
   };
   const launchInvoice = async (): Promise<void> => {
     setAwaitingPayment(true);
     const { invoiceId, accessKey, totalDiscount } = await createBitPayInvoice(invoiceParams);
+    if (setEmail) {
+      await set<string>('email', invoiceParams.email as string);
+      setEmail(invoiceParams.email as string);
+    }
     const res = await browser.runtime.sendMessage({
       name: 'LAUNCH_INVOICE',
       invoiceId
@@ -52,9 +55,9 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
         totalDiscount
       })
     ]);
-    console.log('invoice', invoice);
     const finalGiftCard = {
       ...giftCard,
+      discounts: cardConfig.discounts,
       invoice
     } as GiftCard;
     await saveGiftCard(finalGiftCard);
@@ -70,7 +73,12 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
             </div>
           </>
         ) : (
-          <button type="button" onClick={launchInvoice}>
+          <button
+            className={`${invoiceParams.email ? '' : 'disabled'}`}
+            type="button"
+            onClick={launchInvoice}
+            disabled={!invoiceParams.email}
+          >
             <img src="../../assets/pay-with-bitpay.svg" alt="Pay with BitPay" />
           </button>
         )}

@@ -30,7 +30,8 @@ export function formatCurrency(
       : getPrecision(currencyCode);
   const formatter = new Intl.NumberFormat('en-US', {
     style: 'decimal',
-    minimumFractionDigits: precision
+    minimumFractionDigits: precision,
+    maximumFractionDigits: precision
   });
   const numericValue = formatter.format(amount);
   const symbol = opts.hideSymbol ? undefined : currencySymbols[currencyCode.toUpperCase()];

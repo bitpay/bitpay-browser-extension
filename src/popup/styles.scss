@@ -36,6 +36,11 @@ body,
   }
 }
 
+button {
+  background: none;
+  cursor: pointer;
+}
+
 .action-button {
   display: flex;
   justify-content: center;
@@ -48,6 +53,11 @@ body,
   background-color: #4f6ef7;
   border-radius: 8px;
   cursor: pointer;
+
+  &[disabled] {
+    opacity: 0.6;
+    pointer-events: none;
+  }
 
   &__footer {
     position: fixed;

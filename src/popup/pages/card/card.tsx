@@ -1,22 +1,21 @@
 import React, { useRef, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import { format } from 'date-fns';
 import { browser } from 'webextension-polyfill-ts';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
 import { GiftCard, CardConfig } from '../../../services/gift-card.types';
 import './card.scss';
-import { formatDiscount } from '../../../services/merchant';
 import { set, get } from '../../../services/storage';
 import { resizeToFitPage } from '../../../services/frame';
-import { formatCurrency } from '../../../services/currency';
+import LineItems from '../../components/line-items/line-items';
+import CardHeader from '../../components/card-header/card-header';
 import CodeBox from '../../components/code-box/code-box';
 
-const Card: React.FC<RouteComponentProps & { updatePurchasedGiftCards: (cards: GiftCard[]) => void }> = ({
+const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: GiftCard[]) => void }> = ({
   location,
   history,
-  updatePurchasedGiftCards
+  setPurchasedGiftCards
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -40,7 +39,7 @@ const Card: React.FC<RouteComponentProps & { updatePurchasedGiftCards: (cards: G
       purchasedCard.invoiceId === card.invoiceId ? { ...purchasedCard, archived: true } : { ...purchasedCard }
     );
     await set<GiftCard[]>('purchasedGiftCards', newCards);
-    updatePurchasedGiftCards(newCards);
+    setPurchasedGiftCards(newCards);
     history.goBack();
   };
   const handleMenuClick = (item: string): void => {
@@ -82,54 +81,8 @@ const Card: React.FC<RouteComponentProps & { updatePurchasedGiftCards: (cards: G
             </MenuItem>
           ))}
         </Menu>
-        <div className="card-details__title">{cardConfig.displayName}</div>
-        <div className="card-details__balance">
-          <img src={cardConfig.icon} alt={`${cardConfig.displayName} logo`} />
-          {formatCurrency(card.amount, card.currency, { hideSymbol: true })}
-        </div>
-        <div className="card-details__line-items">
-          <div className="card-details__line-items__item">
-            <div className="card-details__line-items__item__label">Purchased</div>
-            <div className="card-details__line-items__item__value">{format(new Date(card.date), 'MMM dd yyyy')}</div>
-          </div>
-          <div className="card-details__line-items__item">
-            <div className="card-details__line-items__item__label">Credit Amount</div>
-            <div className="card-details__line-items__item__value">
-              {formatCurrency(card.amount, card.currency, { hideSymbol: true })}
-            </div>
-          </div>
-          {card.discounts &&
-            card.discounts.map((discount, index) => (
-              <div className="card-details__line-items__item" key={index}>
-                <div className="card-details__line-items__item__label">
-                  {formatDiscount(discount, cardConfig.currency)} Discount
-                </div>
-                <div className="card-details__line-items__item__value">
-                  -{formatCurrency(0.05, card.currency, { hideSymbol: true })}
-                </div>
-              </div>
-            ))}
-          {card.totalDiscount ? (
-            <>
-              <div className="card-details__line-items__item">
-                <div className="card-details__line-items__item__label">Total Cost</div>
-                <div className="card-details__line-items__item__value">
-                  {formatCurrency(card.amount - (card.totalDiscount || 0.05), card.currency, { hideSymbol: true })}
-                </div>
-              </div>
-            </>
-          ) : null}
-          {card.invoice ? (
-            <>
-              <div className="card-details__line-items__item">
-                <div className="card-details__line-items__item__label">Amount Paid</div>
-                <div className="card-details__line-items__item__value crypto-amount">
-                  {card.invoice.displayAmountPaid} {card.invoice.transactionCurrency}
-                </div>
-              </div>
-            </>
-          ) : null}
-        </div>
+        <CardHeader cardConfig={cardConfig} card={card} />
+        <LineItems cardConfig={cardConfig} card={card} />
         {cardConfig.defaultClaimCodeType !== 'link' ? (
           <>
             <CodeBox label="Claim Code" code={card.claimCode} />

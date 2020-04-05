@@ -1,0 +1,12 @@
+.payment {
+  padding: 10px 0;
+  overflow-y: hidden !important;
+
+  .settings-group {
+    margin-bottom: 20px;
+
+    &__label {
+      color: #73808c;
+    }
+  }
+}
