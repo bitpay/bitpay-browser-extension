@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { browser } from 'webextension-polyfill-ts';
 import Menu from '@material-ui/core/Menu';
@@ -22,6 +22,8 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
     resizeToFitPage(ref, 80);
   }, [ref]);
   const { card, cardConfig } = location.state as { card: GiftCard; cardConfig: CardConfig };
+  const [archived, setArchived] = useState(card.archived);
+  const initiallyArchived = card.archived;
   // const cardObj = location.state.card as GiftCard;
   // const card = { ...cardObj, discounts: [{ type: 'percentage', amount: 5 }], totalDiscount: 0.05 } as GiftCard;
   const redeemUrl = `${cardConfig.redeemUrl}${card.claimCode}`;
@@ -40,7 +42,18 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
     );
     await set<GiftCard[]>('purchasedGiftCards', newCards);
     setPurchasedGiftCards(newCards);
-    history.goBack();
+    setArchived(true);
+    initiallyArchived ? resizeToFitPage(ref, 80) : history.goBack();
+  };
+  const unarchive = async (): Promise<void> => {
+    const cards = await get<GiftCard[]>('purchasedGiftCards');
+    const newCards = cards.map(purchasedCard =>
+      purchasedCard.invoiceId === card.invoiceId ? { ...purchasedCard, archived: false } : { ...purchasedCard }
+    );
+    await set<GiftCard[]>('purchasedGiftCards', newCards);
+    setPurchasedGiftCards(newCards);
+    setArchived(false);
+    resizeToFitPage(ref, 80);
   };
   const handleMenuClick = (item: string): void => {
     switch (item) {
@@ -49,6 +62,9 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
         break;
       case 'Archive':
         archive();
+        break;
+      case 'Unarchive':
+        unarchive();
         break;
       case 'Help':
         return launchNewTab('https://bitpay.com/request-help');
@@ -71,7 +87,7 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
           className="card-details__more__menu"
           style={{ boxShadow: 'none' }}
         >
-          {['Edit Balance', 'Archive', 'Help'].map(option => (
+          {['Edit Balance', archived ? 'Unarchive' : 'Archive', 'Help'].map(option => (
             <MenuItem
               className="card-details__more__menu__item"
               key={option}
@@ -90,7 +106,7 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
           </>
         ) : null}
 
-        {cardConfig.redeemUrl || cardConfig.defaultClaimCodeType === 'link' ? (
+        {!archived && (cardConfig.redeemUrl || cardConfig.defaultClaimCodeType === 'link') ? (
           <button
             className="action-button"
             type="button"
