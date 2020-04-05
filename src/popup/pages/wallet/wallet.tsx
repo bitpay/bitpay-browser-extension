@@ -20,7 +20,7 @@ const Wallet: React.FC<{
   return (
     <div className="wallet">
       <div ref={ref}>
-        <MerchantCta merchant={supportedMerchant} slimCTA />
+        <MerchantCta merchant={supportedMerchant} slimCTA={activeGiftCards.length > 0} />
         <div className="wallet-codes">
           {activeGiftCards.length && supportedGiftCards.length ? (
             <WalletCards activeCards={activeGiftCards} supportedCards={supportedGiftCards} />
