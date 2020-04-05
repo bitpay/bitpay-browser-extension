@@ -1,3 +1,5 @@
+@import "../../../styles/variables";
+
 .amount-page {
   display: flex;
   padding: 10px;
@@ -11,7 +13,7 @@
 
   &__merchant-name {
     font-size: 15px;
-    color: #434d5a;
+    color: $midnightGray;
     font-weight: 500;
     margin-top: 3px;
   }
@@ -57,7 +59,7 @@
     &__denoms {
       opacity: 0.75;
       font-size: 12px;
-      color: #434d5a;
+      color: $midnightGray;
       margin: 0 auto;
       max-width: 200px;
       margin-top: 3px;

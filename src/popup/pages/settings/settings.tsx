@@ -10,9 +10,9 @@ const Settings: React.FC<{ email: string }> = ({ email }) => {
       <div className="settings-group">
         <div className="settings-group__label">Wallet</div>
         <div className="settings-group__item">Hide Empty Balances</div>
-        <button type="button" className="settings-group__item">
+        <Link type="button" className="settings-group__item" to="/settings/archive">
           Archived Gift Cards
-        </button>
+        </Link>
       </div>
       <div className="settings-group">
         <div className="settings-group__label">Email</div>
