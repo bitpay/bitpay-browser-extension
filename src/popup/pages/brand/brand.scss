@@ -1,3 +1,5 @@
+@import "../../../styles/variables";
+
 .brand-page {
   display: flex;
   flex-direction: column;
@@ -89,7 +91,7 @@
       &__title {
         font-weight: 700;
         font-size: 15px;
-        color: #434d5a;
+        color: $midnightGray;
       }
       &__text {
         position: relative;

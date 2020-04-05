@@ -1,0 +1,10 @@
+.archive {
+  padding-bottom: 0;
+  .settings-group__item {
+    padding-left: 17px;
+    height: 63px;
+    &:before {
+      top: calc(50% + 1px);
+    }
+  }
+}

@@ -16,6 +16,7 @@ import { get } from '../services/storage';
 import { GiftCard, CardConfig } from '../services/gift-card.types';
 import { sortByDescendingDate } from '../services/gift-card';
 import Email from './pages/settings/email/email';
+import Archive from './pages/settings/archive/archive';
 
 const Popup: React.FC = () => {
   const [initialEntries, setInitialEntries] = useState(['/shop']);
@@ -85,6 +86,12 @@ const Popup: React.FC = () => {
             />
             <Route path="/shop" render={(props): JSX.Element => <Shop merchants={merchants} {...props} />} />
             <Route path="/settings" exact render={(props): JSX.Element => <Settings email={email} {...props} />} />
+            <Route
+              path="/settings/archive"
+              render={(props): JSX.Element => (
+                <Archive supportedGiftCards={supportedGiftCards} purchasedGiftCards={purchasedGiftCards} {...props} />
+              )}
+            />
             <Route
               path="/settings/email"
               render={(props): JSX.Element => <Email email={email} setEmail={setEmail} {...props} />}

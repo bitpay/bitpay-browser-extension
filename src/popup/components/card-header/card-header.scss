@@ -1,8 +1,10 @@
+@import "../../../styles/variables";
+
 .card-header {
   margin-bottom: 20px;
   &__title {
     font-size: 15px;
-    color: #434d5a;
+    color: $midnightGray;
     font-weight: 500;
     margin-bottom: 3px;
     margin-top: 3px;

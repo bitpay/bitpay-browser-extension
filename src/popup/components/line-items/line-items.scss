@@ -1,3 +1,5 @@
+@import "../../../styles/variables";
+
 .line-items {
   padding: 0 15px 10px;
   font-size: 14px;
@@ -17,7 +19,7 @@
     }
     &__value {
       flex-shrink: 0;
-      color: #434d5a;
+      color: $midnightGray;
 
       &--bold {
         color: black;
