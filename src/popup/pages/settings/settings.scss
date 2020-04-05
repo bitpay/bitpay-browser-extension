@@ -3,7 +3,7 @@
   padding-bottom: 40px;
 
   &--edit {
-    padding-bottom: 20px;
+    padding-bottom: 96px;
   }
 }
 
@@ -25,7 +25,7 @@
 .settings-group {
   $border-color: rgba(0, 0, 0, 0.05);
   $input-border: 1px solid $border-color;
-  $left-padding: 20px;
+  $left-padding: 16px;
   $cell-height: 52px;
 
   border-bottom: $input-border;
@@ -59,7 +59,7 @@
     font-size: 14px;
     background: white;
     position: relative;
-    padding: 0 $left-padding;
+    padding: 0 $left-padding + 2;
     width: 100%;
     text-align: left;
     height: $cell-height;
@@ -147,6 +147,7 @@
           ),
           $alpha: 0.5
         );
+        font-weight: 400;
       }
     }
   }

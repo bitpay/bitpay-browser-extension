@@ -44,7 +44,7 @@ const Email: React.FC<{ email: string; setEmail: (email: string) => void; histor
             <div className="settings-group__caption">Email used for purchase receipts and communication</div>
           </div>
         </div>
-        <div style={{ padding: '0 15px' }}>
+        <div className="action-button__footer">
           <button type="submit" className="action-button" disabled={!formValid}>
             Save
           </button>
