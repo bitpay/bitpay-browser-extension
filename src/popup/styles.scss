@@ -54,6 +54,11 @@ button {
   border-radius: 8px;
   cursor: pointer;
 
+  &[disabled] {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
   &__footer {
     position: fixed;
     bottom: 0;

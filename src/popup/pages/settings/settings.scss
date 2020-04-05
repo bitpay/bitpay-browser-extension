@@ -1,6 +1,10 @@
 .settings {
   background: #f6f7fc;
   padding-bottom: 40px;
+
+  &--edit {
+    padding-bottom: 20px;
+  }
 }
 
 @mixin placeholder {
@@ -99,17 +103,20 @@
       }
     }
 
-    @at-root button#{&} {
-      &:hover {
-        background: #fbfbfb;
-      }
-      &:before {
-        content: url(/assets/icons/right-arrow.svg);
-        background: transparent;
-        position: absolute;
-        right: 13px;
-        top: calc(50% + 2px);
-        transform: translateY(-50%);
+    @at-root {
+      a#{&},
+      button#{&} {
+        &:hover {
+          background: #fbfbfb;
+        }
+        &:before {
+          content: url(/assets/icons/right-arrow.svg);
+          background: transparent;
+          position: absolute;
+          right: 13px;
+          top: calc(50% + 2px);
+          transform: translateY(-50%);
+        }
       }
     }
   }
@@ -129,9 +136,9 @@
 
     > input {
       font-size: 14px;
-      font-weight: 400;
-      color: black;
       width: 100%;
+      font-weight: 500;
+      color: #434d5a;
 
       @include placeholder {
         color: rgba(
