@@ -33,13 +33,15 @@ const Payment: React.FC<any> = ({ location, history, setEmail, setPurchasedGiftC
       <div ref={ref}>
         <CardHeader cardConfig={cardConfig} card={card} />
         {cardConfig.discounts && cardConfig.discounts.length ? <LineItems cardConfig={cardConfig} card={card} /> : null}
-        <div className="input-group">
-          <div className="input-group__label">Email</div>
-          <div className="input-group__input">
-            <input type="email" placeholder="satoshi@bitpay.com" autoFocus onChange={onEmailChange} ref={emailRef} />
+        {!invoiceParams.email ? (
+          <div className="settings-group">
+            <div className="settings-group__label">Email</div>
+            <div className="settings-group__input">
+              <input type="email" placeholder="satoshi@bitpay.com" autoFocus onChange={onEmailChange} ref={emailRef} />
+            </div>
+            <div className="settings-group__caption">Email used for purchase receipts and communication</div>
           </div>
-          <div className="input-group__caption">Email used for purchase receipts and communication</div>
-        </div>
+        ) : null}
         <PayWithBitpay
           invoiceParams={{ ...invoiceParams, amount, email }}
           cardConfig={cardConfig}

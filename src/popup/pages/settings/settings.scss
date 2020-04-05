@@ -1,0 +1,153 @@
+.settings {
+  background: #f6f7fc;
+  padding-bottom: 40px;
+}
+
+@mixin placeholder {
+  &::-webkit-input-placeholder {
+    @content;
+  }
+  &:-moz-placeholder {
+    @content;
+  }
+  &::-moz-placeholder {
+    @content;
+  }
+  &:-ms-input-placeholder {
+    @content;
+  }
+}
+
+.settings-group {
+  $border-color: rgba(0, 0, 0, 0.05);
+  $input-border: 1px solid $border-color;
+  $left-padding: 20px;
+  $cell-height: 52px;
+
+  border-bottom: $input-border;
+
+  &__label {
+    font-size: 12px;
+    color: rgba(
+      $color: (
+        #384366
+      ),
+      $alpha: 0.5
+    );
+    text-transform: uppercase;
+    font-weight: 500;
+    border-bottom: $input-border;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: $left-padding;
+  }
+
+  &__item {
+    font-weight: 500;
+    color: rgba(
+      $color: (
+        #434d5a
+      ),
+      $alpha: 0.65
+    );
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    background: white;
+    position: relative;
+    padding: 0 $left-padding;
+    width: 100%;
+    text-align: left;
+    height: $cell-height;
+
+    &--dark {
+      color: #434d5a;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    &__label {
+      font-weight: 500;
+    }
+
+    &__value {
+      color: rgba(
+        $color: (
+          #434d5a
+        ),
+        $alpha: 0.5
+      );
+      flex-grow: 1;
+      font-weight: 400;
+      text-align: right;
+      margin-right: -5px;
+
+      button & {
+        margin-right: 12px;
+      }
+    }
+
+    &:not(:last-child) {
+      &:after {
+        content: "";
+        height: 1px;
+        width: calc(100% - #{$left-padding});
+        background: $border-color;
+        bottom: 0;
+        right: 0;
+        position: absolute;
+      }
+    }
+
+    @at-root button#{&} {
+      &:hover {
+        background: #fbfbfb;
+      }
+      &:before {
+        content: url(/assets/icons/right-arrow.svg);
+        background: transparent;
+        position: absolute;
+        right: 13px;
+        top: calc(50% + 2px);
+        transform: translateY(-50%);
+      }
+    }
+  }
+
+  &__input {
+    &--wrapper {
+      background: white;
+    }
+
+    margin-left: $left-padding;
+    border-bottom: $input-border;
+    padding-right: $left-padding;
+    background: white;
+    height: $cell-height;
+    display: flex;
+    align-items: center;
+
+    > input {
+      font-size: 14px;
+      font-weight: 400;
+      color: black;
+      width: 100%;
+
+      @include placeholder {
+        color: rgba(
+          $color: (
+            #434d5a
+          ),
+          $alpha: 0.5
+        );
+      }
+    }
+  }
+
+  &__caption {
+    background: white;
+    font-size: 11px;
+    color: rgba(0, 0, 0, 0.4);
+    padding: 15px $left-padding;
+  }
+}

@@ -83,7 +83,7 @@ const Popup: React.FC = () => {
               )}
             />
             <Route path="/shop" render={(props): JSX.Element => <Shop merchants={merchants} {...props} />} />
-            <Route path="/settings" component={Settings} />
+            <Route path="/settings" render={(props): JSX.Element => <Settings email={email} {...props} />} />
             <Route
               path="/wallet"
               render={(props): JSX.Element => (

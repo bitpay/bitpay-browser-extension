@@ -23,5 +23,5 @@ export const resizeToFitPage = (ref: React.RefObject<HTMLDivElement>, padding = 
         ? FrameDimensions.maxFrameHeight
         : fullHeight;
     resizeFrame(height);
-  });
+  }, 10);
 };
