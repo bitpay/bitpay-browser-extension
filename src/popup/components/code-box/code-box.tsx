@@ -14,10 +14,14 @@ const CodeBox: React.FC<{ code: string; label: string }> = ({ code, label }) => 
       box.current.style.transform = 'scale(1.03)';
       value.current.style.color = '#4f6ef7';
       setTimeout((): void => {
-        box.current.style.transform = 'initial';
+        if (box.current) {
+          box.current.style.transform = 'initial';
+        }
       }, 300);
       setTimeout((): void => {
-        value.current.style.color = 'initial';
+        if (value.current) {
+          value.current.style.transform = 'initial';
+        }
         setCopied(false);
       }, 1500);
     }

@@ -27,9 +27,9 @@ const Settings: React.FC<{ email: string }> = ({ email }) => {
           <div className="settings-group__item__label">Country</div>
           <div className="settings-group__item__value">USA</div>
         </button>
-        <button type="button" className="settings-group__item">
+        <Link type="button" className="settings-group__item" to="/settings/legal">
           Legal
-        </button>
+        </Link>
         <div className="settings-group__item">
           <div className="settings-group__item__label">Version</div>
           <div className="settings-group__item__value">1.0.0</div>
