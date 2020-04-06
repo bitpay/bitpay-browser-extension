@@ -3,6 +3,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
+import { Tooltip, makeStyles, createStyles } from '@material-ui/core';
 import { GiftCard, CardConfig } from '../../../services/gift-card.types';
 import './card.scss';
 import { set, get } from '../../../services/storage';
@@ -16,11 +17,29 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
   history,
   setPurchasedGiftCards
 }) => {
+  const useStyles = makeStyles(() =>
+    createStyles({
+      customWidth: {
+        borderRadius: '6px',
+        color: 'white',
+        backgroundColor: '#303133',
+        maxWidth: 200,
+        padding: '12px 15px',
+        fontWeight: 400,
+        fontSize: '11px',
+        textAlign: 'center',
+        top: '10px'
+      }
+    })
+  );
+  const classes = useStyles();
+
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     resizeToFitPage(ref, 80);
   }, [ref]);
   const { card, cardConfig } = location.state as { card: GiftCard; cardConfig: CardConfig };
+  // card.status = 'PENDING';
   const [archived, setArchived] = useState(card.archived);
   const initiallyArchived = card.archived;
   // const cardObj = location.state.card as GiftCard;
@@ -97,7 +116,7 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
         </Menu>
         <CardHeader cardConfig={cardConfig} card={card} />
         <LineItems cardConfig={cardConfig} card={card} />
-        {cardConfig.defaultClaimCodeType !== 'link' ? (
+        {card.status === 'SUCCESS ' && cardConfig.defaultClaimCodeType !== 'link' ? (
           <>
             <div className="card-details__claim-box">
               <div className="card-details__claim-box__value">{card.claimCode}</div>
@@ -112,7 +131,7 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
           </>
         ) : null}
 
-        {!archived && shouldShowRedeemButton() ? (
+        {card.status === 'SUCCESS' && !archived && shouldShowRedeemButton() ? (
           <button
             className="action-button"
             type="button"
@@ -121,6 +140,21 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
           >
             Redeem Now
           </button>
+        ) : null}
+
+        {card.status === 'PENDING' ? (
+          <>
+            <Tooltip
+              title="We’ll update your claim code here when your payment confirms"
+              placement="top"
+              classes={{ tooltip: classes.customWidth }}
+              arrow
+            >
+              <button className="action-button action-button--warn" type="button" style={{ marginBottom: '-10px' }}>
+                Pending Confirmation
+              </button>
+            </Tooltip>
+          </>
         ) : null}
       </div>
     </div>
