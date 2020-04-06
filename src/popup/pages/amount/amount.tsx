@@ -23,6 +23,7 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
     discounts,
     email
   };
+  const baseDelta = getPrecision(cardConfig.currency) === 2 ? 0.01 : 1;
   const changeFixedAmount = (delta: number): void => {
     const denoms = cardConfig.supportedAmounts as number[];
     const maxIndex = denoms.length - 1;
@@ -54,9 +55,9 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
       </div>
       <div className="amount-page__amount-box__wrapper">
         <div className="amount-page__amount-box">
-          <div className="amount-page__amount-box__currency">USD</div>
+          <div className="amount-page__amount-box__currency">{cardConfig.currency}</div>
           <div className="amount-page__amount-box__amount">
-            <button type="button" onClick={(): void => changeAmount(-0.01)}>
+            <button type="button" onClick={(): void => changeAmount(-baseDelta)}>
               <img src="../../assets/icons/decrement-icon.svg" alt="minus" />
             </button>
             <div
@@ -67,7 +68,7 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
             >
               {amount}
             </div>
-            <button type="button" onClick={(): void => changeAmount(0.01)}>
+            <button type="button" onClick={(): void => changeAmount(baseDelta)}>
               <img src="../../assets/icons/increment-icon.svg" alt="minus" />
             </button>
           </div>

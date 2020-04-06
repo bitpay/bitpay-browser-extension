@@ -5,6 +5,7 @@ import { GiftCard, CardConfig, GiftCardInvoiceParams } from '../../../services/g
 import './pay-with-bitpay.scss';
 import { get, set } from '../../../services/storage';
 import { createBitPayInvoice, redeemGiftCard, getBitPayInvoice } from '../../../services/gift-card';
+import Snack from '../snack/snack';
 
 const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
   cardConfig: CardConfig;
@@ -12,6 +13,7 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
   setEmail?: (email: string) => void;
   setPurchasedGiftCards: (cards: GiftCard[]) => void;
 }> = ({ cardConfig, invoiceParams, history, setEmail, setPurchasedGiftCards }) => {
+  const [errorMessage, setErrorMessage] = useState('');
   const [awaitingPayment, setAwaitingPayment] = useState(false);
   const { amount, currency } = invoiceParams;
   const saveGiftCard = async (card: GiftCard): Promise<void> => {
@@ -66,6 +68,7 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
   return (
     <>
       <div className="pay-with-bitpay">
+        <Snack message={errorMessage} onClose={(): void => setErrorMessage('')} />
         {awaitingPayment ? (
           <>
             <div className="action-button action-button--light awaiting-payment" style={{ marginTop: '15px' }}>
@@ -76,7 +79,12 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
           <button
             className={`${invoiceParams.email ? '' : 'disabled'}`}
             type="button"
-            onClick={launchInvoice}
+            onClick={(): Promise<void> =>
+              launchInvoice().catch(err => {
+                setErrorMessage(err.message || 'An unexpected error occurred');
+                setAwaitingPayment(false);
+              })
+            }
             disabled={!invoiceParams.email}
           >
             <img src="../../assets/pay-with-bitpay.svg" alt="Pay with BitPay" />

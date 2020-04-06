@@ -11,6 +11,10 @@ export async function post(url: string, params: any): Promise<any> {
     },
     body: JSON.stringify(params)
   });
+  if (!response.ok) {
+    const err = await response.json();
+    throw Error(err.message);
+  }
   const data = await response.json();
   return data;
 }
