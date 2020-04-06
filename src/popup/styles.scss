@@ -59,6 +59,11 @@ button {
     background-color: rgba($color: #fdb455, $alpha: 0.1);
   }
 
+  &--danger {
+    color: #ef476f;
+    background-color: rgba($color: #ef476f, $alpha: 0.1);
+  }
+
   &[disabled] {
     opacity: 0.6;
     pointer-events: none;

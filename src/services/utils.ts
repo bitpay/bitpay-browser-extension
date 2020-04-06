@@ -26,3 +26,5 @@ export function groupBy(list: any[], props: any): {} {
     return a;
   }, {});
 }
+
+export const wait = (ms: number): Promise<void> => new Promise(_ => setTimeout(_, ms));

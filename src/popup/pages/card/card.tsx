@@ -6,17 +6,18 @@ import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/ho
 import { Tooltip, makeStyles, createStyles } from '@material-ui/core';
 import { GiftCard, CardConfig } from '../../../services/gift-card.types';
 import './card.scss';
-import { set, get } from '../../../services/storage';
+import { set } from '../../../services/storage';
 import { resizeToFitPage } from '../../../services/frame';
 import LineItems from '../../components/line-items/line-items';
 import CardHeader from '../../components/card-header/card-header';
 import { launchNewTab } from '../../../services/browser';
+import { redeemGiftCard } from '../../../services/gift-card';
+import { wait } from '../../../services/utils';
 
-const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: GiftCard[]) => void }> = ({
-  location,
-  history,
-  setPurchasedGiftCards
-}) => {
+const Card: React.FC<RouteComponentProps & {
+  purchasedGiftCards: GiftCard[];
+  setPurchasedGiftCards: (cards: GiftCard[]) => void;
+}> = ({ location, history, purchasedGiftCards, setPurchasedGiftCards }) => {
   const useStyles = makeStyles(() =>
     createStyles({
       customWidth: {
@@ -38,12 +39,9 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
   useEffect(() => {
     resizeToFitPage(ref, 80);
   }, [ref]);
-  const { card, cardConfig } = location.state as { card: GiftCard; cardConfig: CardConfig };
-  // card.status = 'PENDING';
-  const [archived, setArchived] = useState(card.archived);
-  const initiallyArchived = card.archived;
-  // const cardObj = location.state.card as GiftCard;
-  // const card = { ...cardObj, discounts: [{ type: 'percentage', amount: 5 }], totalDiscount: 0.05 } as GiftCard;
+  const { card: giftCard, cardConfig } = location.state as { card: GiftCard; cardConfig: CardConfig };
+  const [card, setCard] = useState(giftCard);
+  const initiallyArchived = giftCard.archived;
   const redeemUrl = `${cardConfig.redeemUrl}${card.claimCode}`;
   const popupState = usePopupState({ variant: 'popover', popupId: 'cardActions' });
   const launchClaimLink = (): void => {
@@ -51,26 +49,30 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
     launchNewTab(url);
   };
   const shouldShowRedeemButton = (): boolean => !!(cardConfig.redeemUrl || cardConfig.defaultClaimCodeType === 'link');
-  const archive = async (): Promise<void> => {
-    const cards = await get<GiftCard[]>('purchasedGiftCards');
-    const newCards = cards.map(purchasedCard =>
-      purchasedCard.invoiceId === card.invoiceId ? { ...purchasedCard, archived: true } : { ...purchasedCard }
+  const updatePurchasedCards = async (cardToUpdate: GiftCard): Promise<void> => {
+    const newCards = purchasedGiftCards.map(purchasedCard =>
+      purchasedCard.invoiceId === cardToUpdate.invoiceId ? { ...purchasedCard, ...cardToUpdate } : { ...purchasedCard }
     );
     await set<GiftCard[]>('purchasedGiftCards', newCards);
     setPurchasedGiftCards(newCards);
-    setArchived(true);
+  };
+  const updateCard = async (cardToUpdate: GiftCard): Promise<void> => {
+    await updatePurchasedCards(cardToUpdate);
+    setCard(cardToUpdate);
+  };
+  const archive = async (): Promise<void> => {
+    updateCard({ ...card, archived: true });
     initiallyArchived ? resizeToFitPage(ref, 80) : history.goBack();
   };
-  const unarchive = async (): Promise<void> => {
-    const cards = await get<GiftCard[]>('purchasedGiftCards');
-    const newCards = cards.map(purchasedCard =>
-      purchasedCard.invoiceId === card.invoiceId ? { ...purchasedCard, archived: false } : { ...purchasedCard }
-    );
-    await set<GiftCard[]>('purchasedGiftCards', newCards);
-    setPurchasedGiftCards(newCards);
+  const resizePageBeforeRerender = (): void => {
     const paddingBottom = shouldShowRedeemButton() ? 136 : 80;
     resizeToFitPage(ref, paddingBottom);
-    setTimeout(() => setArchived(false), 300);
+  };
+  const unarchive = async (): Promise<void> => {
+    await updatePurchasedCards(card);
+    resizePageBeforeRerender();
+    await wait(300);
+    updateCard({ ...card, archived: false });
   };
   const handleMenuClick = (item: string): void => {
     switch (item) {
@@ -90,6 +92,15 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
     }
     popupState.close();
   };
+  const redeem = async (): Promise<void> => {
+    const updatedGiftCard = await redeemGiftCard(card);
+    const fullCard = { ...card, ...updatedGiftCard };
+    await updateCard(fullCard);
+    resizeToFitPage(ref, 80);
+  };
+  useEffect((): void => {
+    if (card.status === 'PENDING') redeem();
+  });
   return (
     <div className="card-details">
       <div ref={ref}>
@@ -104,7 +115,7 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
           className="card-details__more__menu"
           style={{ boxShadow: 'none' }}
         >
-          {['Edit Balance', archived ? 'Unarchive' : 'Archive', 'Help'].map(option => (
+          {['Edit Balance', card.archived ? 'Unarchive' : 'Archive', 'Help'].map(option => (
             <MenuItem
               className="card-details__more__menu__item"
               key={option}
@@ -116,7 +127,7 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
         </Menu>
         <CardHeader cardConfig={cardConfig} card={card} />
         <LineItems cardConfig={cardConfig} card={card} />
-        {card.status === 'SUCCESS ' && cardConfig.defaultClaimCodeType !== 'link' ? (
+        {card.status === 'SUCCESS' && cardConfig.defaultClaimCodeType !== 'link' ? (
           <>
             <div className="card-details__claim-box">
               <div className="card-details__claim-box__value">{card.claimCode}</div>
@@ -131,7 +142,7 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
           </>
         ) : null}
 
-        {card.status === 'SUCCESS' && !archived && shouldShowRedeemButton() ? (
+        {card.status === 'SUCCESS' && !card.archived && shouldShowRedeemButton() ? (
           <button
             className="action-button"
             type="button"
@@ -150,8 +161,32 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
               classes={{ tooltip: classes.customWidth }}
               arrow
             >
-              <button className="action-button action-button--warn" type="button" style={{ marginBottom: '-10px' }}>
+              <button
+                className="action-button action-button--warn"
+                type="button"
+                style={{ marginBottom: '-10px' }}
+                onClick={redeem}
+              >
                 Pending Confirmation
+              </button>
+            </Tooltip>
+          </>
+        ) : null}
+        {card.status === 'FAILURE' ? (
+          <>
+            <Tooltip
+              title="Could not get claim code. Please contact BitPay Support."
+              placement="top"
+              classes={{ tooltip: classes.customWidth }}
+              arrow
+            >
+              <button
+                className="action-button action-button--danger"
+                type="button"
+                style={{ marginBottom: '-10px' }}
+                onClick={(): void => handleMenuClick('Help')}
+              >
+                Something Went Wrong
               </button>
             </Tooltip>
           </>

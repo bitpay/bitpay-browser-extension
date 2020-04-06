@@ -71,7 +71,13 @@ const Popup: React.FC = () => {
             />
             <Route
               path="/card/:id"
-              render={(props): JSX.Element => <Card setPurchasedGiftCards={setPurchasedGiftCards} {...props} />}
+              render={(props): JSX.Element => (
+                <Card
+                  purchasedGiftCards={purchasedGiftCards}
+                  setPurchasedGiftCards={setPurchasedGiftCards}
+                  {...props}
+                />
+              )}
             />
             <Route
               path="/payment/:brand"
