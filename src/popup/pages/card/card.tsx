@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import { browser } from 'webextension-polyfill-ts';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
@@ -10,6 +9,7 @@ import { set, get } from '../../../services/storage';
 import { resizeToFitPage } from '../../../services/frame';
 import LineItems from '../../components/line-items/line-items';
 import CardHeader from '../../components/card-header/card-header';
+import { launchNewTab } from '../../../services/browser';
 
 const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: GiftCard[]) => void }> = ({
   location,
@@ -27,9 +27,6 @@ const Card: React.FC<RouteComponentProps & { setPurchasedGiftCards: (cards: Gift
   // const card = { ...cardObj, discounts: [{ type: 'percentage', amount: 5 }], totalDiscount: 0.05 } as GiftCard;
   const redeemUrl = `${cardConfig.redeemUrl}${card.claimCode}`;
   const popupState = usePopupState({ variant: 'popover', popupId: 'cardActions' });
-  const launchNewTab = (url: string): void => {
-    browser.tabs.create({ url });
-  };
   const launchClaimLink = (): void => {
     const url = cardConfig.defaultClaimCodeType === 'link' ? (card.claimLink as string) : redeemUrl;
     launchNewTab(url);
