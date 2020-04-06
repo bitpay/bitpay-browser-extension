@@ -1,39 +1,28 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import './code-box.scss';
 
+import Anime, { anime } from 'react-anime';
 import copyUtil from '../../../services/copy-util';
 
 const CodeBox: React.FC<{ code: string; label: string }> = ({ code, label }) => {
-  const box = useRef<HTMLButtonElement>(null);
-  const value = useRef<HTMLDivElement>(null);
-  const [copied, setCopied] = useState(false);
-  const boxClicked = (val: string): void => {
-    copyUtil(val);
-    if (!copied && box.current && value.current) {
-      setCopied(true);
-      box.current.style.transform = 'scale(1.03)';
-      value.current.style.color = '#4f6ef7';
-      setTimeout((): void => {
-        if (box.current) {
-          box.current.style.transform = 'initial';
-        }
-      }, 300);
-      setTimeout((): void => {
-        if (value.current) {
-          value.current.style.transform = 'initial';
-        }
-        setCopied(false);
-      }, 1500);
-    }
-  };
+  const [hovering, setHovering] = useState(false);
   return (
     <div className="code-box--wrapper">
-      <button className="code-box" onClick={(): void => boxClicked(code)} ref={box} type="button">
-        <div className="code-box__value" ref={value}>
-          {code}
-        </div>
-        <div className="code-box__label">{label}</div>
-        <div className="code-box__label code-box__label--action">Copy to Clipboard</div>
+      <button
+        className="code-box"
+        onClick={(): void => copyUtil(code)}
+        onMouseEnter={(): void => setHovering(true)}
+        onMouseLeave={(): void => setHovering(false)}
+        type="button"
+      >
+        <div className="code-box__value">{code}</div>
+        <Anime delay={anime.stagger(50)} translateY={[8, 0]} opacity={[0, 1]}>
+          {hovering ? (
+            <div className="code-box__label code-box__label--action">Copy to Clipboard</div>
+          ) : (
+            <div className="code-box__label">{label}</div>
+          )}
+        </Anime>
       </button>
     </div>
   );

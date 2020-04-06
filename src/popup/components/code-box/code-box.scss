@@ -24,7 +24,6 @@
     margin-top: 5px;
 
     &--action {
-      display: none;
       color: #4f6ef7;
       font-weight: 500;
     }
@@ -34,14 +33,5 @@
     font-size: 20px;
     font-weight: 600;
     transition: color 300ms ease-in-out;
-  }
-
-  &:hover {
-    .code-box__label {
-      display: none;
-    }
-    .code-box__label--action {
-      display: block;
-    }
   }
 }
