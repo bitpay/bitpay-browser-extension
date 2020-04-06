@@ -8,6 +8,7 @@
   padding: 20px 0;
   width: 100%;
   cursor: pointer;
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 
   &--wrapper {
     margin: 0 10px;
@@ -32,6 +33,7 @@
   &__value {
     font-size: 20px;
     font-weight: 600;
+    transition: color 300ms ease-in-out;
   }
 
   &:hover {
