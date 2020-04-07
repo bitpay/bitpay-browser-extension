@@ -51,7 +51,7 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
     <div className="amount-page">
       <div className="amount-page__title">
         <div className="amount-page__merchant-name">{cardConfig.displayName}</div>
-        {hasDiscount ? <div className="amount-page__promo">3% Off Each Purchase</div> : null}
+        {hasDiscount && <div className="amount-page__promo">3% Off Each Purchase</div>}
       </div>
       <div className="amount-page__amount-box__wrapper">
         <div className="amount-page__amount-box">
@@ -79,7 +79,7 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
       </div>
       <div className="amount-page__cta">
         {hasDiscount || !email ? (
-          <div className="action-button__footer">
+          <div className="action-button__footer" style={{ marginTop: 0 }}>
             <Link
               className="action-button"
               to={{

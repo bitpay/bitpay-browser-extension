@@ -107,12 +107,10 @@ export async function redeemGiftCard(data: Partial<GiftCard>): Promise<GiftCard>
       return fullCard;
     })
     .catch(err => {
-      const errMessage = err.error && err.error.message;
+      const errMessage = err.message || (err.error && err.error.message);
       const pendingMessages = ['Card creation delayed', 'Invoice is unpaid or payment has not confirmed'];
-      if (pendingMessages.indexOf(errMessage) === -1 && errMessage.indexOf('Please wait') === -1) {
-        throw err;
-      }
-      return { ...data, status: 'PENDING' };
+      const isDelayed = pendingMessages.includes(errMessage) || errMessage.indexOf('Please wait') !== -1;
+      return { ...data, status: isDelayed ? 'PENDING' : 'FAILURE' };
     });
   return giftCard as GiftCard;
 }

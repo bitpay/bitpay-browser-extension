@@ -32,8 +32,8 @@ const Payment: React.FC<any> = ({ location, history, setEmail, setPurchasedGiftC
     <div className="payment">
       <div ref={ref}>
         <CardHeader cardConfig={cardConfig} card={card} />
-        {cardConfig.discounts && cardConfig.discounts.length ? <LineItems cardConfig={cardConfig} card={card} /> : null}
-        {!invoiceParams.email ? (
+        {cardConfig.discounts && cardConfig.discounts.length && <LineItems cardConfig={cardConfig} card={card} />}
+        {!invoiceParams.email && (
           <div className="settings-group">
             <div className="settings-group__label">Email</div>
             <div className="settings-group__input">
@@ -41,7 +41,7 @@ const Payment: React.FC<any> = ({ location, history, setEmail, setPurchasedGiftC
             </div>
             <div className="settings-group__caption">Email used for purchase receipts and communication</div>
           </div>
-        ) : null}
+        )}
         <PayWithBitpay
           invoiceParams={{ ...invoiceParams, amount, email }}
           cardConfig={cardConfig}

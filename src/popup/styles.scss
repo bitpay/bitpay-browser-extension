@@ -54,13 +54,23 @@ button {
   border-radius: 8px;
   cursor: pointer;
 
+  &--warn {
+    color: #fdb455;
+    background-color: rgba($color: #fdb455, $alpha: 0.1);
+  }
+
+  &--danger {
+    color: #ef476f;
+    background-color: rgba($color: #ef476f, $alpha: 0.1);
+  }
+
   &[disabled] {
     opacity: 0.6;
     pointer-events: none;
   }
 
   &__footer {
-    margin: 0 4px;
+    margin: 20px 4px 0;
     &--fixed {
       position: fixed;
       bottom: 0;
@@ -99,4 +109,8 @@ button {
     color: rgba(black, 0.25);
     margin-top: 4px;
   }
+}
+
+span.MuiTooltip-arrow {
+  color: #303133;
 }

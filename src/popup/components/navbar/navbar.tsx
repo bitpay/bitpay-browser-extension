@@ -33,7 +33,7 @@ const Navbar: React.FC<RouteComponentProps> = ({ history, location }) => {
         </button>
       )}
 
-      {showBackButton ? <img className="bp-logo--solo" alt="bitpay" src="../assets/icons/b-logo-blue.svg" /> : null}
+      {showBackButton && <img className="bp-logo--solo" alt="bitpay" src="../assets/icons/b-logo-blue.svg" />}
 
       <div className="header-bar__row">
         {!collapsed ? (

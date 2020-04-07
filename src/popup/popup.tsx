@@ -54,7 +54,7 @@ const Popup: React.FC = () => {
   }, []);
   return (
     <>
-      {loaded ? (
+      {loaded && (
         <Router initialEntries={initialEntries}>
           <Navbar />
           <Switch>
@@ -71,7 +71,13 @@ const Popup: React.FC = () => {
             />
             <Route
               path="/card/:id"
-              render={(props): JSX.Element => <Card setPurchasedGiftCards={setPurchasedGiftCards} {...props} />}
+              render={(props): JSX.Element => (
+                <Card
+                  purchasedGiftCards={purchasedGiftCards}
+                  setPurchasedGiftCards={setPurchasedGiftCards}
+                  {...props}
+                />
+              )}
             />
             <Route
               path="/payment/:brand"
@@ -112,7 +118,7 @@ const Popup: React.FC = () => {
           </Switch>
           <Tabs />
         </Router>
-      ) : null}
+      )}
     </>
   );
 };
