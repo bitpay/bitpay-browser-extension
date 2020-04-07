@@ -24,6 +24,8 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
     email
   };
   const baseDelta = getPrecision(cardConfig.currency) === 2 ? 0.01 : 1;
+  const maxAmount = cardConfig.maxAmount as number;
+  const minAmount = cardConfig.minAmount as number;
   const changeFixedAmount = (delta: number): void => {
     const denoms = cardConfig.supportedAmounts as number[];
     const maxIndex = denoms.length - 1;
@@ -39,14 +41,23 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
       return setAmount(0);
     }
     const newValue = amount + delta;
-    const maxAmount = cardConfig.maxAmount as number;
-    const minAmount = cardConfig.minAmount as number;
     // eslint-disable-next-line no-nested-ternary
     const newAmount = newValue > maxAmount ? maxAmount : newValue < minAmount ? minAmount : newValue;
     setAmount(parseFloat(newAmount.toFixed(getPrecision(cardConfig.currency))));
   };
   const changeAmount = (delta: number): void =>
     hasFixedDenoms ? changeFixedAmount(delta) : changeVariableAmount(delta);
+
+  const handleInput = (input: string): void => {
+    const newAmount = parseFloat(Number(input).toFixed(getPrecision(cardConfig.currency)));
+    if (newAmount >= minAmount && newAmount <= maxAmount) {
+      setAmount(newAmount);
+    } else if (newAmount === 0) {
+      setAmount(0);
+    } else {
+      console.log('error wiggle');
+    }
+  };
   return (
     <div className="amount-page">
       <div className="amount-page__title">
@@ -54,6 +65,18 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
         {hasDiscount && <div className="amount-page__promo">3% Off Each Purchase</div>}
       </div>
       <div className="amount-page__amount-box__wrapper">
+        {!hasFixedDenoms && (
+          <input
+            value={amount}
+            onChange={(e: React.FormEvent<HTMLInputElement>): void => handleInput(e.currentTarget.value)}
+            onBlur={(e: React.FormEvent<HTMLInputElement>): void => e.currentTarget.focus()}
+            className="amount-page__input"
+            placeholder="0"
+            type="number"
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
+          />
+        )}
         <div className="amount-page__amount-box">
           <div className="amount-page__amount-box__currency">{cardConfig.currency}</div>
           <div className="amount-page__amount-box__amount">
@@ -62,9 +85,7 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
             </button>
             <div
               className="amount-page__amount-box__amount__value"
-              style={{
-                color: amount === 0 ? '#DFDFDF' : 'inherit'
-              }}
+              style={{ color: amount === 0 ? '#DFDFDF' : 'inherit' }}
             >
               {amount}
             </div>
