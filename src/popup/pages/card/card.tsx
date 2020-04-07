@@ -7,11 +7,12 @@ import { Tooltip, makeStyles, createStyles } from '@material-ui/core';
 import { GiftCard, CardConfig } from '../../../services/gift-card.types';
 import './card.scss';
 import { resizeToFitPage } from '../../../services/frame';
-import LineItems from '../../components/line-items/line-items';
-import CardHeader from '../../components/card-header/card-header';
 import { launchNewTab } from '../../../services/browser';
 import { redeemGiftCard, getLatestBalance } from '../../../services/gift-card';
 import { wait } from '../../../services/utils';
+import LineItems from '../../components/line-items/line-items';
+import CardHeader from '../../components/card-header/card-header';
+import CodeBox from '../../components/code-box/code-box';
 
 const Card: React.FC<RouteComponentProps & {
   purchasedGiftCards: GiftCard[];
@@ -101,7 +102,7 @@ const Card: React.FC<RouteComponentProps & {
   }, []);
   return (
     <div className="card-details">
-      <div ref={ref}>
+      <div className="card-details__content" ref={ref}>
         <button className="card-details__more" type="button" {...bindTrigger(popupState)}>
           <img src="../../assets/icons/dots.svg" alt="More" />
         </button>
@@ -125,40 +126,29 @@ const Card: React.FC<RouteComponentProps & {
         </Menu>
         <CardHeader amount={getLatestBalance(card)} cardConfig={cardConfig} card={card} />
         <LineItems cardConfig={cardConfig} card={card} />
-        {card.status === 'SUCCESS' && cardConfig.defaultClaimCodeType !== 'link' ? (
-          <>
-            <div className="card-details__claim-box">
-              <div className="card-details__claim-box__value">{card.claimCode}</div>
-              <div className="card-details__claim-box__label">Claim Code</div>
-            </div>
-            {card.pin ? (
-              <div className="card-details__claim-box">
-                <div className="card-details__claim-box__value">{card.pin}</div>
-                <div className="card-details__claim-box__label">Pin</div>
-              </div>
-            ) : null}
-          </>
-        ) : null}
+        {card.status === 'SUCCESS' && cardConfig.defaultClaimCodeType !== 'link' && (
+          <div className="card-details__content__code-box">
+            <CodeBox label="Claim Code" code={card.claimCode} />
+            {card.pin && <CodeBox label="Pin" code={card.pin} />}
+          </div>
+        )}
 
-        {card.status === 'SUCCESS' && !card.archived && shouldShowRedeemButton() ? (
-          <button
-            className="action-button"
-            type="button"
-            onClick={(): void => launchClaimLink()}
-            style={{ marginBottom: '-10px' }}
+        {card.status === 'SUCCESS' && !card.archived && shouldShowRedeemButton() && (
+          <div className="action-button__footer">
+            <button className="action-button" type="button" onClick={(): void => launchClaimLink()}>
+              Redeem Now
+            </button>
+          </div>
+        )}
+
+        {card.status === 'PENDING' && (
+          <Tooltip
+            title="We’ll update your claim code here when your payment confirms"
+            placement="top"
+            classes={{ tooltip: classes.tooltipStyles }}
+            arrow
           >
-            Redeem Now
-          </button>
-        ) : null}
-
-        {card.status === 'PENDING' ? (
-          <>
-            <Tooltip
-              title="We’ll update your claim code here when your payment confirms"
-              placement="top"
-              classes={{ tooltip: classes.tooltipStyles }}
-              arrow
-            >
+            <div className="action-button__footer">
               <button
                 className="action-button action-button--warn"
                 type="button"
@@ -167,28 +157,27 @@ const Card: React.FC<RouteComponentProps & {
               >
                 Pending Confirmation
               </button>
-            </Tooltip>
-          </>
-        ) : null}
-        {card.status === 'FAILURE' ? (
-          <>
-            <Tooltip
-              title="Could not get claim code. Please contact BitPay Support."
-              placement="top"
-              classes={{ tooltip: classes.tooltipStyles }}
-              arrow
-            >
+            </div>
+          </Tooltip>
+        )}
+        {card.status === 'FAILURE' && (
+          <Tooltip
+            title="Could not get claim code. Please contact BitPay Support."
+            placement="top"
+            classes={{ tooltip: classes.tooltipStyles }}
+            arrow
+          >
+            <div className="action-button__footer">
               <button
                 className="action-button action-button--danger"
                 type="button"
-                style={{ marginBottom: '-10px' }}
                 onClick={(): void => handleMenuClick('Help')}
               >
                 Something Went Wrong
               </button>
-            </Tooltip>
-          </>
-        ) : null}
+            </div>
+          </Tooltip>
+        )}
       </div>
     </div>
   );

@@ -1,0 +1,33 @@
+.code-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f4f6fa;
+  border-radius: 10px;
+  padding: 20px 0;
+  width: 100%;
+  cursor: pointer;
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+
+  &--wrapper {
+    margin: 0 10px;
+  }
+
+  &__label {
+    font-size: 12px;
+    color: rgba($color: #434d5a, $alpha: 0.75);
+    margin-top: 5px;
+
+    &--action {
+      color: #4f6ef7;
+      font-weight: 500;
+    }
+  }
+
+  &__value {
+    font-size: 20px;
+    font-weight: 600;
+    transition: color 300ms ease-in-out;
+  }
+}

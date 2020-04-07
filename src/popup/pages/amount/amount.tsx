@@ -24,6 +24,8 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
     email
   };
   const baseDelta = getPrecision(cardConfig.currency) === 2 ? 0.01 : 1;
+  const maxAmount = cardConfig.maxAmount as number;
+  const minAmount = cardConfig.minAmount as number;
   const changeFixedAmount = (delta: number): void => {
     const denoms = cardConfig.supportedAmounts as number[];
     const maxIndex = denoms.length - 1;
@@ -39,21 +41,46 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
       return setAmount(0);
     }
     const newValue = amount + delta;
-    const maxAmount = cardConfig.maxAmount as number;
-    const minAmount = cardConfig.minAmount as number;
     // eslint-disable-next-line no-nested-ternary
     const newAmount = newValue > maxAmount ? maxAmount : newValue < minAmount ? minAmount : newValue;
     setAmount(parseFloat(newAmount.toFixed(getPrecision(cardConfig.currency))));
   };
   const changeAmount = (delta: number): void =>
     hasFixedDenoms ? changeFixedAmount(delta) : changeVariableAmount(delta);
+
+  const [inputError, setInputError] = useState(false);
+  const handleInput = (input: string): void => {
+    const newAmount = parseFloat(Number(input).toFixed(getPrecision(cardConfig.currency)));
+    if (newAmount >= minAmount && newAmount <= maxAmount) {
+      setAmount(newAmount);
+    } else if (newAmount === 0) {
+      setAmount(0);
+    } else {
+      setInputError(true);
+      setTimeout((): void => {
+        setInputError(false);
+      }, 900);
+    }
+  };
   return (
     <div className="amount-page">
       <div className="amount-page__title">
         <div className="amount-page__merchant-name">{cardConfig.displayName}</div>
-        {hasDiscount ? <div className="amount-page__promo">3% Off Each Purchase</div> : null}
+        {hasDiscount && <div className="amount-page__promo">3% Off Each Purchase</div>}
       </div>
       <div className="amount-page__amount-box__wrapper">
+        {!hasFixedDenoms && (
+          <input
+            value={amount}
+            onChange={(e: React.FormEvent<HTMLInputElement>): void => handleInput(e.currentTarget.value)}
+            onBlur={(e: React.FormEvent<HTMLInputElement>): void => e.currentTarget.focus()}
+            className="amount-page__input"
+            placeholder="0"
+            type="number"
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
+          />
+        )}
         <div className="amount-page__amount-box">
           <div className="amount-page__amount-box__currency">{cardConfig.currency}</div>
           <div className="amount-page__amount-box__amount">
@@ -61,10 +88,8 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
               <img src="../../assets/icons/decrement-icon.svg" alt="minus" />
             </button>
             <div
-              className="amount-page__amount-box__amount__value"
-              style={{
-                color: amount === 0 ? '#DFDFDF' : 'inherit'
-              }}
+              className={`amount-page__amount-box__amount__value${inputError ? ' wiggle-animation' : ''}`}
+              style={{ color: amount === 0 ? '#DFDFDF' : 'inherit' }}
             >
               {amount}
             </div>
@@ -79,19 +104,21 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
       </div>
       <div className="amount-page__cta">
         {hasDiscount || !email ? (
-          <Link
-            className="action-button"
-            to={{
-              pathname: `/payment/${cardConfig.name}`,
-              state: {
-                amount,
-                cardConfig,
-                invoiceParams
-              }
-            }}
-          >
-            Continue
-          </Link>
+          <div className="action-button__footer" style={{ marginTop: 0 }}>
+            <Link
+              className="action-button"
+              to={{
+                pathname: `/payment/${cardConfig.name}`,
+                state: {
+                  amount,
+                  cardConfig,
+                  invoiceParams
+                }
+              }}
+            >
+              Continue
+            </Link>
+          </div>
         ) : (
           <PayWithBitpay
             invoiceParams={{ ...invoiceParams, amount }}

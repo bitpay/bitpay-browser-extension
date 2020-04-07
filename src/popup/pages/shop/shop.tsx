@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './shop.scss';
 
 import { Link } from 'react-router-dom';
+import Anime, { anime } from 'react-anime';
 import SearchBar from '../../components/search-bar/search-bar';
 import MerchantCell from '../../components/merchant-cell/merchant-cell';
 import { Merchant } from '../../../services/merchant';
@@ -29,17 +30,19 @@ const Shop: React.FC<{ merchants: Merchant[] }> = ({ merchants }) => {
         {!searchVal && (
           <>
             <div className="shop-page__section-header">Popular Brands</div>
-            {featuredMerchants.map(merchant => (
-              <Link
-                to={{
-                  pathname: `/brand/${merchant.name}`,
-                  state: { merchant }
-                }}
-                key={merchant.name}
-              >
-                <MerchantCell key={merchant.name} merchant={merchant} />
-              </Link>
-            ))}
+            <Anime delay={anime.stagger(50)} translateY={[-32, 0]} opacity={[0, 1]}>
+              {featuredMerchants.map(merchant => (
+                <Link
+                  to={{
+                    pathname: `/brand/${merchant.name}`,
+                    state: { merchant }
+                  }}
+                  key={merchant.name}
+                >
+                  <MerchantCell key={merchant.name} merchant={merchant} />
+                </Link>
+              ))}
+            </Anime>
             <div className="shop-page__divider" />
           </>
         )}

@@ -73,4 +73,38 @@
       text-align: center;
     }
   }
+
+  &__input {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+}
+
+.wiggle-animation {
+  animation-name: wiggle;
+  animation-duration: 600ms;
+}
+@keyframes wiggle {
+  from,
+  to {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translate3d(-10px, 0, 0);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translate3d(10px, 0, 0);
+  }
 }

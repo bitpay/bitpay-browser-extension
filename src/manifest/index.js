@@ -4,7 +4,7 @@ const pkg = require('../../package.json');
 
 const manifestInput = {
   manifest_version: 2,
-  name: 'Sample WebExtension',
+  name: 'Pay with BitPay',
   version: pkg.version,
 
   icons: {
@@ -14,16 +14,16 @@ const manifestInput = {
     '128': 'assets/icons/favicon-128.png'
   },
 
-  description: 'Sample description',
-  homepage_url: 'https://github.com/abhijithvijayan/web-extension-starter',
-  short_name: 'Sample Name',
+  description: 'Spend crypto anywhere',
+  homepage_url: 'https://github.com/msalcala11/extension',
+  short_name: 'Pay with BitPay',
 
   permissions: ['activeTab', 'storage', 'http://*/*', 'https://*/*'],
   content_security_policy: "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
-  '__chrome|firefox__author': 'abhijithvijayan',
+  '__chrome|firefox__author': 'bitpay',
   __opera__developer: {
-    name: 'abhijithvijayan'
+    name: 'bitpay'
   },
 
   __firefox__applications: {
@@ -42,7 +42,7 @@ const manifestInput = {
       '48': 'assets/icons/favicon-48.png',
       '128': 'assets/icons/favicon-128.png'
     },
-    default_title: 'tiny title',
+    default_title: 'Pay with BitPay',
     '__chrome|opera__chrome_style': false,
     __firefox__browser_style: false
   },

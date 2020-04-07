@@ -66,7 +66,7 @@ const Popup: React.FC = () => {
   }, []);
   return (
     <>
-      {loaded ? (
+      {loaded && (
         <Router initialEntries={initialEntries}>
           <Navbar />
           <Switch>
@@ -131,7 +131,7 @@ const Popup: React.FC = () => {
           </Switch>
           <Tabs />
         </Router>
-      ) : null}
+      )}
     </>
   );
 };
