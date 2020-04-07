@@ -38,27 +38,23 @@ const LineItems: React.FC<{ cardConfig: CardConfig; card: Partial<GiftCard> & Un
             </div>
           </div>
         ))}
-      {totalDiscount && (
-        <>
-          <div className="line-items__item line-items__item">
-            <div className={`line-items__item__label line-items__item__label${card.date ? '' : '--bold'}`}>
-              Total Cost
-            </div>
-            <div className={`line-items__item__value line-items__item__value${card.date ? '' : '--bold'}`}>
-              {formatCurrency(card.amount - totalDiscount, card.currency, { hideSymbol: !!card.date })}
-            </div>
+      {totalDiscount !== 0 && (
+        <div className="line-items__item line-items__item">
+          <div className={`line-items__item__label line-items__item__label${card.date ? '' : '--bold'}`}>
+            Total Cost
           </div>
-        </>
+          <div className={`line-items__item__value line-items__item__value${card.date ? '' : '--bold'}`}>
+            {formatCurrency(card.amount - totalDiscount, card.currency, { hideSymbol: !!card.date })}
+          </div>
+        </div>
       )}
       {card.invoice && (
-        <>
-          <div className="line-items__item">
-            <div className="line-items__item__label">Amount Paid</div>
-            <div className="line-items__item__value crypto-amount">
-              {card.invoice.displayAmountPaid} {card.invoice.transactionCurrency}
-            </div>
+        <div className="line-items__item">
+          <div className="line-items__item__label">Amount Paid</div>
+          <div className="line-items__item__value crypto-amount">
+            {card.invoice.displayAmountPaid} {card.invoice.transactionCurrency}
           </div>
-        </>
+        </div>
       )}
     </div>
   );

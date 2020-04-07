@@ -5,6 +5,18 @@
   &__content {
     display: flex;
     flex-direction: column;
+
+    &__code-box {
+      > :first-child {
+        margin-top: 10px;
+      }
+      > :not(:first-child) {
+        margin-top: 14px;
+      }
+      > :last-child {
+        margin-bottom: 10px;
+      }
+    }
   }
 
   &__more {

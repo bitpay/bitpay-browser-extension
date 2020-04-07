@@ -129,7 +129,7 @@ const Card: React.FC<RouteComponentProps & {
         <CardHeader cardConfig={cardConfig} card={card} />
         <LineItems cardConfig={cardConfig} card={card} />
         {card.status === 'SUCCESS' && cardConfig.defaultClaimCodeType !== 'link' && (
-          <div style={{ marginTop: '10px' }}>
+          <div className="card-details__content__code-box">
             <CodeBox label="Claim Code" code={card.claimCode} />
             {card.pin && <CodeBox label="Pin" code={card.pin} />}
           </div>
@@ -144,40 +144,36 @@ const Card: React.FC<RouteComponentProps & {
         )}
 
         {card.status === 'PENDING' && (
-          <>
-            <Tooltip
-              title="We’ll update your claim code here when your payment confirms"
-              placement="top"
-              classes={{ tooltip: classes.customWidth }}
-              arrow
-            >
-              <div className="action-button__footer">
-                <button className="action-button action-button--warn" type="button" onClick={redeem}>
-                  Pending Confirmation
-                </button>
-              </div>
-            </Tooltip>
-          </>
+          <Tooltip
+            title="We’ll update your claim code here when your payment confirms"
+            placement="top"
+            classes={{ tooltip: classes.customWidth }}
+            arrow
+          >
+            <div className="action-button__footer">
+              <button className="action-button action-button--warn" type="button" onClick={redeem}>
+                Pending Confirmation
+              </button>
+            </div>
+          </Tooltip>
         )}
         {card.status === 'FAILURE' && (
-          <>
-            <Tooltip
-              title="Could not get claim code. Please contact BitPay Support."
-              placement="top"
-              classes={{ tooltip: classes.customWidth }}
-              arrow
-            >
-              <div className="action-button__footer">
-                <button
-                  className="action-button action-button--danger"
-                  type="button"
-                  onClick={(): void => handleMenuClick('Help')}
-                >
-                  Something Went Wrong
-                </button>
-              </div>
-            </Tooltip>
-          </>
+          <Tooltip
+            title="Could not get claim code. Please contact BitPay Support."
+            placement="top"
+            classes={{ tooltip: classes.customWidth }}
+            arrow
+          >
+            <div className="action-button__footer">
+              <button
+                className="action-button action-button--danger"
+                type="button"
+                onClick={(): void => handleMenuClick('Help')}
+              >
+                Something Went Wrong
+              </button>
+            </div>
+          </Tooltip>
         )}
       </div>
     </div>
