@@ -75,6 +75,18 @@
     text-align: left;
     height: $cell-height;
 
+    &:not(:last-child) {
+      &:after {
+        content: "";
+        height: 1px;
+        width: calc(100% - #{$left-padding});
+        background: $border-color;
+        bottom: 0;
+        right: 0;
+        position: absolute;
+      }
+    }
+
     &--dark {
       color: $midnightGray;
       font-weight: 500;
@@ -122,18 +134,6 @@
       }
     }
 
-    &:not(:last-child) {
-      &:after {
-        content: "";
-        height: 1px;
-        width: calc(100% - #{$left-padding});
-        background: $border-color;
-        bottom: 0;
-        right: 0;
-        position: absolute;
-      }
-    }
-
     @at-root {
       a#{&},
       button#{&} {
@@ -153,13 +153,7 @@
   }
 
   &__input {
-    &--wrapper {
-      background: white;
-    }
-
-    margin-left: $left-padding;
-    border-bottom: $input-border;
-    padding-right: $left-padding;
+    padding: 0 $left-padding;
     background: white;
     height: $cell-height;
     display: flex;
@@ -180,9 +174,22 @@
         );
       }
     }
+
+    + div {
+      &:after {
+        content: "";
+        height: 1px;
+        width: calc(100% - #{$left-padding});
+        background: $border-color;
+        top: 0;
+        right: 0;
+        position: absolute;
+      }
+    }
   }
 
   &__caption {
+    position: relative;
     background: white;
     font-size: 11px;
     color: rgba(0, 0, 0, 0.4);

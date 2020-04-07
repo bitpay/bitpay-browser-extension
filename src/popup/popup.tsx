@@ -12,12 +12,13 @@ import Navbar from './components/navbar/navbar';
 import { Merchant, getBitPayMerchantFromHost, fetchCachedMerchants } from '../services/merchant';
 import Amount from './pages/amount/amount';
 import Payment from './pages/payment/payment';
-import { get } from '../services/storage';
+import { get, set } from '../services/storage';
 import { GiftCard, CardConfig } from '../services/gift-card.types';
 import { sortByDescendingDate } from '../services/gift-card';
 import Email from './pages/settings/email/email';
 import Archive from './pages/settings/archive/archive';
 import Legal from './pages/settings/legal/legal';
+import Balance from './pages/card/balance/balance';
 
 const Popup: React.FC = () => {
   const [initialEntries, setInitialEntries] = useState(['/shop']);
@@ -28,6 +29,17 @@ const Popup: React.FC = () => {
   const [supportedMerchant, setSupportedMerchant] = useState(undefined as Merchant | undefined);
   const [supportedGiftCards, setSupportedGiftCards] = useState([] as CardConfig[]);
   const [purchasedGiftCards, setPurchasedGiftCards] = useState([] as GiftCard[]);
+
+  const updatePurchasedCards = async (cardToUpdate: GiftCard): Promise<void> => {
+    const newCards = purchasedGiftCards.map(purchasedCard =>
+      purchasedCard.invoiceId === cardToUpdate.invoiceId ? { ...purchasedCard, ...cardToUpdate } : { ...purchasedCard }
+    );
+    await set<GiftCard[]>('purchasedGiftCards', newCards);
+    setPurchasedGiftCards(newCards);
+  };
+  const updateGiftCard = async (card: GiftCard): Promise<void> => {
+    await updatePurchasedCards(card);
+  };
 
   useEffect(() => {
     const getStartPage = async (): Promise<void> => {
@@ -71,13 +83,14 @@ const Popup: React.FC = () => {
             />
             <Route
               path="/card/:id"
+              exact
               render={(props): JSX.Element => (
-                <Card
-                  purchasedGiftCards={purchasedGiftCards}
-                  setPurchasedGiftCards={setPurchasedGiftCards}
-                  {...props}
-                />
+                <Card purchasedGiftCards={purchasedGiftCards} updateGiftCard={updateGiftCard} {...props} />
               )}
+            />
+            <Route
+              path="/card/:id/balance"
+              render={(props): JSX.Element => <Balance updateGiftCard={updateGiftCard} {...props} />}
             />
             <Route
               path="/payment/:brand"
