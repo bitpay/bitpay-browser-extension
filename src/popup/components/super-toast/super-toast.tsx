@@ -3,7 +3,7 @@ import './super-toast.scss';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const SuperToast: React.FC<any> = ({ title, caption, shopMode }) => (
-  <div className={`super-toast${shopMode && ' super-toast--gradient'}`}>
+  <div className={`super-toast${shopMode ? ' super-toast--gradient' : ''}`}>
     <div className="super-toast__content">
       <div className="super-toast__content__icon">
         <img id="blue" src="./../assets/icons/info-icon-blue.svg" alt="info" />

@@ -48,6 +48,7 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
   const changeAmount = (delta: number): void =>
     hasFixedDenoms ? changeFixedAmount(delta) : changeVariableAmount(delta);
 
+  const [inputError, setInputError] = useState(false);
   const handleInput = (input: string): void => {
     const newAmount = parseFloat(Number(input).toFixed(getPrecision(cardConfig.currency)));
     if (newAmount >= minAmount && newAmount <= maxAmount) {
@@ -55,7 +56,10 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
     } else if (newAmount === 0) {
       setAmount(0);
     } else {
-      console.log('error wiggle');
+      setInputError(true);
+      setTimeout((): void => {
+        setInputError(false);
+      }, 900);
     }
   };
   return (
@@ -84,7 +88,7 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
               <img src="../../assets/icons/decrement-icon.svg" alt="minus" />
             </button>
             <div
-              className="amount-page__amount-box__amount__value"
+              className={`amount-page__amount-box__amount__value${inputError ? ' wiggle-animation' : ''}`}
               style={{ color: amount === 0 ? '#DFDFDF' : 'inherit' }}
             >
               {amount}
