@@ -57,6 +57,11 @@ export interface UnsoldGiftCard {
   discounts?: GiftCardDiscount[];
 }
 
+export interface GiftCardBalanceEntry {
+  date: string;
+  amount: number;
+}
+
 export interface GiftCard extends UnsoldGiftCard {
   accessKey: string;
   archived: boolean;
@@ -72,7 +77,7 @@ export interface GiftCard extends UnsoldGiftCard {
   status: 'SUCCESS' | 'PENDING' | 'FAILURE';
   clientId: string;
   totalDiscount?: number;
-  balanceHistory?: [{ date: string; amount: number }];
+  balanceHistory?: GiftCardBalanceEntry[];
   invoice: Invoice;
 }
 

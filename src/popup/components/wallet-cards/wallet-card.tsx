@@ -3,13 +3,14 @@ import classNames from 'classnames';
 import { GiftCard, CardConfig } from '../../../services/gift-card.types';
 import './wallet-card.scss';
 import { formatCurrency } from '../../../services/currency';
+import { getLatestBalance } from '../../../services/gift-card';
 
 const WalletCard: React.FC<{
   cards: GiftCard[];
   cardConfig: CardConfig;
   type: 'pocket' | 'brand-box' | 'card-box';
 }> = ({ cards, cardConfig, type = 'pocket' }) => {
-  const totalBalance = cards.reduce((sum, card) => sum + card.amount, 0);
+  const totalBalance = cards.reduce((sum, card) => sum + getLatestBalance(card), 0);
   const isGradient = cardConfig.logoBackgroundColor.indexOf('gradient') > -1;
   const cardBackgroundStyle = {
     ...(!isGradient && { background: cardConfig.logoBackgroundColor }),

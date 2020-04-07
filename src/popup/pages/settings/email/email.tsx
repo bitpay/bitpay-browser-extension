@@ -28,18 +28,16 @@ const Email: React.FC<{ email: string; setEmail: (email: string) => void; histor
         <div>
           <div className="settings-group">
             <div className="settings-group__label">Email</div>
-            <div className="settings-group__input--wrapper">
-              <div className="settings-group__input">
-                <input
-                  type="email"
-                  defaultValue={email}
-                  placeholder="satoshi@bitpay.com"
-                  autoFocus
-                  required
-                  onChange={onEmailChange}
-                  ref={emailRef}
-                />
-              </div>
+            <div className="settings-group__input">
+              <input
+                type="email"
+                defaultValue={email}
+                placeholder="satoshi@bitpay.com"
+                autoFocus
+                required
+                onChange={onEmailChange}
+                ref={emailRef}
+              />
             </div>
             <div className="settings-group__caption">Email used for purchase receipts and communication</div>
           </div>

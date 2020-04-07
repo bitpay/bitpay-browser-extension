@@ -8,7 +8,8 @@ import {
   GiftCardInvoiceParams,
   GiftCardOrder,
   Invoice,
-  GiftCardDiscount
+  GiftCardDiscount,
+  GiftCardBalanceEntry
 } from './gift-card.types';
 import { post } from './utils';
 
@@ -124,8 +125,8 @@ export function fetchAvailableCards(): Promise<CardConfig[]> {
   return fetchAvailableCardMap().then(availableCardMap => getCardConfigFromApiConfigMap(availableCardMap));
 }
 
-export function sortByDescendingDate(a: GiftCard, b: GiftCard): 1 | -1 {
-  return a.date < b.date ? 1 : -1;
+export function sortByDescendingDate(a: { date: Date | string }, b: { date: Date | string }): 1 | -1 {
+  return new Date(a.date) < new Date(b.date) ? 1 : -1;
 }
 
 export const getDiscountAmount = (amount: number, discount: GiftCardDiscount): number =>
@@ -133,3 +134,8 @@ export const getDiscountAmount = (amount: number, discount: GiftCardDiscount): n
 
 export const getTotalDiscount = (amount: number, discounts: GiftCardDiscount[] = []): number =>
   discounts.reduce((sum, discount) => sum + getDiscountAmount(amount, discount), 0);
+
+export const getLatestBalanceEntry = (card: GiftCard): GiftCardBalanceEntry =>
+  (card.balanceHistory || []).sort(sortByDescendingDate)[0] || { date: card.date, amount: card.amount };
+
+export const getLatestBalance = (card: GiftCard): number => getLatestBalanceEntry(card).amount;

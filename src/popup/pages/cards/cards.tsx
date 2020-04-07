@@ -4,6 +4,7 @@ import { GiftCard, CardConfig } from '../../../services/gift-card.types';
 import './cards.scss';
 import WalletCard from '../../components/wallet-cards/wallet-card';
 import { sortByDescendingDate } from '../../../services/gift-card';
+import { resizeFrame } from '../../../services/frame';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Cards: React.FC<any> = ({ location, purchasedGiftCards }) => {
@@ -11,6 +12,7 @@ const Cards: React.FC<any> = ({ location, purchasedGiftCards }) => {
   const cards = (purchasedGiftCards as GiftCard[])
     .filter(card => card.name === cardConfig.name && !card.archived)
     .sort(sortByDescendingDate);
+  resizeFrame(405);
   return (
     <>
       <div className="cards-page">
