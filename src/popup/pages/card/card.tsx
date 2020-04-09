@@ -6,7 +6,6 @@ import { GiftCard, CardConfig } from '../../../services/gift-card.types';
 import { resizeToFitPage } from '../../../services/frame';
 import { launchNewTab } from '../../../services/browser';
 import { redeemGiftCard, getLatestBalance } from '../../../services/gift-card';
-import { wait } from '../../../services/utils';
 import LineItems from '../../components/line-items/line-items';
 import CardHeader from '../../components/card-header/card-header';
 import CodeBox from '../../components/code-box/code-box';
@@ -47,7 +46,7 @@ const Card: React.FC<RouteComponentProps & {
   };
   const shouldShowRedeemButton = (): boolean => !!(cardConfig.redeemUrl || cardConfig.defaultClaimCodeType === 'link');
   const updateCard = async (cardToUpdate: GiftCard): Promise<void> => {
-    await updateGiftCard(cardToUpdate);
+    updateGiftCard(cardToUpdate);
     setCard(cardToUpdate);
   };
   const archive = async (): Promise<void> => {
@@ -59,9 +58,8 @@ const Card: React.FC<RouteComponentProps & {
     resizeToFitPage(ref, paddingBottom);
   };
   const unarchive = async (): Promise<void> => {
-    await updateGiftCard(card);
+    updateGiftCard(card);
     resizePageBeforeRerender();
-    await wait(300);
     updateCard({ ...card, archived: false });
   };
 
