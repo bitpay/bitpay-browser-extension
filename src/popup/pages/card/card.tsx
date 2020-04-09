@@ -1,11 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
+import './card.scss';
 import { RouteComponentProps } from 'react-router-dom';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
 import { Tooltip, makeStyles, createStyles } from '@material-ui/core';
 import { GiftCard, CardConfig } from '../../../services/gift-card.types';
-import './card.scss';
 import { resizeToFitPage } from '../../../services/frame';
 import { launchNewTab } from '../../../services/browser';
 import { redeemGiftCard, getLatestBalance } from '../../../services/gift-card';
@@ -13,6 +10,7 @@ import { wait } from '../../../services/utils';
 import LineItems from '../../components/line-items/line-items';
 import CardHeader from '../../components/card-header/card-header';
 import CodeBox from '../../components/code-box/code-box';
+import CardMenu from '../../components/card-menu/card-menu';
 
 const Card: React.FC<RouteComponentProps & {
   purchasedGiftCards: GiftCard[];
@@ -43,7 +41,6 @@ const Card: React.FC<RouteComponentProps & {
   const [card, setCard] = useState(giftCard);
   const initiallyArchived = giftCard.archived;
   const redeemUrl = `${cardConfig.redeemUrl}${card.claimCode}`;
-  const popupState = usePopupState({ variant: 'popover', popupId: 'cardActions' });
   const launchClaimLink = (): void => {
     const url = cardConfig.defaultClaimCodeType === 'link' ? (card.claimLink as string) : redeemUrl;
     launchNewTab(url);
@@ -67,6 +64,9 @@ const Card: React.FC<RouteComponentProps & {
     await wait(300);
     updateCard({ ...card, archived: false });
   };
+
+  const cardMenu = useRef();
+  const menuOptions = ['Edit Balance', card.archived ? 'Unarchive' : 'Archive', 'Help'];
   const handleMenuClick = (item: string): void => {
     switch (item) {
       case 'Edit Balance':
@@ -79,6 +79,7 @@ const Card: React.FC<RouteComponentProps & {
         archive();
         break;
       case 'Unarchive':
+        cardMenu.current.close();
         unarchive();
         break;
       case 'Help':
@@ -86,7 +87,6 @@ const Card: React.FC<RouteComponentProps & {
       default:
         console.log('Unknown Menu Option Selected');
     }
-    popupState.close();
   };
   const redeem = async (): Promise<void> => {
     const updatedGiftCard = await redeemGiftCard(card);
@@ -103,27 +103,7 @@ const Card: React.FC<RouteComponentProps & {
   return (
     <div className="card-details">
       <div className="card-details__content" ref={ref}>
-        <button className="card-details__more" type="button" {...bindTrigger(popupState)}>
-          <img src="../../assets/icons/dots.svg" alt="More" />
-        </button>
-        <Menu
-          {...bindMenu(popupState)}
-          getContentAnchorEl={null}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-          className="card-details__more__menu"
-          style={{ boxShadow: 'none' }}
-        >
-          {['Edit Balance', card.archived ? 'Unarchive' : 'Archive', 'Help'].map(option => (
-            <MenuItem
-              className="card-details__more__menu__item"
-              key={option}
-              onClick={(): void => handleMenuClick(option)}
-            >
-              {option}
-            </MenuItem>
-          ))}
-        </Menu>
+        <CardMenu ref={cardMenu} items={menuOptions} onClick={handleMenuClick} />
         <CardHeader amount={getLatestBalance(card)} cardConfig={cardConfig} card={card} />
         <LineItems cardConfig={cardConfig} card={card} />
         {card.status === 'SUCCESS' && cardConfig.defaultClaimCodeType !== 'link' && (

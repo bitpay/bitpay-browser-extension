@@ -58,11 +58,15 @@ button {
   &--warn {
     color: #fdb455;
     background-color: rgba($color: #fdb455, $alpha: 0.1);
+    font-weight: 500;
+    padding: 18px;
   }
 
   &--danger {
     color: #ef476f;
     background-color: rgba($color: #ef476f, $alpha: 0.1);
+    font-weight: 500;
+    padding: 18px;
   }
 
   &[disabled] {

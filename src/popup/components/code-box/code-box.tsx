@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import './code-box.scss';
 
-import Anime, { anime } from 'react-anime';
+import Anime from 'react-anime';
 import copyUtil from '../../../services/copy-util';
 
 const CodeBox: React.FC<{ code: string; label: string }> = ({ code, label }) => {
@@ -35,7 +35,7 @@ const CodeBox: React.FC<{ code: string; label: string }> = ({ code, label }) => 
         type="button"
       >
         <div className="code-box__value">{code}</div>
-        <Anime delay={anime.stagger(50)} translateY={[8, 0]} opacity={[0, 1]}>
+        <Anime delay={50} translateY={[8, 0]} opacity={[0, 1]}>
           {copied ? (
             <div className="code-box__label code-box__label--action">Copied to Clipboard!</div>
           ) : (
