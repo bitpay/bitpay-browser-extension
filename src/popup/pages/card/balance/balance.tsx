@@ -1,8 +1,5 @@
 /* eslint-disable jsx-a11y/no-autofocus */
 import React, { useRef, useState, useEffect } from 'react';
-import { bindTrigger, bindMenu } from 'material-ui-popup-state/core';
-import { Menu, MenuItem } from '@material-ui/core';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import { resizeToFitPage } from '../../../../services/frame';
 import { GiftCard, CardConfig } from '../../../../services/gift-card.types';
 import CardHeader from '../../../components/card-header/card-header';
@@ -10,6 +7,7 @@ import './balance.scss';
 import { getPrecision } from '../../../../services/currency';
 import { getLatestBalanceEntry } from '../../../../services/gift-card';
 import { wait } from '../../../../services/utils';
+import CardMenu from '../../../components/card-menu/card-menu';
 
 const Balance: React.FC<{
   updateGiftCard: (cards: GiftCard) => void;
@@ -32,7 +30,6 @@ const Balance: React.FC<{
   const inputRef = useRef<HTMLInputElement>(null);
   // eslint-disable-next-line no-unused-expressions
   inputRef.current?.focus();
-  const popupState = usePopupState({ variant: 'popover', popupId: 'updateTypes' });
   const step = getPrecision(cardConfig.currency) === 2 ? '0.01' : '1';
   const onEmailChange = (): void => {
     setFormValid(inputRef.current?.validity.valid || false);
@@ -49,7 +46,6 @@ const Balance: React.FC<{
     history.goBack();
   };
   const handleMenuClick = async (option: string): Promise<void> => {
-    popupState.close();
     await wait(100);
     history.goBack();
     history.push({
@@ -60,27 +56,10 @@ const Balance: React.FC<{
   return (
     <div className="card-details balance">
       <div ref={ref}>
-        <button className="card-details__more" type="button" {...bindTrigger(popupState)}>
-          <img src="../../assets/icons/dots.svg" alt="More" />
-        </button>
-        <Menu
-          {...bindMenu(popupState)}
-          getContentAnchorEl={null}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-          className="card-details__more__menu"
-          style={{ boxShadow: 'none' }}
-        >
-          {[updateType === 'Amount Spent' ? 'Enter Remaining Balance' : 'Enter Amount Spent'].map(option => (
-            <MenuItem
-              className="card-details__more__menu__item"
-              key={option}
-              onClick={(): Promise<void> => handleMenuClick(option)}
-            >
-              {option}
-            </MenuItem>
-          ))}
-        </Menu>
+        <CardMenu
+          items={[updateType === 'Amount Spent' ? 'Enter Remaining Balance' : 'Enter Amount Spent']}
+          onClick={handleMenuClick}
+        />
         <CardHeader amount={latestBalance} cardConfig={cardConfig} card={card} />
         <form onSubmit={saveValue}>
           <div>

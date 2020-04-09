@@ -65,7 +65,6 @@ const Card: React.FC<RouteComponentProps & {
     updateCard({ ...card, archived: false });
   };
 
-  const menuOptions = ['Edit Balance', card.archived ? 'Unarchive' : 'Archive', 'Help'];
   const handleMenuClick = (item: string): void => {
     switch (item) {
       case 'Edit Balance':
@@ -101,7 +100,7 @@ const Card: React.FC<RouteComponentProps & {
   return (
     <div className="card-details">
       <div className="card-details__content" ref={ref}>
-        <CardMenu items={menuOptions} onClick={handleMenuClick} />
+        <CardMenu items={['Edit Balance', card.archived ? 'Unarchive' : 'Archive', 'Help']} onClick={handleMenuClick} />
         <CardHeader amount={getLatestBalance(card)} cardConfig={cardConfig} card={card} />
         <LineItems cardConfig={cardConfig} card={card} />
         {card.status === 'SUCCESS' && cardConfig.defaultClaimCodeType !== 'link' && (
