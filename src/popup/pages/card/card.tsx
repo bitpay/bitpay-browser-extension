@@ -35,12 +35,15 @@ const Card: React.FC<RouteComponentProps & {
   );
   const classes = useStyles();
   const ref = useRef<HTMLDivElement>(null);
+  const mountedRef = useRef(true);
+
   const {
     card: { invoiceId },
     cardConfig
   } = location.state as { card: GiftCard; cardConfig: CardConfig };
   const giftCard = purchasedGiftCards.find(c => c.invoiceId === invoiceId) as GiftCard;
   const [card, setCard] = useState(giftCard);
+  const [fetchingClaimCode, setFetchingClaimCode] = useState(false);
   const initiallyArchived = giftCard.archived;
   const redeemUrl = `${cardConfig.redeemUrl}${card.claimCode}`;
   const popupState = usePopupState({ variant: 'popover', popupId: 'cardActions' });
@@ -53,13 +56,16 @@ const Card: React.FC<RouteComponentProps & {
     await updateGiftCard(cardToUpdate);
     setCard(cardToUpdate);
   };
+  const resizeFrame = (paddingBottom = 80): void => {
+    if (mountedRef.current) resizeToFitPage(ref, paddingBottom);
+  };
   const archive = async (): Promise<void> => {
     await updateCard({ ...card, archived: true });
-    initiallyArchived ? resizeToFitPage(ref, 80) : history.goBack();
+    initiallyArchived ? resizeFrame() : history.goBack();
   };
   const resizePageBeforeRerender = (): void => {
-    const paddingBottom = shouldShowRedeemButton() ? 136 : 80;
-    resizeToFitPage(ref, paddingBottom);
+    const paddingBottom = shouldShowRedeemButton() ? 136 : undefined;
+    resizeFrame(paddingBottom);
   };
   const unarchive = async (): Promise<void> => {
     await updateGiftCard(card);
@@ -89,16 +95,26 @@ const Card: React.FC<RouteComponentProps & {
     popupState.close();
   };
   const redeem = async (): Promise<void> => {
+    setFetchingClaimCode(true);
     const updatedGiftCard = await redeemGiftCard(card);
+    if (!mountedRef.current) return;
+    if (updatedGiftCard.status === 'PENDING') {
+      await wait(700);
+    }
+    setFetchingClaimCode(false);
     const fullCard = { ...card, ...updatedGiftCard };
     await updateCard(fullCard);
-    resizeToFitPage(ref, 80);
+    resizeFrame();
   };
   useEffect(() => {
-    resizeToFitPage(ref, 80);
+    resizeFrame();
   }, [ref]);
-  useEffect((): void => {
+  useEffect(() => {
     if (card.status === 'PENDING') redeem();
+    return (): void => {
+      mountedRef.current = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <div className="card-details">
@@ -155,7 +171,14 @@ const Card: React.FC<RouteComponentProps & {
                 style={{ marginBottom: '-10px' }}
                 onClick={redeem}
               >
-                Pending Confirmation
+                {fetchingClaimCode ? (
+                  <>
+                    <img className="action-button__spinner" src="../../assets/icons/spinner-warn.svg" alt="spinner" />
+                    Fetching Claim Code
+                  </>
+                ) : (
+                  <>Pending Confirmation</>
+                )}
               </button>
             </div>
           </Tooltip>

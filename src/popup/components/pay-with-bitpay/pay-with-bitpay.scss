@@ -7,12 +7,6 @@
     width: 270px;
     margin-top: 0;
     color: #4f6ef7;
-
-    > img {
-      animation: spin 1s linear infinite;
-      margin-right: 12px;
-      margin-top: -2px;
-    }
   }
   button.disabled {
     opacity: 0.5;
