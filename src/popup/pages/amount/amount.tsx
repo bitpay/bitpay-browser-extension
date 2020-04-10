@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './amount.scss';
+import Anime from 'react-anime';
 import CardDenoms from '../../components/card-denoms/card-denoms';
 import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
 import { GiftCardInvoiceParams, CardConfig } from '../../../services/gift-card.types';
@@ -62,6 +63,33 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
       }, 900);
     }
   };
+
+  const xMax = 12;
+  const errorAnimation = inputError
+    ? {
+        easing: 'easeInOutSine',
+        duration: 325,
+        translateX: [
+          {
+            value: xMax * -1
+          },
+          {
+            value: xMax
+          },
+          {
+            value: xMax / -2
+          },
+          {
+            value: xMax / 2
+          },
+          {
+            value: 0
+          }
+        ]
+      }
+    : {
+        translateX: [0, 0]
+      };
   return (
     <div className="amount-page">
       <div className="amount-page__title">
@@ -88,10 +116,10 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
               <img src="../../assets/icons/decrement-icon.svg" alt="minus" />
             </button>
             <div
-              className={`amount-page__amount-box__amount__value${inputError ? ' wiggle-animation' : ''}`}
+              className="amount-page__amount-box__amount__value"
               style={{ color: amount === 0 ? '#DFDFDF' : 'inherit' }}
             >
-              {amount}
+              <Anime {...errorAnimation}>{amount}</Anime>
             </div>
             <button type="button" onClick={(): void => changeAmount(baseDelta)}>
               <img src="../../assets/icons/increment-icon.svg" alt="minus" />
