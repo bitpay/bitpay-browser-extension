@@ -88,6 +88,12 @@ button {
     }
   }
 
+  &__spinner {
+    animation: spin 1s linear infinite;
+    margin-right: 12px;
+    margin-top: -2px;
+  }
+
   &--light {
     background: #eef1ff;
     color: #4f6ef7;

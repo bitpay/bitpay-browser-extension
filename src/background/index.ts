@@ -8,6 +8,9 @@ import { get, set } from '../services/storage';
 import { fetchDirectIntegrations, DirectIntegration } from '../services/directory';
 
 let cachedMerchants: Merchant[] | undefined;
+let cacheDate = 0;
+const cacheValidityDuration: number = 1000 * 60;
+
 const invoiceEventResolveFunctionMap: {
   [invoiceId: string]: (message: GiftCardInvoiceMessage) => GiftCardInvoiceMessage;
 } = {};
@@ -21,14 +24,41 @@ function setIcon(bitpayAccepted: boolean): void {
   browser.browserAction.setIcon({ path: getIconPath(bitpayAccepted) });
 }
 
+function addToSupportedGiftCards(supportedGiftCards: CardConfig[], availableGiftCards: CardConfig[]): CardConfig[] {
+  const combinedGiftCards = supportedGiftCards.concat(availableGiftCards);
+  const giftCardsMappedByName = new Map(combinedGiftCards.map(config => [config.name, config]));
+  return Array.from(giftCardsMappedByName.values());
+}
+
 async function getCachedMerchants(): Promise<Merchant[]> {
   return cachedMerchants || fetchCachedMerchants();
+}
+
+async function refreshCachedMerchants(): Promise<void> {
+  const [directIntegrations, availableGiftCards, supportedGiftCards = []] = await Promise.all([
+    fetchDirectIntegrations().catch(() => []),
+    fetchAvailableCards().catch(() => []),
+    get<CardConfig[]>('supportedGiftCards')
+  ]);
+  cachedMerchants = getMerchants(directIntegrations, availableGiftCards);
+  cacheDate = Date.now();
+  const newSupportedGiftCards = addToSupportedGiftCards(supportedGiftCards, availableGiftCards);
+  await Promise.all([
+    set<DirectIntegration[]>('directIntegrations', directIntegrations),
+    set<CardConfig[]>('availableGiftCards', availableGiftCards),
+    set<CardConfig[]>('supportedGiftCards', newSupportedGiftCards)
+  ]);
+}
+
+async function refreshCachedMerchantsIfNeeded(): Promise<void> {
+  if (Date.now() > cacheDate + cacheValidityDuration) await refreshCachedMerchants();
 }
 
 async function handleUrlChange(host: string): Promise<void> {
   const merchants = await getCachedMerchants();
   const bitpayAccepted = !!(host && isBitPayAccepted(host, merchants));
-  return setIcon(bitpayAccepted);
+  await setIcon(bitpayAccepted);
+  await refreshCachedMerchantsIfNeeded();
 }
 
 async function createClientIdIfNotExists(): Promise<void> {
@@ -44,13 +74,14 @@ async function sendMessageToTab(messageName: string, tab: Tabs.Tab): Promise<voi
   });
 }
 
-browser.tabs.onActivated.addListener(async () => {
-  const tabs = await browser.tabs.query({ active: true });
-  const { url } = tabs[0];
+browser.tabs.onActivated.addListener(async data => {
+  const tabs = await browser.tabs.query({ active: true, windowId: data.windowId });
+  const { url } = tabs.find(tab => tab.id === data.tabId) || { url: '' };
   const host = url && removeProtocolAndWww(url).split('/')[0];
   const merchants = await getCachedMerchants();
   const bitpayAccepted = !!(host && isBitPayAccepted(host, merchants));
   setIcon(bitpayAccepted);
+  await refreshCachedMerchantsIfNeeded();
 });
 
 browser.browserAction.onClicked.addListener(async tab => {
@@ -60,18 +91,11 @@ browser.browserAction.onClicked.addListener(async tab => {
 });
 
 browser.runtime.onInstalled.addListener(async () => {
-  const directIntegrations = await fetchDirectIntegrations().catch(() => []);
-  const availableGiftCards = await fetchAvailableCards().catch(() => []);
-  cachedMerchants = getMerchants(directIntegrations, availableGiftCards);
-  await Promise.all([
-    set<DirectIntegration[]>('directIntegrations', directIntegrations),
-    set<CardConfig[]>('availableGiftCards', availableGiftCards),
-    createClientIdIfNotExists()
-  ]);
+  await Promise.all([refreshCachedMerchants(), createClientIdIfNotExists()]);
 });
 
 async function launchInvoiceAndListenForPayment(invoiceId: string): Promise<GiftCardInvoiceMessage> {
-  const url = `${process.env.API_ORIGIN}/invoice?id=${invoiceId}&v=3?view=modal`;
+  const url = `${process.env.API_ORIGIN}/invoice?id=${invoiceId}?view=modal`;
   const { id } = await browser.windows.create({ url, type: 'popup', height: 735, width: 430 });
   windowIdInvoiceMap[id as number] = invoiceId;
   const promise = new Promise<GiftCardInvoiceMessage>(resolve => {

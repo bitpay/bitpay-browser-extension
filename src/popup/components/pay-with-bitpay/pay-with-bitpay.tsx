@@ -72,7 +72,8 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
         {awaitingPayment ? (
           <>
             <div className="action-button action-button--light awaiting-payment" style={{ marginTop: '15px' }}>
-              <img src="../../assets/icons/spinner.svg" alt="spinner" /> Awaiting Payment
+              <img className="action-button__spinner" src="../../assets/icons/spinner.svg" alt="spinner" /> Awaiting
+              Payment
             </div>
           </>
         ) : (

@@ -30,22 +30,19 @@ const Popup: React.FC = () => {
   const [supportedGiftCards, setSupportedGiftCards] = useState([] as CardConfig[]);
   const [purchasedGiftCards, setPurchasedGiftCards] = useState([] as GiftCard[]);
 
-  const updatePurchasedCards = async (cardToUpdate: GiftCard): Promise<void> => {
+  const updateGiftCard = async (card: GiftCard): Promise<void> => {
     const newCards = purchasedGiftCards.map(purchasedCard =>
-      purchasedCard.invoiceId === cardToUpdate.invoiceId ? { ...purchasedCard, ...cardToUpdate } : { ...purchasedCard }
+      purchasedCard.invoiceId === card.invoiceId ? { ...purchasedCard, ...card } : { ...purchasedCard }
     );
     await set<GiftCard[]>('purchasedGiftCards', newCards);
     setPurchasedGiftCards(newCards);
-  };
-  const updateGiftCard = async (card: GiftCard): Promise<void> => {
-    await updatePurchasedCards(card);
   };
 
   useEffect(() => {
     const getStartPage = async (): Promise<void> => {
       const [allMerchants, allSupportedGiftCards, allPurchasedGiftCards, receiptEmail] = await Promise.all([
         fetchCachedMerchants(),
-        get<CardConfig[]>('availableGiftCards'),
+        get<CardConfig[]>('supportedGiftCards'),
         get<GiftCard[]>('purchasedGiftCards'),
         get<string>('email')
       ]);

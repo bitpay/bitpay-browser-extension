@@ -53,8 +53,8 @@ export function isBitPayAccepted(host: string, merchants: Merchant[]): boolean {
 }
 
 export function getMerchants(
-  directIntegrations: DirectIntegration[],
-  availableGiftCardBrands: CardConfig[]
+  directIntegrations: DirectIntegration[] = [],
+  availableGiftCardBrands: CardConfig[] = []
 ): Merchant[] {
   const directIntegrationMerchants = directIntegrations.map(integration => ({
     ...integration,
@@ -80,7 +80,9 @@ export function getMerchants(
 }
 
 export async function fetchCachedMerchants(): Promise<Merchant[]> {
-  const directIntegrations = await get<DirectIntegration[]>('directIntegrations');
-  const availableGiftCardBrands = await get<CardConfig[]>('availableGiftCards');
+  const [directIntegrations, availableGiftCardBrands] = await Promise.all([
+    get<DirectIntegration[]>('directIntegrations'),
+    get<CardConfig[]>('availableGiftCards')
+  ]);
   return getMerchants(directIntegrations, availableGiftCardBrands);
 }
