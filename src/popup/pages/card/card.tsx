@@ -67,7 +67,6 @@ const Card: React.FC<RouteComponentProps & {
   const unarchive = async (): Promise<void> => {
     updateGiftCard(card);
     resizePageBeforeRerender();
-    await wait(300);
     updateCard({ ...card, archived: false });
   };
 
