@@ -25,7 +25,7 @@ function setIcon(bitpayAccepted: boolean): void {
 }
 
 function addToSupportedGiftCards(supportedGiftCards: CardConfig[], availableGiftCards: CardConfig[]): CardConfig[] {
-  const combinedGiftCards = supportedGiftCards.concat(availableGiftCards);
+  const combinedGiftCards = availableGiftCards.concat(supportedGiftCards);
   const giftCardsMappedByName = new Map(combinedGiftCards.map(config => [config.name, config]));
   return Array.from(giftCardsMappedByName.values());
 }

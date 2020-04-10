@@ -5,6 +5,7 @@ import CardDenoms from '../../components/card-denoms/card-denoms';
 import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
 import { GiftCardInvoiceParams, CardConfig } from '../../../services/gift-card.types';
 import { getPrecision } from '../../../services/currency';
+import { formatDiscount } from '../../../services/merchant';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchasedGiftCards }) => {
@@ -13,14 +14,13 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
   const initialAmount =
     cardConfig.supportedAmounts && cardConfig.supportedAmounts[0] ? cardConfig.supportedAmounts[0] : 0;
   const [amount, setAmount] = useState(initialAmount);
-  const hasDiscount = false;
-  const discounts = (cardConfig.discounts || []).map(discount => discount.code);
+  const discount = (cardConfig.discounts || [])[0];
   const invoiceParams: GiftCardInvoiceParams = {
     brand: cardConfig.name,
     currency: cardConfig.currency,
     amount: initialAmount,
     clientId,
-    discounts,
+    discounts: discount ? [discount.code] : [],
     email
   };
   const baseDelta = getPrecision(cardConfig.currency) === 2 ? 0.01 : 1;
@@ -66,7 +66,9 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
     <div className="amount-page">
       <div className="amount-page__title">
         <div className="amount-page__merchant-name">{cardConfig.displayName}</div>
-        {hasDiscount && <div className="amount-page__promo">3% Off Each Purchase</div>}
+        {discount && (
+          <div className="amount-page__promo">{formatDiscount(discount, cardConfig.currency)} Off Each Purchase</div>
+        )}
       </div>
       <div className="amount-page__amount-box__wrapper">
         {!hasFixedDenoms && (
@@ -103,7 +105,7 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
         </div>
       </div>
       <div className="amount-page__cta">
-        {hasDiscount || !email ? (
+        {(cardConfig.activationFees && cardConfig.activationFees.length) || discount || !email ? (
           <div className="action-button__footer" style={{ marginTop: 0 }}>
             <Link
               className="action-button"
