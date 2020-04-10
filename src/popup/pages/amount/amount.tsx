@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './amount.scss';
-import Anime from 'react-anime';
+import Anime, { AnimeValue } from 'react-anime';
 import CardDenoms from '../../components/card-denoms/card-denoms';
 import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
 import { GiftCardInvoiceParams, CardConfig } from '../../../services/gift-card.types';
@@ -60,36 +60,17 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
       setInputError(true);
       setTimeout((): void => {
         setInputError(false);
-      }, 900);
+      }, 325);
     }
   };
-
-  const xMax = 12;
-  const errorAnimation = inputError
-    ? {
-        easing: 'easeInOutSine',
-        duration: 325,
-        translateX: [
-          {
-            value: xMax * -1
-          },
-          {
-            value: xMax
-          },
-          {
-            value: xMax / -2
-          },
-          {
-            value: xMax / 2
-          },
-          {
-            value: 0
-          }
-        ]
-      }
-    : {
-        translateX: [0, 0]
-      };
+  const xAmp = 12;
+  const wiggleFrames = [
+    { value: xAmp * -1 },
+    { value: xAmp },
+    { value: xAmp / -2 },
+    { value: xAmp / 2 },
+    { value: 0 }
+  ] as AnimeValue[];
   return (
     <div className="amount-page">
       <div className="amount-page__title">
@@ -121,7 +102,9 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
               className="amount-page__amount-box__amount__value"
               style={{ color: amount === 0 ? '#DFDFDF' : 'inherit' }}
             >
-              <Anime {...errorAnimation}>{amount}</Anime>
+              <Anime duration={325} easing="easeInOutSine" translateX={inputError ? wiggleFrames : [0, 0]}>
+                {amount}
+              </Anime>
             </div>
             <button type="button" onClick={(): void => changeAmount(baseDelta)}>
               <img src="../../assets/icons/increment-icon.svg" alt="minus" />
