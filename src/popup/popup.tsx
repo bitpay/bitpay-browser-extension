@@ -42,7 +42,7 @@ const Popup: React.FC = () => {
     const getStartPage = async (): Promise<void> => {
       const [allMerchants, allSupportedGiftCards, allPurchasedGiftCards, receiptEmail] = await Promise.all([
         fetchCachedMerchants(),
-        get<CardConfig[]>('availableGiftCards'),
+        get<CardConfig[]>('supportedGiftCards'),
         get<GiftCard[]>('purchasedGiftCards'),
         get<string>('email')
       ]);
