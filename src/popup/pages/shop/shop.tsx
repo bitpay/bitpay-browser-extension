@@ -10,10 +10,7 @@ import { resizeToFitPage } from '../../../services/frame';
 import { wait } from '../../../services/utils';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Shop: React.FC<{ merchants: Merchant[]; location: { state?: { searchVal: string; scrollTop: number } } }> = ({
-  merchants,
-  location
-}) => {
+const Shop: React.FC<{ merchants: Merchant[]; location: any }> = ({ merchants, location }) => {
   const [searchVal, setSearchVal] = useState('' as string);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {

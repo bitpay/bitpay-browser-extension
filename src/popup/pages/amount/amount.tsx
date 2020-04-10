@@ -49,15 +49,20 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
   const changeAmount = (delta: number): void =>
     hasFixedDenoms ? changeFixedAmount(delta) : changeVariableAmount(delta);
 
+  const [rawInput, setRawInput] = useState('0');
   const [inputError, setInputError] = useState(false);
   const handleInput = (input: string): void => {
     const newAmount = parseFloat(Number(input).toFixed(getPrecision(cardConfig.currency)));
+    if (input.endsWith('.') || input.endsWith('0')) return setRawInput(input);
     if (newAmount >= minAmount && newAmount <= maxAmount) {
       setAmount(newAmount);
+      setRawInput(newAmount.toString());
     } else if (newAmount === 0) {
       setAmount(0);
+      setRawInput('0');
     } else {
       setInputError(true);
+      setRawInput(amount.toString());
       setTimeout((): void => {
         setInputError(false);
       }, 325);
@@ -82,12 +87,12 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
       <div className="amount-page__amount-box__wrapper">
         {!hasFixedDenoms && (
           <input
-            value={amount}
+            value={rawInput}
             onChange={(e: React.FormEvent<HTMLInputElement>): void => handleInput(e.currentTarget.value)}
             onBlur={(e: React.FormEvent<HTMLInputElement>): void => e.currentTarget.focus()}
             className="amount-page__input"
             placeholder="0"
-            type="number"
+            type="text"
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
           />
@@ -103,7 +108,7 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
               style={{ color: amount === 0 ? '#DFDFDF' : 'inherit' }}
             >
               <Anime duration={325} easing="easeInOutSine" translateX={inputError ? wiggleFrames : [0, 0]}>
-                {amount}
+                {hasFixedDenoms ? amount : rawInput}
               </Anime>
             </div>
             <button type="button" onClick={(): void => changeAmount(baseDelta)}>
