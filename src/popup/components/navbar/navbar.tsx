@@ -7,6 +7,9 @@ const Navbar: React.FC<RouteComponentProps> = ({ history, location }) => {
   const [preCollapseHeight, setPreCollapseHeight] = useState(0);
   const [collapsed, setCollapsed] = useState(false);
   const goBack = (): void => {
+    if (collapsed) {
+      setCollapsed(false);
+    }
     history.goBack();
   };
   const collapse = (): void => {
@@ -35,7 +38,7 @@ const Navbar: React.FC<RouteComponentProps> = ({ history, location }) => {
 
       {showBackButton && <img className="bp-logo--solo" alt="bitpay" src="../assets/icons/b-logo-blue.svg" />}
 
-      <div className="header-bar__row">
+      <div className="header-bar__controls">
         {!collapsed ? (
           <button type="button" onClick={collapse} style={{ marginRight: '7px' }}>
             <img alt="exit" src="../assets/icons/minimize-icon.svg" />

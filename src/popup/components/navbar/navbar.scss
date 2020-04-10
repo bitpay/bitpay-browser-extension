@@ -7,6 +7,7 @@
 }
 
 .header-bar {
+  position: relative;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -17,23 +18,27 @@
   padding: 0 12px;
   border-bottom: 1px solid rgba(black, 0.05);
 
-  &__row {
-    transform: translateY(1px);
+  &__controls {
+    position: absolute;
+    right: 13px;
   }
 }
 
 .bp-logo {
   height: 18px;
-  margin-left: 4px;
+  position: absolute;
+  left: 16px;
 
   &--solo {
-    transform: translateY(-1.5px);
+    position: absolute;
+    left: calc(100% / 2);
+    transform: translateX(-7px) translateY(-2px);
   }
 }
 
 .back-button {
-  position: relative;
-  margin-left: 4px;
+  position: absolute;
+  left: 16px;
   &::before {
     content: "";
     position: absolute;
