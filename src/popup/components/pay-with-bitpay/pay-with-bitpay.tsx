@@ -71,7 +71,7 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
         <Snack message={errorMessage} onClose={(): void => setErrorMessage('')} />
         {awaitingPayment ? (
           <>
-            <div className="action-button action-button--light awaiting-payment" style={{ marginTop: '15px' }}>
+            <div className="action-button action-button--light awaiting-payment">
               <img className="action-button__spinner" src="../../assets/icons/spinner.svg" alt="spinner" /> Awaiting
               Payment
             </div>

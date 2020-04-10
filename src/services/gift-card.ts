@@ -129,6 +129,14 @@ export function sortByDescendingDate(a: { date: Date | string }, b: { date: Date
   return new Date(a.date) < new Date(b.date) ? 1 : -1;
 }
 
+export function getActivationFee(amount: number, cardConfig: CardConfig): number {
+  const activationFees = (cardConfig && cardConfig.activationFees) || [];
+  const fixedFee = activationFees.find(
+    fee => fee.type === 'fixed' && amount >= fee.amountRange.min && amount <= fee.amountRange.max
+  );
+  return (fixedFee && fixedFee.fee) || 0;
+}
+
 export const getDiscountAmount = (amount: number, discount: GiftCardDiscount): number =>
   discount.type === 'percentage' ? (discount.amount / 100) * amount : discount.amount;
 

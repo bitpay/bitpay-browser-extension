@@ -11,13 +11,13 @@ import { resizeToFitPage } from '../../../services/frame';
 const Payment: React.FC<any> = ({ location, history, setEmail, setPurchasedGiftCards }) => {
   const ref = useRef<HTMLDivElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
-  const [email, setReceiptEmail] = useState('');
 
   useEffect(() => {
     resizeToFitPage(ref, 77);
   }, [ref]);
   const amount = location.state.amount as number;
   const invoiceParams = location.state.invoiceParams as GiftCardInvoiceParams;
+  const [email, setReceiptEmail] = useState(invoiceParams.email || '');
   const cardConfig = location.state.cardConfig as CardConfig;
   const card: UnsoldGiftCard = {
     amount,
@@ -25,6 +25,9 @@ const Payment: React.FC<any> = ({ location, history, setEmail, setPurchasedGiftC
     name: cardConfig.name,
     discounts: cardConfig.discounts
   };
+  const shouldShowLineItems =
+    (cardConfig.discounts && cardConfig.discounts.length) ||
+    (cardConfig.activationFees && cardConfig.activationFees.length);
   const onEmailChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     emailRef.current?.validity.valid ? setReceiptEmail(event.target.value) : setReceiptEmail('');
   };
@@ -32,7 +35,7 @@ const Payment: React.FC<any> = ({ location, history, setEmail, setPurchasedGiftC
     <div className="payment">
       <div ref={ref}>
         <CardHeader cardConfig={cardConfig} card={card} />
-        {cardConfig.discounts && cardConfig.discounts.length && <LineItems cardConfig={cardConfig} card={card} />}
+        {shouldShowLineItems && <LineItems cardConfig={cardConfig} card={card} />}
         {!invoiceParams.email && (
           <div className="settings-group">
             <div className="settings-group__label">Email</div>
