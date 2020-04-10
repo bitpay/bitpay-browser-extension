@@ -3,6 +3,7 @@ import './card.scss';
 import { RouteComponentProps } from 'react-router-dom';
 import { Tooltip, makeStyles, createStyles } from '@material-ui/core';
 import { GiftCard, CardConfig } from '../../../services/gift-card.types';
+import { wait } from '../../../services/utils';
 import { resizeToFitPage } from '../../../services/frame';
 import { launchNewTab } from '../../../services/browser';
 import { redeemGiftCard, getLatestBalance } from '../../../services/gift-card';
@@ -66,6 +67,7 @@ const Card: React.FC<RouteComponentProps & {
   const unarchive = async (): Promise<void> => {
     updateGiftCard(card);
     resizePageBeforeRerender();
+    await wait(300);
     updateCard({ ...card, archived: false });
   };
 
