@@ -9,18 +9,16 @@ import { Merchant } from '../../../services/merchant';
 import { resizeToFitPage } from '../../../services/frame';
 import { wait } from '../../../services/utils';
 
-const Shop: React.FC<{ merchants: Merchant[]; location: { state?: { searchVal: string; scrollTop: number } } }> = ({
-  merchants,
-  location
-}) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const Shop: React.FC<{ merchants: Merchant[]; location: any }> = ({ merchants, location }) => {
   const [searchVal, setSearchVal] = useState('' as string);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const setScrollPositionAndSearchVal = async (): Promise<void> => {
-      if (ref.current && location.state) {
+      if (location.state) {
         setSearchVal(location.state.searchVal);
         await wait(0);
-        ref.current.scrollTop = location.state.scrollTop || 0;
+        if (ref.current) ref.current.scrollTop = location.state.scrollTop || 0;
       }
     };
     resizeToFitPage(ref);

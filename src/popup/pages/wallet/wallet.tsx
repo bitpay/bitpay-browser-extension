@@ -16,7 +16,9 @@ const Wallet: React.FC<{
   useEffect(() => {
     resizeToFitPage(ref, 100);
   }, [ref]);
-  const activeGiftCards = purchasedGiftCards.filter(card => !card.archived).sort(sortByDescendingDate);
+  const activeGiftCards = purchasedGiftCards
+    .filter(card => !card.archived && card.status !== 'UNREDEEMED')
+    .sort(sortByDescendingDate);
   return (
     <div className="wallet">
       <div ref={ref}>
