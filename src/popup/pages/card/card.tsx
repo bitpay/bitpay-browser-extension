@@ -60,13 +60,9 @@ const Card: React.FC<RouteComponentProps & {
     await updateCard({ ...card, archived: true });
     initiallyArchived ? resizeFrame() : history.goBack();
   };
-  const resizePageBeforeRerender = (): void => {
-    const paddingBottom = shouldShowRedeemButton() ? 136 : undefined;
-    resizeFrame(paddingBottom);
-  };
   const unarchive = async (): Promise<void> => {
     updateGiftCard(card);
-    resizePageBeforeRerender();
+    resizeFrame();
     updateCard({ ...card, archived: false });
   };
 
