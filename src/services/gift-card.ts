@@ -12,6 +12,7 @@ import {
   GiftCardBalanceEntry
 } from './gift-card.types';
 import { post } from './utils';
+import { getPrecision } from './currency';
 
 function getCardConfigFromApiBrandConfig(cardName: string, apiBrandConfig: ApiCardConfig): CardConfig {
   const cards = apiBrandConfig;
@@ -127,6 +128,10 @@ export function fetchAvailableCards(): Promise<CardConfig[]> {
 
 export function sortByDescendingDate(a: { date: Date | string }, b: { date: Date | string }): 1 | -1 {
   return new Date(a.date) < new Date(b.date) ? 1 : -1;
+}
+
+export function getCardPrecision(cardConfig: CardConfig): number {
+  return cardConfig.integersOnly ? 0 : getPrecision(cardConfig.currency);
 }
 
 export function getActivationFee(amount: number, cardConfig: CardConfig): number {

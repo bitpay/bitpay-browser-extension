@@ -12,7 +12,15 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
   invoiceParams: GiftCardInvoiceParams;
   setEmail?: (email: string) => void;
   setPurchasedGiftCards: (cards: GiftCard[]) => void;
-}> = ({ cardConfig, invoiceParams, history, setEmail, setPurchasedGiftCards }) => {
+  onInvalidParams?: () => void;
+}> = ({
+  cardConfig,
+  invoiceParams,
+  history,
+  setEmail,
+  setPurchasedGiftCards,
+  onInvalidParams = (): void => undefined
+}) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [awaitingPayment, setAwaitingPayment] = useState(false);
   const { amount, currency } = invoiceParams;
@@ -29,7 +37,15 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
     history.push(`/wallet`);
     history.push({ pathname: `/card/${card.invoiceId}`, state: { card, cardConfig } });
   };
+  const isAmountValid = (): boolean => {
+    const maxAmount = cardConfig.maxAmount as number;
+    const minAmount = cardConfig.minAmount as number;
+    return cardConfig.supportedAmounts ? true : amount <= maxAmount && amount >= minAmount;
+  };
   const launchInvoice = async (): Promise<void> => {
+    if (!isAmountValid()) {
+      return onInvalidParams();
+    }
     setAwaitingPayment(true);
     const { invoiceId, accessKey, totalDiscount } = await createBitPayInvoice(invoiceParams);
     if (setEmail) {

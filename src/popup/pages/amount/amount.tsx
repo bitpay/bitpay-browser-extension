@@ -5,58 +5,8 @@ import Anime, { AnimeValue } from 'react-anime';
 import CardDenoms from '../../components/card-denoms/card-denoms';
 import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
 import { GiftCardInvoiceParams, CardConfig } from '../../../services/gift-card.types';
-import { getPrecision } from '../../../services/currency';
 import { formatDiscount } from '../../../services/merchant';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const AmountInput: React.FC<any> = ({ amount, setAmount, minAmount, maxAmount, cardConfig, hasFixedDenoms }) => {
-  const [rawInput, setRawInput] = useState('0');
-  const [inputError, setInputError] = useState(false);
-  const handleInput = (input: string): void => {
-    const newAmount = parseFloat(Number(input).toFixed(getPrecision(cardConfig.currency)));
-    if (input.endsWith('.') || input.endsWith('.0')) return setRawInput(input);
-    if (newAmount >= minAmount && newAmount <= maxAmount) {
-      setAmount(newAmount);
-      setRawInput(newAmount.toString());
-    } else if (newAmount === 0) {
-      setAmount(0);
-      setRawInput('0');
-    } else {
-      setInputError(true);
-      setRawInput(amount.toString());
-      setTimeout((): void => {
-        setInputError(false);
-      }, 325);
-    }
-  };
-  const xAmp = 12;
-  const wiggleFrames = [
-    { value: xAmp * -1 },
-    { value: xAmp },
-    { value: xAmp / -2 },
-    { value: xAmp / 2 },
-    { value: 0 }
-  ] as AnimeValue[];
-  return (
-    <>
-      {!hasFixedDenoms && (
-        <input
-          value={rawInput}
-          onChange={(e: React.FormEvent<HTMLInputElement>): void => handleInput(e.currentTarget.value)}
-          onBlur={(e: React.FormEvent<HTMLInputElement>): void => e.currentTarget.focus()}
-          className="amount-page__input"
-          placeholder="0"
-          type="text"
-          // eslint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus
-        />
-      )}
-      <Anime duration={325} easing="easeInOutSine" translateX={inputError ? wiggleFrames : [0, 0]}>
-        {hasFixedDenoms ? amount : rawInput}
-      </Anime>
-    </>
-  );
-};
+import { getCardPrecision } from '../../../services/gift-card';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchasedGiftCards }) => {
@@ -65,6 +15,8 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
   const initialAmount =
     cardConfig.supportedAmounts && cardConfig.supportedAmounts[0] ? cardConfig.supportedAmounts[0] : 0;
   const [amount, setAmount] = useState(initialAmount);
+  const [inputValue, setInputValue] = useState('');
+  const [inputError, setInputError] = useState(false);
   const discount = (cardConfig.discounts || [])[0];
   const invoiceParams: GiftCardInvoiceParams = {
     brand: cardConfig.name,
@@ -74,7 +26,8 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
     discounts: discount ? [discount.code] : [],
     email
   };
-  const baseDelta = getPrecision(cardConfig.currency) === 2 ? 0.01 : 1;
+  const precision = getCardPrecision(cardConfig);
+  const baseDelta = precision === 2 ? 0.01 : 1;
   const maxAmount = cardConfig.maxAmount as number;
   const minAmount = cardConfig.minAmount as number;
   const changeFixedAmount = (delta: number): void => {
@@ -94,10 +47,48 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
     const newValue = amount + delta;
     // eslint-disable-next-line no-nested-ternary
     const newAmount = newValue > maxAmount ? maxAmount : newValue < minAmount ? minAmount : newValue;
-    setAmount(parseFloat(newAmount.toFixed(getPrecision(cardConfig.currency))));
+    setAmount(parseFloat(newAmount.toFixed(precision)));
+    setInputValue(`${newAmount.toFixed(precision)}`);
   };
   const changeAmount = (delta: number): void =>
     hasFixedDenoms ? changeFixedAmount(delta) : changeVariableAmount(delta);
+  const shakeInput = (): void => {
+    setInputError(true);
+    setTimeout((): void => {
+      setInputError(false);
+    }, 325);
+  };
+  const xAmp = 12;
+  const shakeAnimation = [
+    { value: xAmp * -1 },
+    { value: xAmp },
+    { value: xAmp / -2 },
+    { value: xAmp / 2 },
+    { value: 0 }
+  ] as AnimeValue[];
+  const enforcePrecision = (value: string): string => {
+    const [integer, decimal] = value.split('.');
+    if (!decimal) {
+      return precision === 0 ? integer : value;
+    }
+    const newDecimal = decimal.length > precision ? decimal.substring(0, precision) : decimal;
+    return [integer, newDecimal].join('.');
+  };
+  const handleInput = (input: string): void => {
+    const stringValue = input;
+    const newAmount = parseFloat(Number(input).toFixed(precision));
+    if (newAmount <= maxAmount) {
+      const correctedValue = enforcePrecision(stringValue);
+      if (correctedValue !== stringValue) shakeInput();
+      setInputValue(correctedValue);
+      setAmount(newAmount);
+    } else if (newAmount === 0) {
+      setInputValue('0');
+      setAmount(0);
+    } else {
+      shakeInput();
+    }
+  };
   return (
     <div className="amount-page">
       <div className="amount-page__title">
@@ -107,6 +98,17 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
         )}
       </div>
       <div className="amount-page__amount-box__wrapper">
+        {!hasFixedDenoms && (
+          <input
+            value={inputValue}
+            onChange={(e: React.FormEvent<HTMLInputElement>): void => handleInput(e.currentTarget.value)}
+            onBlur={(e: React.FormEvent<HTMLInputElement>): void => e.currentTarget.focus()}
+            className="amount-page__input"
+            placeholder="0"
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
+          />
+        )}
         <div className="amount-page__amount-box">
           <div className="amount-page__amount-box__currency">{cardConfig.currency}</div>
           <div className="amount-page__amount-box__amount">
@@ -117,14 +119,9 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
               className="amount-page__amount-box__amount__value"
               style={{ color: amount === 0 ? '#DFDFDF' : 'inherit' }}
             >
-              <AmountInput
-                amount={amount}
-                setAmount={setAmount}
-                minAmount={minAmount}
-                maxAmount={maxAmount}
-                cardConfig={cardConfig}
-                hasFixedDenoms={hasFixedDenoms}
-              />
+              <Anime duration={325} easing="easeInOutSine" translateX={inputError ? shakeAnimation : [0, 0]}>
+                {maxAmount ? inputValue || '0' : amount}
+              </Anime>
             </div>
             <button type="button" onClick={(): void => changeAmount(baseDelta)}>
               <img src="../../assets/icons/increment-icon.svg" alt="minus" />
@@ -158,6 +155,7 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
             cardConfig={cardConfig}
             history={history}
             setPurchasedGiftCards={setPurchasedGiftCards}
+            onInvalidParams={(): void => shakeInput()}
           />
         )}
       </div>
