@@ -9,7 +9,6 @@ import { Merchant } from '../../../services/merchant';
 import { resizeToFitPage } from '../../../services/frame';
 import { wait } from '../../../services/utils';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Shop: React.FC<{ merchants: Merchant[]; location: { state?: { searchVal: string; scrollTop: number } } }> = ({
   merchants,
   location
