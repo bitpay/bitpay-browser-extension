@@ -12,9 +12,10 @@ import Navbar from './components/navbar/navbar';
 import { Merchant, getBitPayMerchantFromHost, fetchCachedMerchants } from '../services/merchant';
 import Amount from './pages/amount/amount';
 import Payment from './pages/payment/payment';
-import { get, set } from '../services/storage';
+import { get } from '../services/storage';
 import { GiftCard, CardConfig } from '../services/gift-card.types';
 import { sortByDescendingDate } from '../services/gift-card';
+import { updateCard, listenForInvoiceChanges, handlePaymentEvent } from '../services/gift-card-storage';
 import Email from './pages/settings/email/email';
 import Archive from './pages/settings/archive/archive';
 import Legal from './pages/settings/legal/legal';
@@ -29,14 +30,31 @@ const Popup: React.FC = () => {
   const [supportedMerchant, setSupportedMerchant] = useState(undefined as Merchant | undefined);
   const [supportedGiftCards, setSupportedGiftCards] = useState([] as CardConfig[]);
   const [purchasedGiftCards, setPurchasedGiftCards] = useState([] as GiftCard[]);
+  const [realtimeInvoiceIds, setRealtimeInvoiceIds] = useState([] as string[]);
 
   const updateGiftCard = async (card: GiftCard): Promise<void> => {
-    const newCards = purchasedGiftCards.map(purchasedCard =>
-      purchasedCard.invoiceId === card.invoiceId ? { ...purchasedCard, ...card } : { ...purchasedCard }
-    );
-    await set<GiftCard[]>('purchasedGiftCards', newCards);
+    const newCards = await updateCard(card, purchasedGiftCards);
     setPurchasedGiftCards(newCards);
   };
+
+  useEffect(() => {
+    const attemptToRedeemGiftCards = (): void => {
+      const unredeemedGiftCards = purchasedGiftCards.filter(
+        c =>
+          c.status === 'UNREDEEMED' &&
+          Date.now() - new Date(c.date).getTime() > 1000 &&
+          !realtimeInvoiceIds.includes(c.invoiceId)
+      );
+      if (!unredeemedGiftCards.length) return;
+      setRealtimeInvoiceIds([...realtimeInvoiceIds, ...unredeemedGiftCards.map(c => c.invoiceId)]);
+      unredeemedGiftCards.forEach(async card => {
+        const updatedInvoice = await listenForInvoiceChanges(card);
+        const newCards = await handlePaymentEvent(card, updatedInvoice, purchasedGiftCards);
+        setPurchasedGiftCards(newCards);
+      });
+    };
+    attemptToRedeemGiftCards();
+  }, [purchasedGiftCards, realtimeInvoiceIds]);
 
   useEffect(() => {
     const getStartPage = async (): Promise<void> => {
@@ -70,7 +88,13 @@ const Popup: React.FC = () => {
             <Route
               path="/amount/:brand"
               render={(props): JSX.Element => (
-                <Amount clientId={clientId} email={email} setPurchasedGiftCards={setPurchasedGiftCards} {...props} />
+                <Amount
+                  clientId={clientId}
+                  email={email}
+                  purchasedGiftCards={purchasedGiftCards}
+                  setPurchasedGiftCards={setPurchasedGiftCards}
+                  {...props}
+                />
               )}
             />
             <Route path="/brand/:brand" component={Brand} />
@@ -96,6 +120,7 @@ const Popup: React.FC = () => {
                   clientId={clientId}
                   email={email}
                   setEmail={setEmail}
+                  purchasedGiftCards={purchasedGiftCards}
                   setPurchasedGiftCards={setPurchasedGiftCards}
                   {...props}
                 />

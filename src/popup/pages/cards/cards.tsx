@@ -10,7 +10,7 @@ import { resizeFrame } from '../../../services/frame';
 const Cards: React.FC<any> = ({ location, purchasedGiftCards }) => {
   const { cardConfig } = location.state as { cards: GiftCard[]; cardConfig: CardConfig };
   const cards = (purchasedGiftCards as GiftCard[])
-    .filter(card => card.name === cardConfig.name && !card.archived)
+    .filter(card => card.name === cardConfig.name && !card.archived && card.status !== 'UNREDEEMED')
     .sort(sortByDescendingDate);
   resizeFrame(405);
   return (

@@ -9,7 +9,7 @@ import { formatDiscount } from '../../../services/merchant';
 import { getCardPrecision } from '../../../services/gift-card';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchasedGiftCards }) => {
+const Amount: React.FC<any> = ({ location, clientId, email, history, purchasedGiftCards, setPurchasedGiftCards }) => {
   const { cardConfig } = location.state as { cardConfig: CardConfig };
   const hasFixedDenoms = cardConfig.supportedAmounts && cardConfig.supportedAmounts[0];
   const initialAmount =
@@ -154,6 +154,7 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, setPurchase
             invoiceParams={{ ...invoiceParams, amount }}
             cardConfig={cardConfig}
             history={history}
+            purchasedGiftCards={purchasedGiftCards}
             setPurchasedGiftCards={setPurchasedGiftCards}
             onInvalidParams={(): void => shakeInput()}
           />

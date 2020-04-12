@@ -15,10 +15,10 @@ const Shop: React.FC<{ merchants: Merchant[]; location: any }> = ({ merchants, l
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const setScrollPositionAndSearchVal = async (): Promise<void> => {
-      if (ref.current && location.state) {
+      if (location.state) {
         setSearchVal(location.state.searchVal);
         await wait(0);
-        ref.current.scrollTop = location.state.scrollTop || 0;
+        if (ref.current) ref.current.scrollTop = location.state.scrollTop || 0;
       }
     };
     resizeToFitPage(ref);
