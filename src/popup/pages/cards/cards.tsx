@@ -1,10 +1,11 @@
 import React from 'react';
+import './cards.scss';
 import { Link } from 'react-router-dom';
 import { GiftCard, CardConfig } from '../../../services/gift-card.types';
-import './cards.scss';
-import WalletCard from '../../components/wallet-cards/wallet-card';
 import { sortByDescendingDate } from '../../../services/gift-card';
 import { resizeFrame } from '../../../services/frame';
+import WalletCard from '../../components/wallet-cards/wallet-card';
+import ActionButton from '../../components/action-button/action-button';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Cards: React.FC<any> = ({ location, purchasedGiftCards }) => {
@@ -33,8 +34,8 @@ const Cards: React.FC<any> = ({ location, purchasedGiftCards }) => {
         ))}
       </div>
       <div className="action-button__footer--fixed">
-        <Link className="action-button" to={{ pathname: `/amount/${cardConfig.name}`, state: { cardConfig } }}>
-          Top Up
+        <Link to={{ pathname: `/amount/${cardConfig.name}`, state: { cardConfig } }}>
+          <ActionButton>Top Up</ActionButton>
         </Link>
       </div>
     </>

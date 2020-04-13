@@ -1,0 +1,68 @@
+.action-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 12px;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  background-color: #4f6ef7;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+
+  &--warn {
+    color: #fdb455;
+    background-color: rgba($color: #fdb455, $alpha: 0.1);
+    font-weight: 500;
+    padding: 18px;
+  }
+
+  &--danger {
+    color: #ef476f;
+    background-color: rgba($color: #ef476f, $alpha: 0.1);
+    font-weight: 500;
+    padding: 18px;
+  }
+
+  &[disabled] {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  &__footer {
+    margin: 10px 4px 0;
+    &--fixed {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: white;
+      padding: 14px 14px 18px;
+      display: flex;
+      justify-content: center;
+      box-shadow: 0 -2px 8px 0 rgba(black, 0.08);
+
+      a {
+        width: 100%;
+      }
+    }
+    a {
+      width: 100%;
+    }
+  }
+
+  &__spinner {
+    animation: spin 1s linear infinite;
+    margin-right: 12px;
+    margin-top: -2px;
+  }
+
+  &--light {
+    background: #eef1ff;
+    color: #4f6ef7;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 10px 0;
+  }
+}

@@ -8,6 +8,7 @@ import { getPrecision } from '../../../../services/currency';
 import { getLatestBalanceEntry } from '../../../../services/gift-card';
 import { wait } from '../../../../services/utils';
 import CardMenu from '../../../components/card-menu/card-menu';
+import ActionButton from '../../../components/action-button/action-button';
 
 const Balance: React.FC<{
   updateGiftCard: (cards: GiftCard) => void;
@@ -83,9 +84,9 @@ const Balance: React.FC<{
             </div>
           </div>
           <div style={{ padding: '0 15px' }}>
-            <button type="submit" className="action-button" disabled={!formValid}>
+            <ActionButton type="submit" disabled={!formValid}>
               Save
-            </button>
+            </ActionButton>
           </div>
         </form>
       </div>

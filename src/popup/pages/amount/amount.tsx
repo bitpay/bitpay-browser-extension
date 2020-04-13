@@ -7,6 +7,7 @@ import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
 import { GiftCardInvoiceParams, CardConfig } from '../../../services/gift-card.types';
 import { formatDiscount } from '../../../services/merchant';
 import { getCardPrecision } from '../../../services/gift-card';
+import ActionButton from '../../components/action-button/action-button';
 
 const shkAmp = 12;
 
@@ -133,7 +134,6 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, purchasedGi
         {(cardConfig.activationFees && cardConfig.activationFees.length) || discount || !email ? (
           <div className="action-button__footer" style={{ marginTop: 0 }}>
             <Link
-              className="action-button"
               to={{
                 pathname: `/payment/${cardConfig.name}`,
                 state: {
@@ -143,7 +143,7 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, purchasedGi
                 }
               }}
             >
-              Continue
+              <ActionButton>Continue</ActionButton>
             </Link>
           </div>
         ) : (

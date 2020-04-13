@@ -11,6 +11,7 @@ import LineItems from '../../components/line-items/line-items';
 import CardHeader from '../../components/card-header/card-header';
 import CodeBox from '../../components/code-box/code-box';
 import CardMenu from '../../components/card-menu/card-menu';
+import ActionButton from '../../components/action-button/action-button';
 
 const Card: React.FC<RouteComponentProps & {
   purchasedGiftCards: GiftCard[];
@@ -123,9 +124,7 @@ const Card: React.FC<RouteComponentProps & {
 
         {card.status === 'SUCCESS' && !card.archived && shouldShowRedeemButton() && (
           <div className="action-button__footer">
-            <button className="action-button" type="button" onClick={(): void => launchClaimLink()}>
-              Redeem Now
-            </button>
+            <ActionButton onClick={launchClaimLink}>Redeem Now</ActionButton>
           </div>
         )}
 
@@ -137,12 +136,7 @@ const Card: React.FC<RouteComponentProps & {
             arrow
           >
             <div className="action-button__footer">
-              <button
-                className="action-button action-button--warn"
-                type="button"
-                style={{ marginBottom: '-10px' }}
-                onClick={redeem}
-              >
+              <ActionButton onClick={redeem} flavor="warn">
                 {fetchingClaimCode ? (
                   <>
                     <img className="action-button__spinner" src="../../assets/icons/spinner-warn.svg" alt="spinner" />
@@ -151,7 +145,7 @@ const Card: React.FC<RouteComponentProps & {
                 ) : (
                   <>Pending Confirmation</>
                 )}
-              </button>
+              </ActionButton>
             </div>
           </Tooltip>
         )}
@@ -163,13 +157,9 @@ const Card: React.FC<RouteComponentProps & {
             arrow
           >
             <div className="action-button__footer">
-              <button
-                className="action-button action-button--danger"
-                type="button"
-                onClick={(): void => handleMenuClick('Help')}
-              >
+              <ActionButton onClick={(): void => handleMenuClick('Help')} flavor="danger">
                 Something Went Wrong
-              </button>
+              </ActionButton>
             </div>
           </Tooltip>
         )}
