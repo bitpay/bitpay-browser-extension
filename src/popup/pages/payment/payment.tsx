@@ -25,9 +25,10 @@ const Payment: React.FC<any> = ({ location, history, setEmail, purchasedGiftCard
     name: cardConfig.name,
     discounts: cardConfig.discounts
   };
-  const shouldShowLineItems =
+  const shouldShowLineItems = !!(
     (cardConfig.discounts && cardConfig.discounts.length) ||
-    (cardConfig.activationFees && cardConfig.activationFees.length);
+    (cardConfig.activationFees && cardConfig.activationFees.length)
+  );
   const onEmailChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     emailRef.current?.validity.valid ? setReceiptEmail(event.target.value) : setReceiptEmail('');
   };
