@@ -8,7 +8,6 @@
   padding: 20px 0;
   width: 100%;
   cursor: pointer;
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 
   &--wrapper {
     margin: 0 10px;
@@ -17,17 +16,25 @@
   &__label {
     font-size: 12px;
     color: rgba($color: #434d5a, $alpha: 0.75);
-    margin-top: 5px;
+    position: absolute;
+    top: 0;
 
     &--action {
       color: #4f6ef7;
       font-weight: 500;
+    }
+    &--wrapper {
+      display: flex;
+      justify-content: center;
+      position: relative;
+      margin: 5px auto 0;
+      height: 18px;
+      width: 195px;
     }
   }
 
   &__value {
     font-size: 20px;
     font-weight: 600;
-    transition: color 300ms ease-in-out;
   }
 }

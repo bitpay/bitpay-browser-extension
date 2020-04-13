@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './amount.scss';
-import Anime, { AnimeValue } from 'react-anime';
+import { motion } from 'framer-motion';
 import CardDenoms from '../../components/card-denoms/card-denoms';
 import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
 import { GiftCardInvoiceParams, CardConfig } from '../../../services/gift-card.types';
 import { formatDiscount } from '../../../services/merchant';
 import { getCardPrecision } from '../../../services/gift-card';
+
+const shkAmp = 12;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Amount: React.FC<any> = ({ location, clientId, email, history, purchasedGiftCards, setPurchasedGiftCards }) => {
@@ -58,14 +60,6 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, purchasedGi
       setInputError(false);
     }, 325);
   };
-  const xAmp = 12;
-  const shakeAnimation = [
-    { value: xAmp * -1 },
-    { value: xAmp },
-    { value: xAmp / -2 },
-    { value: xAmp / 2 },
-    { value: 0 }
-  ] as AnimeValue[];
   const enforcePrecision = (value: string): string => {
     const [integer, decimal] = value.split('.');
     if (!decimal) {
@@ -115,14 +109,17 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, purchasedGi
             <button type="button" onClick={(): void => changeAmount(-baseDelta)}>
               <img src="../../assets/icons/decrement-icon.svg" alt="minus" />
             </button>
-            <div
+            <motion.div
               className="amount-page__amount-box__amount__value"
-              style={{ color: amount === 0 ? '#DFDFDF' : 'inherit' }}
+              initial={false}
+              animate={{
+                x: inputError ? [null, shkAmp * -1, shkAmp, shkAmp / -2, shkAmp / 2, 0] : [0, 0],
+                color: amount === 0 ? '#DFDFDF' : '#000000'
+              }}
+              transition={{ duration: 0.325 }}
             >
-              <Anime duration={325} easing="easeInOutSine" translateX={inputError ? shakeAnimation : [0, 0]}>
-                {maxAmount ? inputValue || '0' : amount}
-              </Anime>
-            </div>
+              {maxAmount ? inputValue || '0' : amount}
+            </motion.div>
             <button type="button" onClick={(): void => changeAmount(baseDelta)}>
               <img src="../../assets/icons/increment-icon.svg" alt="minus" />
             </button>
