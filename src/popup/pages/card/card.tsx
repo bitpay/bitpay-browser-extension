@@ -1,18 +1,17 @@
 import React, { useRef, useEffect, useState } from 'react';
+import './card.scss';
 import { RouteComponentProps } from 'react-router-dom';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
 import { Tooltip, makeStyles, createStyles } from '@material-ui/core';
 import { GiftCard, CardConfig } from '../../../services/gift-card.types';
-import './card.scss';
+import { wait } from '../../../services/utils';
 import { resizeToFitPage } from '../../../services/frame';
 import { launchNewTab } from '../../../services/browser';
 import { redeemGiftCard, getLatestBalance } from '../../../services/gift-card';
-import { wait } from '../../../services/utils';
 import LineItems from '../../components/line-items/line-items';
 import CardHeader from '../../components/card-header/card-header';
 import CodeBox from '../../components/code-box/code-box';
+import CardMenu from '../../components/card-menu/card-menu';
+import ActionButton from '../../components/action-button/action-button';
 
 const Card: React.FC<RouteComponentProps & {
   purchasedGiftCards: GiftCard[];
@@ -46,14 +45,13 @@ const Card: React.FC<RouteComponentProps & {
   const [fetchingClaimCode, setFetchingClaimCode] = useState(false);
   const initiallyArchived = giftCard.archived;
   const redeemUrl = `${cardConfig.redeemUrl}${card.claimCode}`;
-  const popupState = usePopupState({ variant: 'popover', popupId: 'cardActions' });
   const launchClaimLink = (): void => {
     const url = cardConfig.defaultClaimCodeType === 'link' ? (card.claimLink as string) : redeemUrl;
     launchNewTab(url);
   };
   const shouldShowRedeemButton = (): boolean => !!(cardConfig.redeemUrl || cardConfig.defaultClaimCodeType === 'link');
   const updateCard = async (cardToUpdate: GiftCard): Promise<void> => {
-    await updateGiftCard(cardToUpdate);
+    updateGiftCard(cardToUpdate);
     setCard(cardToUpdate);
   };
   const resizeFrame = (paddingBottom = 80): void => {
@@ -63,16 +61,12 @@ const Card: React.FC<RouteComponentProps & {
     await updateCard({ ...card, archived: true });
     initiallyArchived ? resizeFrame() : history.goBack();
   };
-  const resizePageBeforeRerender = (): void => {
-    const paddingBottom = shouldShowRedeemButton() ? 136 : undefined;
-    resizeFrame(paddingBottom);
-  };
   const unarchive = async (): Promise<void> => {
-    await updateGiftCard(card);
-    resizePageBeforeRerender();
-    await wait(300);
+    updateGiftCard(card);
+    resizeFrame();
     updateCard({ ...card, archived: false });
   };
+
   const handleMenuClick = (item: string): void => {
     switch (item) {
       case 'Edit Balance':
@@ -92,7 +86,6 @@ const Card: React.FC<RouteComponentProps & {
       default:
         console.log('Unknown Menu Option Selected');
     }
-    popupState.close();
   };
   const redeem = async (): Promise<void> => {
     setFetchingClaimCode(true);
@@ -119,27 +112,7 @@ const Card: React.FC<RouteComponentProps & {
   return (
     <div className="card-details">
       <div className="card-details__content" ref={ref}>
-        <button className="card-details__more" type="button" {...bindTrigger(popupState)}>
-          <img src="../../assets/icons/dots.svg" alt="More" />
-        </button>
-        <Menu
-          {...bindMenu(popupState)}
-          getContentAnchorEl={null}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-          className="card-details__more__menu"
-          style={{ boxShadow: 'none' }}
-        >
-          {['Edit Balance', card.archived ? 'Unarchive' : 'Archive', 'Help'].map(option => (
-            <MenuItem
-              className="card-details__more__menu__item"
-              key={option}
-              onClick={(): void => handleMenuClick(option)}
-            >
-              {option}
-            </MenuItem>
-          ))}
-        </Menu>
+        <CardMenu items={['Edit Balance', card.archived ? 'Unarchive' : 'Archive', 'Help']} onClick={handleMenuClick} />
         <CardHeader amount={getLatestBalance(card)} cardConfig={cardConfig} card={card} />
         <LineItems cardConfig={cardConfig} card={card} />
         {card.status === 'SUCCESS' && cardConfig.defaultClaimCodeType !== 'link' && (
@@ -151,9 +124,7 @@ const Card: React.FC<RouteComponentProps & {
 
         {card.status === 'SUCCESS' && !card.archived && shouldShowRedeemButton() && (
           <div className="action-button__footer">
-            <button className="action-button" type="button" onClick={(): void => launchClaimLink()}>
-              Redeem Now
-            </button>
+            <ActionButton onClick={launchClaimLink}>Redeem Now</ActionButton>
           </div>
         )}
 
@@ -165,12 +136,7 @@ const Card: React.FC<RouteComponentProps & {
             arrow
           >
             <div className="action-button__footer">
-              <button
-                className="action-button action-button--warn"
-                type="button"
-                style={{ marginBottom: '-10px' }}
-                onClick={redeem}
-              >
+              <ActionButton onClick={redeem} flavor="warn">
                 {fetchingClaimCode ? (
                   <>
                     <img className="action-button__spinner" src="../../assets/icons/spinner-warn.svg" alt="spinner" />
@@ -179,7 +145,7 @@ const Card: React.FC<RouteComponentProps & {
                 ) : (
                   <>Pending Confirmation</>
                 )}
-              </button>
+              </ActionButton>
             </div>
           </Tooltip>
         )}
@@ -191,13 +157,9 @@ const Card: React.FC<RouteComponentProps & {
             arrow
           >
             <div className="action-button__footer">
-              <button
-                className="action-button action-button--danger"
-                type="button"
-                onClick={(): void => handleMenuClick('Help')}
-              >
+              <ActionButton onClick={(): void => handleMenuClick('Help')} flavor="danger">
                 Something Went Wrong
-              </button>
+              </ActionButton>
             </div>
           </Tooltip>
         )}
