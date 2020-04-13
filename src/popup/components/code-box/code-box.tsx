@@ -7,17 +7,11 @@ import copyUtil from '../../../services/copy-util';
 const animateLabels = {
   base: {
     opacity: 1,
-    y: 0,
-    transition: {
-      delay: 0.3
-    }
+    y: 0
   },
   delta: {
     opacity: 0,
-    y: 8,
-    transition: {
-      delay: 0.15
-    }
+    y: 8
   }
 };
 
