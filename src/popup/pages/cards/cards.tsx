@@ -1,6 +1,7 @@
 import React from 'react';
 import './cards.scss';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { GiftCard, CardConfig } from '../../../services/gift-card.types';
 import { sortByDescendingDate } from '../../../services/gift-card';
 import { resizeFrame } from '../../../services/frame';
@@ -19,18 +20,20 @@ const Cards: React.FC<any> = ({ location, purchasedGiftCards }) => {
       <div className="cards-page">
         <WalletCard type="brand-box" cards={cards} cardConfig={cardConfig} />
         {cards.map((card, index) => (
-          <Link
-            to={{
-              pathname: `/card/${card.invoiceId}`,
-              state: {
-                card,
-                cardConfig
-              }
-            }}
-            key={index}
-          >
-            <WalletCard type="card-box" cards={[card]} cardConfig={cardConfig} />
-          </Link>
+          <motion.div whileTap={{ scale: 0.96 }}>
+            <Link
+              to={{
+                pathname: `/card/${card.invoiceId}`,
+                state: {
+                  card,
+                  cardConfig
+                }
+              }}
+              key={index}
+            >
+              <WalletCard type="card-box" cards={[card]} cardConfig={cardConfig} />
+            </Link>
+          </motion.div>
         ))}
       </div>
       <div className="action-button__footer--fixed">

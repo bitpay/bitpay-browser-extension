@@ -107,9 +107,9 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, purchasedGi
         <div className="amount-page__amount-box">
           <div className="amount-page__amount-box__currency">{cardConfig.currency}</div>
           <div className="amount-page__amount-box__amount">
-            <button type="button" onClick={(): void => changeAmount(-baseDelta)}>
+            <motion.button whileTap={{ scale: 0.9 }} onClick={(): void => changeAmount(-baseDelta)} type="button">
               <img src="../../assets/icons/decrement-icon.svg" alt="minus" />
-            </button>
+            </motion.button>
             <motion.div
               className="amount-page__amount-box__amount__value"
               initial={false}
@@ -121,9 +121,9 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, purchasedGi
             >
               {maxAmount ? inputValue || '0' : amount}
             </motion.div>
-            <button type="button" onClick={(): void => changeAmount(baseDelta)}>
+            <motion.button whileTap={{ scale: 0.9 }} onClick={(): void => changeAmount(baseDelta)} type="button">
               <img src="../../assets/icons/increment-icon.svg" alt="minus" />
-            </button>
+            </motion.button>
           </div>
           <div className="amount-page__amount-box__denoms">
             <CardDenoms cardConfig={cardConfig} />
