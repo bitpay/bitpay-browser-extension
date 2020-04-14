@@ -5,7 +5,7 @@ import { Tooltip, makeStyles, createStyles } from '@material-ui/core';
 import { GiftCard, CardConfig } from '../../../services/gift-card.types';
 import { wait } from '../../../services/utils';
 import { resizeToFitPage } from '../../../services/frame';
-import { launchNewTab } from '../../../services/browser';
+import { launchNewTab, goToPage } from '../../../services/browser';
 import { redeemGiftCard, getLatestBalance } from '../../../services/gift-card';
 import LineItems from '../../components/line-items/line-items';
 import CardHeader from '../../components/card-header/card-header';
@@ -47,7 +47,7 @@ const Card: React.FC<RouteComponentProps & {
   const redeemUrl = `${cardConfig.redeemUrl}${card.claimCode}`;
   const launchClaimLink = (): void => {
     const url = cardConfig.defaultClaimCodeType === 'link' ? (card.claimLink as string) : redeemUrl;
-    launchNewTab(url);
+    goToPage(url);
   };
   const shouldShowRedeemButton = (): boolean => !!(cardConfig.redeemUrl || cardConfig.defaultClaimCodeType === 'link');
   const updateCard = async (cardToUpdate: GiftCard): Promise<void> => {
