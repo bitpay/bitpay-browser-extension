@@ -20,8 +20,8 @@ const Account: React.FC<{
     await browser.runtime.sendMessage({
       name: 'LAUNCH_WINDOW',
       url: `${process.env.API_ORIGIN}/wallet-card/login?context=bpa`,
-      width: 332,
-      height: 590
+      width: 350,
+      height: 595
     });
     const newUser = await get<BitpayUser>('bitpayUser');
     if (!newUser) {
