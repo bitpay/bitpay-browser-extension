@@ -41,15 +41,14 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
           </div>
           <div className="brand-page__header__block">
             <div className="brand-page__header__block__title">{merchant.displayName}</div>
-            {getDiscount(merchant) ? (
+            <div className="brand-page__header__block__caption">
+              {merchant.hasDirectIntegration ? <>{merchant.caption}</> : <CardDenoms cardConfig={cardConfig} />}
+            </div>
+            {getDiscount(merchant) && (
               <div className="brand-page__header__block__discount" style={{ color, borderColor: color }}>
                 <div style={{ transform: 'translateY(-0.5px)' }}>
                   <DiscountText merchant={merchant} />
                 </div>
-              </div>
-            ) : (
-              <div className="brand-page__header__block__caption">
-                {merchant.hasDirectIntegration ? <>{merchant.caption}</> : <CardDenoms cardConfig={cardConfig} />}
               </div>
             )}
           </div>
