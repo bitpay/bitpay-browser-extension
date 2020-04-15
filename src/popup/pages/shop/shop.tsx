@@ -2,16 +2,35 @@ import React, { useState, useEffect, useRef } from 'react';
 import './shop.scss';
 
 import { Link } from 'react-router-dom';
-import Anime, { anime } from 'react-anime';
+import { motion } from 'framer-motion';
 import SearchBar from '../../components/search-bar/search-bar';
 import MerchantCell from '../../components/merchant-cell/merchant-cell';
 import { Merchant } from '../../../services/merchant';
 import { resizeToFitPage } from '../../../services/frame';
 import { wait } from '../../../services/utils';
 
+const listAnimation = {
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  base: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: 'spring',
+      damping: 15,
+      stiffness: 200,
+      delay: i * 0.05
+    }
+  }),
+  delta: { opacity: 0, y: -32 }
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Shop: React.FC<{ merchants: Merchant[]; location: any }> = ({ merchants, location }) => {
   const [searchVal, setSearchVal] = useState('' as string);
+  const [isDirty, setDirty] = useState(false);
+  useEffect(() => {
+    if (searchVal) setDirty(true);
+  }, [searchVal]);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const setScrollPositionAndSearchVal = async (): Promise<void> => {
@@ -41,8 +60,14 @@ const Shop: React.FC<{ merchants: Merchant[]; location: any }> = ({ merchants, l
         {!searchVal && (
           <>
             <div className="shop-page__section-header">Popular Brands</div>
-            <Anime delay={anime.stagger(50)} translateY={[-32, 0]} opacity={[0, 1]}>
-              {featuredMerchants.map(merchant => (
+            {featuredMerchants.map((merchant, index) => (
+              <motion.div
+                custom={index}
+                initial={isDirty ? 'base' : 'delta'}
+                animate="base"
+                variants={listAnimation}
+                key={merchant.name}
+              >
                 <Link
                   to={{
                     pathname: `/brand/${merchant.name}`,
@@ -53,8 +78,8 @@ const Shop: React.FC<{ merchants: Merchant[]; location: any }> = ({ merchants, l
                 >
                   <MerchantCell key={merchant.name} merchant={merchant} />
                 </Link>
-              ))}
-            </Anime>
+              </motion.div>
+            ))}
             <div className="shop-page__divider" />
           </>
         )}

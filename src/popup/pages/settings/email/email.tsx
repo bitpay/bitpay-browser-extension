@@ -2,6 +2,7 @@
 import React, { useRef, useState } from 'react';
 import { resizeFrame } from '../../../../services/frame';
 import { set } from '../../../../services/storage';
+import ActionButton from '../../../components/action-button/action-button';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Email: React.FC<{ email: string; setEmail: (email: string) => void; history?: any }> = ({
@@ -43,9 +44,9 @@ const Email: React.FC<{ email: string; setEmail: (email: string) => void; histor
           </div>
         </div>
         <div className="action-button__footer--fixed">
-          <button type="submit" className="action-button" disabled={!formValid}>
+          <ActionButton type="submit" disabled={!formValid}>
             Save
-          </button>
+          </ActionButton>
         </div>
       </form>
     </div>

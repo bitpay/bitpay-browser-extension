@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './amount.scss';
+import { motion } from 'framer-motion';
 import CardDenoms from '../../components/card-denoms/card-denoms';
 import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
 import { GiftCardInvoiceParams, CardConfig } from '../../../services/gift-card.types';
@@ -8,6 +9,9 @@ import { getCardPrecision } from '../../../services/gift-card';
 import DiscountText from '../../components/discount-text/discount-text';
 import { Merchant } from '../../../services/merchant';
 import { resizeFrame } from '../../../services/frame';
+import ActionButton from '../../components/action-button/action-button';
+
+const shkAmp = 12;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Amount: React.FC<any> = ({
@@ -25,6 +29,7 @@ const Amount: React.FC<any> = ({
     cardConfig.supportedAmounts && cardConfig.supportedAmounts[0] ? cardConfig.supportedAmounts[0] : 0;
   const [amount, setAmount] = useState(initialAmount);
   const [inputValue, setInputValue] = useState('');
+  const [inputError, setInputError] = useState(false);
   const discount = (cardConfig.discounts || [])[0];
   const invoiceParams: GiftCardInvoiceParams = {
     brand: cardConfig.name,
@@ -60,13 +65,11 @@ const Amount: React.FC<any> = ({
   };
   const changeAmount = (delta: number): void =>
     hasFixedDenoms ? changeFixedAmount(delta) : changeVariableAmount(delta);
-
-  const [inputError, setInputError] = useState(false);
   const shakeInput = (): void => {
     setInputError(true);
     setTimeout((): void => {
       setInputError(false);
-    }, 900);
+    }, 325);
   };
   const enforcePrecision = (value: string): string => {
     const [integer, decimal] = value.split('.');
@@ -117,18 +120,23 @@ const Amount: React.FC<any> = ({
         <div className="amount-page__amount-box">
           <div className="amount-page__amount-box__currency">{cardConfig.currency}</div>
           <div className="amount-page__amount-box__amount">
-            <button type="button" onClick={(): void => changeAmount(-baseDelta)}>
+            <motion.button whileTap={{ scale: 0.9 }} onClick={(): void => changeAmount(-baseDelta)} type="button">
               <img src="../../assets/icons/decrement-icon.svg" alt="minus" />
-            </button>
-            <div
-              className={`amount-page__amount-box__amount__value${inputError ? ' wiggle-animation' : ''}`}
-              style={{ color: amount === 0 ? '#DFDFDF' : 'inherit' }}
+            </motion.button>
+            <motion.div
+              className="amount-page__amount-box__amount__value"
+              initial={false}
+              animate={{
+                x: inputError ? [null, shkAmp * -1, shkAmp, shkAmp / -2, shkAmp / 2, 0] : [0, 0],
+                color: amount === 0 ? '#DFDFDF' : '#000000'
+              }}
+              transition={{ duration: 0.325 }}
             >
-              {cardConfig.maxAmount ? inputValue || '0' : amount}
-            </div>
-            <button type="button" onClick={(): void => changeAmount(baseDelta)}>
+              {maxAmount ? inputValue || '0' : amount}
+            </motion.div>
+            <motion.button whileTap={{ scale: 0.9 }} onClick={(): void => changeAmount(baseDelta)} type="button">
               <img src="../../assets/icons/increment-icon.svg" alt="minus" />
-            </button>
+            </motion.button>
           </div>
           <div className="amount-page__amount-box__denoms">
             <CardDenoms cardConfig={cardConfig} />
@@ -139,7 +147,6 @@ const Amount: React.FC<any> = ({
         {(cardConfig.activationFees && cardConfig.activationFees.length) || discount || (!email && !user) ? (
           <div className="action-button__footer" style={{ marginTop: 0 }}>
             <Link
-              className="action-button"
               to={{
                 pathname: `/payment/${cardConfig.name}`,
                 state: {
@@ -149,7 +156,7 @@ const Amount: React.FC<any> = ({
                 }
               }}
             >
-              Continue
+              <ActionButton>Continue</ActionButton>
             </Link>
           </div>
         ) : (

@@ -4,6 +4,7 @@ import './settings.scss';
 import { Link } from 'react-router-dom';
 import { resizeFrame } from '../../../services/frame';
 import { BitpayUser } from '../../../services/bitpay-id';
+import { launchNewTab } from '../../../services/browser';
 
 const Settings: React.FC<{ email: string; user: BitpayUser }> = ({ email, user }) => {
   resizeFrame(450);
@@ -11,7 +12,6 @@ const Settings: React.FC<{ email: string; user: BitpayUser }> = ({ email, user }
     <div className="settings">
       <div className="settings-group">
         <div className="settings-group__label">Wallet</div>
-        <div className="settings-group__item">Hide Empty Balances</div>
         <Link type="button" className="settings-group__item" to="/settings/archive">
           Archived Gift Cards
         </Link>
@@ -49,17 +49,17 @@ const Settings: React.FC<{ email: string; user: BitpayUser }> = ({ email, user }
       )}
       <div className="settings-group">
         <div className="settings-group__label">Other</div>
-        <button type="button" className="settings-group__item">
-          <div className="settings-group__item__label">Country</div>
-          <div className="settings-group__item__value">USA</div>
-        </button>
         <Link type="button" className="settings-group__item" to="/settings/legal">
           Legal
         </Link>
-        <div className="settings-group__item">
+        <button
+          type="button"
+          className="settings-group__item"
+          onClick={(): void => launchNewTab('https://github.com/msalcala11/extension')}
+        >
           <div className="settings-group__item__label">Version</div>
           <div className="settings-group__item__value">1.0.0</div>
-        </div>
+        </button>
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { browser } from 'webextension-polyfill-ts';
 import { Merchant, getDiscount } from '../../../services/merchant';
 import { resizeToFitPage, FrameDimensions } from '../../../services/frame';
 import CardDenoms from '../../components/card-denoms/card-denoms';
+import ActionButton from '../../components/action-button/action-button';
 import DiscountText from '../../components/discount-text/discount-text';
 
 const Brand: React.FC<RouteComponentProps> = ({ location }) => {
@@ -106,19 +107,12 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
         {(merchant.cta || cardConfig) && (
           <div className="action-button__footer--fixed">
             {merchant.hasDirectIntegration && merchant.cta ? (
-              <button
-                className="action-button"
-                onClick={(): void => merchant.cta && navigatePage(merchant.cta.link)}
-                type="button"
-              >
+              <ActionButton onClick={(): void => merchant.cta && navigatePage(merchant.cta.link)}>
                 {merchant.cta.displayText}
-              </button>
+              </ActionButton>
             ) : (
-              <Link
-                className="action-button"
-                to={{ pathname: `/amount/${cardConfig.name}`, state: { cardConfig, merchant } }}
-              >
-                Buy Credits
+              <Link to={{ pathname: `/amount/${cardConfig.name}`, state: { cardConfig, merchant } }}>
+                <ActionButton>Buy Credits</ActionButton>
               </Link>
             )}
           </div>
