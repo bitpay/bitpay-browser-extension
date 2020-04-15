@@ -103,7 +103,6 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
       delete windowIdResolveMap[tab?.windowId as number];
       browser.tabs.remove(tab?.id as number);
       await pairBitpayId(message.data);
-      console.log('resolve function', resolveFn);
       return resolveFn && resolveFn({ data: { status: 'complete' } });
     }
     case 'INVOICE_EVENT': {

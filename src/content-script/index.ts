@@ -99,7 +99,8 @@ if (window.location.origin === process.env.API_ORIGIN) {
     });
   } else if (window.location.href.includes('/wallet-card')) {
     const scriptElement = document.createElement('script');
-    scriptElement.innerHTML = `window.webkit = {
+    scriptElement.innerHTML = `
+    window.webkit = {
       messageHandlers: {
         cordova_iab: {
           postMessage: message => {
@@ -107,10 +108,13 @@ if (window.location.origin === process.env.API_ORIGIN) {
           }
         }
       }
-    };`;
+    };
+    window.postMessage({ message: 'pairingOnly' });
+    `;
     document.head.appendChild(scriptElement);
     window.addEventListener('message', ({ data }) => {
-      const { message, params } = JSON.parse(data);
+      const dataObj = typeof data === 'string' ? JSON.parse(data) : data;
+      const { message, params } = dataObj;
       if (message !== 'pairing') return;
       browser.runtime.sendMessage(undefined, {
         name: 'ID_CONNECTED',
