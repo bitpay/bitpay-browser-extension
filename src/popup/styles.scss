@@ -5,12 +5,8 @@
 @import "../popup/components/tabs/tabs";
 @import "../popup/components/merchant-cta/merchant-cta";
 
-* {
-  font-family: "Heebo", sans-serif;
-}
-
 body {
-  color: $black;
+  color: black;
   background-color: white;
 }
 
@@ -61,5 +57,5 @@ button {
 }
 
 span.MuiTooltip-arrow {
-  color: #303133;
+  color: $black;
 }

@@ -126,18 +126,18 @@
       text-align: left;
       &__label {
         font-size: 13px;
-        color: $midnightGray;
+        color: $slateDark;
         font-weight: 500;
       }
       &__note {
         opacity: 0.5;
         font-size: 12px;
-        color: $midnightGray;
+        color: $slateDark;
       }
     }
     &__balance {
       font-size: 26px;
-      color: #303133;
+      color: $black;
     }
   }
 }

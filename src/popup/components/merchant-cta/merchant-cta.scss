@@ -22,14 +22,14 @@
 
     &__merchant {
       font-size: 16px;
-      color: $midnightGray;
+      color: $slateDark;
       font-weight: bold;
     }
 
     &__caption {
       opacity: 0.75;
       font-size: 13px;
-      color: $midnightGray;
+      color: $slateDark;
     }
 
     &__promo {
@@ -42,18 +42,18 @@
   > a {
     display: block;
     text-align: center;
-    background: #4f6ef7;
+    background: $blue;
     width: 100%;
     color: white;
     font-size: 12px;
     font-weight: 500;
-    background: #4f6ef7;
+    background: $blue;
     border-radius: 6px;
     padding: 8px 0;
 
     &.zero {
       background: #eef1ff;
-      color: #4f6ef7;
+      color: $blue;
       font-size: 16px;
       font-weight: 500;
       margin-top: 15px;
@@ -70,13 +70,13 @@
     }
     &__title {
       font-size: 18px;
-      color: #303133;
+      color: $black;
       font-weight: 600;
       margin: 6px 0;
     }
     &__description {
       font-size: 13px;
-      color: $midnightGray;
+      color: $slateDark;
       margin: 6px 0;
     }
   }

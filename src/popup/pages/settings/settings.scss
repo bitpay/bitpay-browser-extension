@@ -1,7 +1,7 @@
 @import "../../../styles/variables";
 
 .settings {
-  background: #f6f7fc;
+  background: $feather;
 
   .zero-state {
     background: white;
@@ -61,7 +61,7 @@
     font-weight: 500;
     color: rgba(
       $color: (
-        #434d5a
+        $slateDark
       ),
       $alpha: 0.65
     );
@@ -96,11 +96,11 @@
     }
 
     &--link {
-      color: #4f6ef7;
+      color: $blue;
     }
 
     &--dark {
-      color: #303133;
+      color: $black;
       font-weight: 500;
       font-size: 14px;
     }
@@ -117,13 +117,13 @@
 
       > div:first-child {
         font-weight: 600;
-        color: $midnightGray;
+        color: $slateDark;
       }
 
       &__note {
         font-size: 14px;
         font-weight: 500;
-        color: $midnightGray;
+        color: $slateDark;
         opacity: 0.75;
       }
     }
@@ -131,7 +131,7 @@
     &__value {
       color: rgba(
         $color: (
-          #434d5a
+          $slateDark
         ),
         $alpha: 0.5
       );
@@ -175,12 +175,12 @@
       font-size: 14px;
       width: 100%;
       font-weight: 500;
-      color: #303133;
+      color: $black;
 
       @include placeholder {
         color: rgba(
           $color: (
-            #434d5a
+            $slateDark
           ),
           $alpha: 0.5
         );

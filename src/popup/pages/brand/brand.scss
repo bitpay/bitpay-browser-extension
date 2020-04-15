@@ -52,13 +52,13 @@
       &__title {
         font-weight: 700;
         font-size: 18px;
-        color: #303133;
+        color: $black;
       }
 
       &__caption {
         font-weight: 400;
         font-size: 13px;
-        color: rgba(#434d5a, 0.75);
+        color: rgba($slateDark, 0.75);
         padding-right: 4px;
       }
 
@@ -73,8 +73,8 @@
         align-items: center;
         margin-top: 12px;
         transform: translateX(-4px);
-        color: #4f6ef7;
-        border: 1.5px solid #4f6ef7;
+        color: $blue;
+        border: 1.5px solid $blue;
       }
     }
   }
@@ -91,7 +91,7 @@
       &__title {
         font-weight: 700;
         font-size: 15px;
-        color: $midnightGray;
+        color: $slateDark;
       }
       &__text {
         position: relative;
@@ -110,7 +110,7 @@
           right: 0;
           font-weight: 400;
           font-size: 12px;
-          color: #4f6ef7;
+          color: $blue;
           line-height: 17px;
           cursor: pointer;
           background: linear-gradient(90deg, rgba(white, 0), white, white);

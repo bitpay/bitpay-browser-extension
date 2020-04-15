@@ -1,3 +1,5 @@
+@import "../../../styles/variables";
+
 .code-box {
   display: flex;
   flex-direction: column;
@@ -15,12 +17,12 @@
 
   &__label {
     font-size: 12px;
-    color: rgba($color: #434d5a, $alpha: 0.75);
+    color: rgba($color: $slateDark, $alpha: 0.75);
     position: absolute;
     top: 0;
 
     &--action {
-      color: #4f6ef7;
+      color: $blue;
       font-weight: 500;
     }
     &--wrapper {

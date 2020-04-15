@@ -1,3 +1,5 @@
+@import "../../../styles/variables";
+
 .shop-page {
   position: relative;
 
@@ -12,12 +14,12 @@
     padding: 10px 12px 12px 16px;
     font-weight: 500;
     font-size: 13px;
-    color: rgba(#434d5a, 0.75);
+    color: rgba($slateDark, 0.75);
 
     &--action {
       font-weight: 500;
       font-size: 12px;
-      color: #4f6ef7;
+      color: $blue;
     }
   }
 

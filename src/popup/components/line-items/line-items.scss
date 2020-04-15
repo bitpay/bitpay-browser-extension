@@ -19,7 +19,7 @@
     }
     &__value {
       flex-shrink: 0;
-      color: $midnightGray;
+      color: $slateDark;
 
       &--bold {
         color: black;
@@ -28,7 +28,7 @@
       }
 
       &.crypto-amount {
-        color: #4f6ef7;
+        color: $blue;
         font-weight: 500;
       }
     }

@@ -4,7 +4,7 @@
   margin-bottom: 20px;
   &__title {
     font-size: 15px;
-    color: $midnightGray;
+    color: $slateDark;
     font-weight: 500;
     margin-bottom: 3px;
     margin-top: 3px;
@@ -12,7 +12,7 @@
   }
 
   &__balance {
-    color: #303133;
+    color: $black;
     display: flex;
     align-items: center;
     justify-content: center;

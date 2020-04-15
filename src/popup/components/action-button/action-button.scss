@@ -1,3 +1,5 @@
+@import "../../../styles/variables";
+
 .action-button {
   display: flex;
   justify-content: center;
@@ -7,21 +9,21 @@
   color: white;
   font-size: 16px;
   font-weight: 700;
-  background-color: #4f6ef7;
+  background-color: $blue;
   border-radius: 8px;
   cursor: pointer;
   user-select: none;
 
   &--warn {
-    color: #fdb455;
-    background-color: rgba($color: #fdb455, $alpha: 0.1);
+    color: $warning;
+    background-color: rgba($color: $warning, $alpha: 0.1);
     font-weight: 500;
     padding: 18px;
   }
 
   &--danger {
-    color: #ef476f;
-    background-color: rgba($color: #ef476f, $alpha: 0.1);
+    color: $caution;
+    background-color: rgba($color: $caution, $alpha: 0.1);
     font-weight: 500;
     padding: 18px;
   }
@@ -60,7 +62,7 @@
 
   &--light {
     background: #eef1ff;
-    color: #4f6ef7;
+    color: $blue;
     font-size: 16px;
     font-weight: 500;
     padding: 10px 0;
@@ -68,7 +70,7 @@
 
   &--pending {
     background: #eef1ff;
-    color: #4f6ef7;
+    color: $blue;
     font-size: 16px;
     font-weight: 500;
     padding: 10px 0;

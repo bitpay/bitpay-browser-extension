@@ -16,14 +16,14 @@
       &__label {
         .name,
         .email {
-          color: #303133;
+          color: $black;
         }
         .email {
           font-weight: 500;
         }
       }
       &__note {
-        color: $midnightGray;
+        color: $slateDark;
         font-size: 13px;
         font-weight: 400;
       }
@@ -40,7 +40,7 @@
   }
   &__title {
     font-size: 20px;
-    color: #303133;
+    color: $black;
     font-weight: 600;
     margin-top: 10px;
     margin-bottom: 10px;
