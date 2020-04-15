@@ -1,9 +1,10 @@
 import { CardConfig } from './gift-card.types';
-import { sortByDisplayName } from './gift-card';
+import { sortByDisplayName, fetchAvailableCards, addToSupportedGiftCards } from './gift-card';
 import { removeProtocolAndWww } from './utils';
-import { DirectIntegration } from './directory';
-import { get } from './storage';
+import { DirectIntegration, fetchDirectIntegrations } from './directory';
+import { get, set } from './storage';
 import { currencySymbols } from './currency';
+import { BitpayUser } from './bitpay-id';
 
 export interface Merchant extends DirectIntegration {
   name: string;
@@ -85,4 +86,26 @@ export async function fetchCachedMerchants(): Promise<Merchant[]> {
     get<CardConfig[]>('availableGiftCards')
   ]);
   return getMerchants(directIntegrations, availableGiftCardBrands);
+}
+
+export async function fetchMerchants(): Promise<Merchant[]> {
+  const user = await get<BitpayUser>('bitpayUser');
+  const [directIntegrations, availableGiftCards, supportedGiftCards = []] = await Promise.all([
+    fetchDirectIntegrations().catch(() => []),
+    fetchAvailableCards({ user }).catch(() => []),
+    get<CardConfig[]>('supportedGiftCards')
+  ]);
+  const newSupportedGiftCards = addToSupportedGiftCards(supportedGiftCards, availableGiftCards);
+  await Promise.all([
+    set<DirectIntegration[]>('directIntegrations', directIntegrations),
+    set<CardConfig[]>('availableGiftCards', availableGiftCards),
+    set<CardConfig[]>('supportedGiftCards', newSupportedGiftCards)
+  ]);
+  return getMerchants(directIntegrations, availableGiftCards);
+}
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export function getDiscount(merchant: Merchant) {
+  const cardConfig = merchant.giftCards[0];
+  return merchant.discount || (cardConfig && cardConfig.discounts && cardConfig.discounts[0]);
 }

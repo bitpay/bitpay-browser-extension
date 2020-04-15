@@ -3,9 +3,10 @@ import { RouteComponentProps, Link } from 'react-router-dom';
 import './brand.scss';
 import { browser } from 'webextension-polyfill-ts';
 
-import { formatDiscount, Merchant } from '../../../services/merchant';
+import { Merchant, getDiscount } from '../../../services/merchant';
 import { resizeToFitPage, FrameDimensions } from '../../../services/frame';
 import CardDenoms from '../../components/card-denoms/card-denoms';
+import DiscountText from '../../components/discount-text/discount-text';
 
 const Brand: React.FC<RouteComponentProps> = ({ location }) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -32,6 +33,7 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
       url: website
     });
   }
+  const color = merchant.theme === '#ffffff' ? '#24a186' : merchant.theme;
   return (
     <div className="brand-page">
       <div ref={ref}>
@@ -48,18 +50,15 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
           </div>
           <div className="brand-page__header__block">
             <div className="brand-page__header__block__title">{merchant.displayName}</div>
-            <div className="brand-page__header__block__caption">
-              {merchant.hasDirectIntegration ? <>{merchant.caption}</> : <CardDenoms cardConfig={cardConfig} />}
-            </div>
-            {merchant.discount && (
-              <div
-                className="brand-page__header__block__discount"
-                style={{ color: merchant.theme, borderColor: merchant.theme }}
-              >
-                <span style={{ transform: 'translateY(-0.5px)' }}>
-                  {formatDiscount(merchant.discount, cardConfig ? cardConfig.currency : merchant.discount.currency)} Off
-                  Every Purchase
-                </span>
+            {getDiscount(merchant) ? (
+              <div className="brand-page__header__block__discount" style={{ color, borderColor: color }}>
+                <div style={{ transform: 'translateY(-0.5px)' }}>
+                  <DiscountText merchant={merchant} />
+                </div>
+              </div>
+            ) : (
+              <div className="brand-page__header__block__caption">
+                {merchant.hasDirectIntegration ? <>{merchant.caption}</> : <CardDenoms cardConfig={cardConfig} />}
               </div>
             )}
           </div>
@@ -115,7 +114,10 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
                 {merchant.cta.displayText}
               </button>
             ) : (
-              <Link className="action-button" to={{ pathname: `/amount/${cardConfig.name}`, state: { cardConfig } }}>
+              <Link
+                className="action-button"
+                to={{ pathname: `/amount/${cardConfig.name}`, state: { cardConfig, merchant } }}
+              >
                 Buy Credits
               </Link>
             )}

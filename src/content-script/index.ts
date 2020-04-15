@@ -61,14 +61,13 @@ function resizeIframe(frame: HTMLIFrameElement, height: number = FrameDimensions
 
 browser.runtime.onMessage.addListener(message => {
   const messageName = message && message.name;
-  const [messagePrefix, messageSuffix] = messageName.split(':');
-  switch (messagePrefix) {
+  switch (messageName) {
     case 'EXTENSION_ICON_CLICKED':
       return iframe ? removeIframe(iframe) : addIframe(createIframe());
     case 'POPUP_CLOSED':
       return iframe && removeIframe(iframe);
     case 'POPUP_RESIZED':
-      return iframe && resizeIframe(iframe, messageSuffix);
+      return iframe && resizeIframe(iframe, message.height);
     default:
       console.log('Unsupported Event:', message);
   }
@@ -84,18 +83,41 @@ if (document.visibilityState !== 'hidden') {
 }
 
 if (window.location.origin === process.env.API_ORIGIN) {
-  const invoiceId = new URLSearchParams(window.location.search).get('id');
-  window.addEventListener('message', message => {
-    browser.runtime.sendMessage(undefined, {
-      name: 'INVOICE_EVENT',
-      data: message.data
-        ? {
-            invoiceId,
-            status: message.data.status,
-            exceptionStatus: message.data.exceptionStatus
-          }
-        : undefined
+  if (window.location.href.includes('/invoice')) {
+    const invoiceId = new URLSearchParams(window.location.search).get('id');
+    window.addEventListener('message', message => {
+      browser.runtime.sendMessage(undefined, {
+        name: 'INVOICE_EVENT',
+        data: message.data
+          ? {
+              invoiceId,
+              status: message.data.status,
+              exceptionStatus: message.data.exceptionStatus
+            }
+          : undefined
+      });
     });
-  });
+  } else if (window.location.href.includes('/wallet-card')) {
+    const scriptElement = document.createElement('script');
+    scriptElement.innerHTML = `window.webkit = {
+      messageHandlers: {
+        cordova_iab: {
+          postMessage: message => {
+            window.postMessage(message);
+          }
+        }
+      }
+    };`;
+    document.head.appendChild(scriptElement);
+    window.addEventListener('message', ({ data }) => {
+      const { message, params } = JSON.parse(data);
+      console.log('received message data', params);
+      if (message !== 'pairing') return;
+      browser.runtime.sendMessage(undefined, {
+        name: 'ID_CONNECTED',
+        data: params
+      });
+    });
+  }
 }
 export {};

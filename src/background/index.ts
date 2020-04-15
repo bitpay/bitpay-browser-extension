@@ -1,20 +1,16 @@
 import { browser, Tabs } from 'webextension-polyfill-ts';
 import * as uuid from 'uuid';
-import { fetchAvailableCards } from '../services/gift-card';
-import { CardConfig, GiftCardInvoiceMessage } from '../services/gift-card.types';
+import { GiftCardInvoiceMessage } from '../services/gift-card.types';
 import { removeProtocolAndWww } from '../services/utils';
-import { isBitPayAccepted, getMerchants, Merchant, fetchCachedMerchants } from '../services/merchant';
+import { isBitPayAccepted, fetchMerchants, Merchant, fetchCachedMerchants } from '../services/merchant';
 import { get, set } from '../services/storage';
-import { fetchDirectIntegrations, DirectIntegration } from '../services/directory';
+import { generatePairingToken } from '../services/bitpay-id';
 
 let cachedMerchants: Merchant[] | undefined;
 let cacheDate = 0;
-const cacheValidityDuration: number = 1000 * 60;
+const cacheValidityDuration = 0; // 1000 * 60;
 
-const invoiceEventResolveFunctionMap: {
-  [invoiceId: string]: (message: GiftCardInvoiceMessage) => GiftCardInvoiceMessage;
-} = {};
-const windowIdInvoiceMap: { [windowId: number]: string } = {};
+const windowIdResolveMap: { [windowId: number]: (message: GiftCardInvoiceMessage) => GiftCardInvoiceMessage } = {};
 
 function getIconPath(bitpayAccepted: boolean): string {
   return `/assets/icons/favicon${bitpayAccepted ? '-active' : ''}-128.png`;
@@ -24,34 +20,17 @@ function setIcon(bitpayAccepted: boolean): void {
   browser.browserAction.setIcon({ path: getIconPath(bitpayAccepted) });
 }
 
-function addToSupportedGiftCards(supportedGiftCards: CardConfig[], availableGiftCards: CardConfig[]): CardConfig[] {
-  const combinedGiftCards = availableGiftCards.concat(supportedGiftCards);
-  const giftCardsMappedByName = new Map(combinedGiftCards.map(config => [config.name, config]));
-  return Array.from(giftCardsMappedByName.values());
-}
-
 async function getCachedMerchants(): Promise<Merchant[]> {
   return cachedMerchants || fetchCachedMerchants();
 }
 
 async function refreshCachedMerchants(): Promise<void> {
-  const [directIntegrations, availableGiftCards, supportedGiftCards = []] = await Promise.all([
-    fetchDirectIntegrations().catch(() => []),
-    fetchAvailableCards().catch(() => []),
-    get<CardConfig[]>('supportedGiftCards')
-  ]);
-  cachedMerchants = getMerchants(directIntegrations, availableGiftCards);
+  cachedMerchants = await fetchCachedMerchants();
   cacheDate = Date.now();
-  const newSupportedGiftCards = addToSupportedGiftCards(supportedGiftCards, availableGiftCards);
-  await Promise.all([
-    set<DirectIntegration[]>('directIntegrations', directIntegrations),
-    set<CardConfig[]>('availableGiftCards', availableGiftCards),
-    set<CardConfig[]>('supportedGiftCards', newSupportedGiftCards)
-  ]);
 }
 
 async function refreshCachedMerchantsIfNeeded(): Promise<void> {
-  if (Date.now() > cacheDate + cacheValidityDuration) await refreshCachedMerchants();
+  if (Date.now() > cacheDate + cacheValidityDuration) await fetchMerchants();
 }
 
 async function handleUrlChange(host: string): Promise<void> {
@@ -68,10 +47,9 @@ async function createClientIdIfNotExists(): Promise<void> {
   }
 }
 
-async function sendMessageToTab(messageName: string, tab: Tabs.Tab): Promise<void> {
-  return browser.tabs.sendMessage(tab.id as number, {
-    name: messageName
-  });
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function sendMessageToTab(message: any, tab: Tabs.Tab): Promise<void> {
+  return browser.tabs.sendMessage(tab.id as number, message);
 }
 
 browser.tabs.onActivated.addListener(async data => {
@@ -94,38 +72,55 @@ browser.runtime.onInstalled.addListener(async () => {
   await Promise.all([refreshCachedMerchants(), createClientIdIfNotExists()]);
 });
 
-async function launchInvoiceAndListenForPayment(invoiceId: string): Promise<GiftCardInvoiceMessage> {
-  const url = `${process.env.API_ORIGIN}/invoice?id=${invoiceId}?view=modal`;
-  const { id } = await browser.windows.create({ url, type: 'popup', height: 735, width: 430 });
-  windowIdInvoiceMap[id as number] = invoiceId;
+async function launchWindowAndListenForEvents({
+  url,
+  height = 735,
+  width = 430
+}: {
+  url: string;
+  height: number;
+  width: number;
+}): Promise<GiftCardInvoiceMessage> {
+  const { id } = await browser.windows.create({ url, type: 'popup', height, width });
   const promise = new Promise<GiftCardInvoiceMessage>(resolve => {
-    invoiceEventResolveFunctionMap[invoiceId] = resolve as () => GiftCardInvoiceMessage;
+    windowIdResolveMap[id as number] = resolve as () => GiftCardInvoiceMessage;
   });
   const message = await promise;
   return message;
 }
 
+async function pairBitpayId(payload: { secret: string; code?: string }): Promise<void> {
+  await generatePairingToken(payload);
+}
+
 browser.runtime.onMessage.addListener(async (message, sender) => {
   const { tab } = sender;
   switch (message && message.name) {
-    case 'LAUNCH_INVOICE':
-      return tab && launchInvoiceAndListenForPayment(message.invoiceId);
+    case 'LAUNCH_WINDOW':
+      return tab && launchWindowAndListenForEvents(message);
+    case 'ID_CONNECTED': {
+      const resolveFn = windowIdResolveMap[tab?.windowId as number];
+      delete windowIdResolveMap[tab?.windowId as number];
+      browser.tabs.remove(tab?.id as number);
+      await pairBitpayId(message.data);
+      console.log('resolve function', resolveFn);
+      return resolveFn && resolveFn({ data: { status: 'complete' } });
+    }
     case 'INVOICE_EVENT': {
       if (!message.data || !message.data.status) {
         return;
       }
-      const resolveFn = invoiceEventResolveFunctionMap[message.data.invoiceId];
+      const resolveFn = windowIdResolveMap[tab?.windowId as number];
       return resolveFn && resolveFn(message);
     }
     case 'URL_CHANGED':
       return handleUrlChange(message.host);
     default:
-      return tab && sendMessageToTab(message.name, tab);
+      return tab && sendMessageToTab(message, tab);
   }
 });
 
 browser.windows.onRemoved.addListener(windowId => {
-  const invoiceId = windowIdInvoiceMap[windowId];
-  const resolveFn = invoiceEventResolveFunctionMap[invoiceId];
+  const resolveFn = windowIdResolveMap[windowId];
   return resolveFn && resolveFn({ data: { status: 'closed' } });
 });

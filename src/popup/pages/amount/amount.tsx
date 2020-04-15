@@ -4,12 +4,22 @@ import './amount.scss';
 import CardDenoms from '../../components/card-denoms/card-denoms';
 import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
 import { GiftCardInvoiceParams, CardConfig } from '../../../services/gift-card.types';
-import { formatDiscount } from '../../../services/merchant';
 import { getCardPrecision } from '../../../services/gift-card';
+import DiscountText from '../../components/discount-text/discount-text';
+import { Merchant } from '../../../services/merchant';
+import { resizeFrame } from '../../../services/frame';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Amount: React.FC<any> = ({ location, clientId, email, history, purchasedGiftCards, setPurchasedGiftCards }) => {
-  const { cardConfig } = location.state as { cardConfig: CardConfig };
+const Amount: React.FC<any> = ({
+  location,
+  clientId,
+  email,
+  user,
+  history,
+  purchasedGiftCards,
+  setPurchasedGiftCards
+}) => {
+  const { cardConfig, merchant } = location.state as { cardConfig: CardConfig; merchant: Merchant };
   const hasFixedDenoms = cardConfig.supportedAmounts && cardConfig.supportedAmounts[0];
   const initialAmount =
     cardConfig.supportedAmounts && cardConfig.supportedAmounts[0] ? cardConfig.supportedAmounts[0] : 0;
@@ -22,7 +32,7 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, purchasedGi
     amount: initialAmount,
     clientId,
     discounts: discount ? [discount.code] : [],
-    email
+    email: (user && user.email) || email
   };
   const precision = getCardPrecision(cardConfig);
   const baseDelta = precision === 2 ? 0.01 : 1;
@@ -81,12 +91,15 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, purchasedGi
       shakeInput();
     }
   };
+  resizeFrame(360);
   return (
     <div className="amount-page">
       <div className="amount-page__title">
         <div className="amount-page__merchant-name">{cardConfig.displayName}</div>
         {discount && (
-          <div className="amount-page__promo">{formatDiscount(discount, cardConfig.currency)} Off Each Purchase</div>
+          <div className="amount-page__promo">
+            <DiscountText merchant={merchant} />
+          </div>
         )}
       </div>
       <div className="amount-page__amount-box__wrapper">
@@ -123,7 +136,7 @@ const Amount: React.FC<any> = ({ location, clientId, email, history, purchasedGi
         </div>
       </div>
       <div className="amount-page__cta">
-        {(cardConfig.activationFees && cardConfig.activationFees.length) || discount || !email ? (
+        {(cardConfig.activationFees && cardConfig.activationFees.length) || discount || (!email && !user) ? (
           <div className="action-button__footer" style={{ marginTop: 0 }}>
             <Link
               className="action-button"

@@ -4,12 +4,12 @@ export enum FrameDimensions {
   collapsedHeight = 47,
   height = 350,
   width = 300,
-  maxFrameHeight = 530,
+  maxFrameHeight = 600,
   minExpandedFrameHeight = 200
 }
 
 export const resizeFrame = (height: number): void => {
-  browser.runtime.sendMessage({ name: `POPUP_RESIZED:${height}` });
+  browser.runtime.sendMessage({ name: `POPUP_RESIZED`, height });
 };
 
 export const resizeToFitPage = (ref: React.RefObject<HTMLDivElement>, padding = 0): void => {

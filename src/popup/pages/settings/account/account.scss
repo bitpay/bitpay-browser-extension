@@ -1,0 +1,52 @@
+@import "../../../../styles/variables";
+
+.account {
+  background: white;
+
+  .settings-group {
+    margin-bottom: 0;
+
+    &__item {
+      &__avatar {
+        height: 34px;
+        width: 34px;
+      }
+      &__label {
+        .name,
+        .email {
+          color: #303133;
+        }
+        .email {
+          font-weight: 500;
+        }
+      }
+      &__note {
+        color: $midnightGray;
+        font-size: 13px;
+        font-weight: 400;
+      }
+    }
+  }
+
+  &__linked {
+    padding-top: 20px;
+  }
+
+  &__zero-state {
+    padding: 15px;
+    text-align: center;
+  }
+  &__title {
+    font-size: 20px;
+    color: #303133;
+    font-weight: 600;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  &__body {
+    font-size: 14px;
+    color: #565d6d;
+    margin-bottom: 30px;
+    padding: 0 15px;
+  }
+}

@@ -3,10 +3,10 @@ export function removeProtocolAndWww(url: string): string {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function post(url: string, params: any): Promise<any> {
+export async function post(url: string, params: any, opts?: { headers?: { [name: string]: string } }): Promise<any> {
   const response = await fetch(url, {
     method: 'POST',
-    headers: {
+    headers: (opts && opts.headers) || {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(params)

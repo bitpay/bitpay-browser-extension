@@ -87,8 +87,20 @@
       }
     }
 
+    &--link,
     &--dark {
-      color: $midnightGray;
+      > img {
+        height: 16px;
+        margin-right: 10px;
+      }
+    }
+
+    &--link {
+      color: #4f6ef7;
+    }
+
+    &--dark {
+      color: #303133;
       font-weight: 500;
       font-size: 14px;
     }
