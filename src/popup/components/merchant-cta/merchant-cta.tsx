@@ -1,4 +1,5 @@
 import React from 'react';
+import './merchant-cta.scss';
 import { Link } from 'react-router-dom';
 import { Merchant, getDiscount } from '../../../services/merchant';
 import CardDenoms from '../card-denoms/card-denoms';

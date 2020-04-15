@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
 import './brand.scss';
-import { browser } from 'webextension-polyfill-ts';
 
 import { Merchant, getDiscount } from '../../../services/merchant';
 import { resizeToFitPage, FrameDimensions } from '../../../services/frame';
+import { goToPage } from '../../../services/browser';
 import CardDenoms from '../../components/card-denoms/card-denoms';
 import ActionButton from '../../components/action-button/action-button';
 import DiscountText from '../../components/discount-text/discount-text';
@@ -24,17 +24,7 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
   if (cardConfig && !cardConfig.description) {
     cardConfig.description = cardConfig.terms;
   }
-  function navigatePage(link: string): void {
-    let website = link;
-    const detectProtocolPresent = /^https?:\/\//i;
-    if (!detectProtocolPresent.test(link)) {
-      website = `https://${link}`;
-    }
-    browser.tabs.update({
-      url: website
-    });
-  }
-  const color = merchant.theme === '#ffffff' ? '#24a186' : merchant.theme;
+  const color = merchant.theme === '#ffffff' ? '#4f6ef7' : merchant.theme;
   return (
     <div className="brand-page">
       <div ref={ref}>
@@ -43,7 +33,7 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
             <img className="brand-page__header__icon" alt={merchant.displayName} src={merchant.icon} />
             <button
               className="brand-page__header__icon--hover"
-              onClick={(): void => navigatePage(merchant.link)}
+              onClick={(): void => goToPage(merchant.link)}
               type="button"
             >
               <img alt="go to website" src="../assets/icons/link-icon.svg" />
@@ -51,15 +41,14 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
           </div>
           <div className="brand-page__header__block">
             <div className="brand-page__header__block__title">{merchant.displayName}</div>
-            {getDiscount(merchant) ? (
+            <div className="brand-page__header__block__caption">
+              {merchant.hasDirectIntegration ? <>{merchant.caption}</> : <CardDenoms cardConfig={cardConfig} />}
+            </div>
+            {getDiscount(merchant) && (
               <div className="brand-page__header__block__discount" style={{ color, borderColor: color }}>
                 <div style={{ transform: 'translateY(-0.5px)' }}>
                   <DiscountText merchant={merchant} />
                 </div>
-              </div>
-            ) : (
-              <div className="brand-page__header__block__caption">
-                {merchant.hasDirectIntegration ? <>{merchant.caption}</> : <CardDenoms cardConfig={cardConfig} />}
               </div>
             )}
           </div>
@@ -107,7 +96,7 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
         {(merchant.cta || cardConfig) && (
           <div className="action-button__footer--fixed">
             {merchant.hasDirectIntegration && merchant.cta ? (
-              <ActionButton onClick={(): void => merchant.cta && navigatePage(merchant.cta.link)}>
+              <ActionButton onClick={(): void => merchant.cta && goToPage(merchant.cta.link)}>
                 {merchant.cta.displayText}
               </ActionButton>
             ) : (

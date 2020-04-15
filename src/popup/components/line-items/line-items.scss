@@ -14,22 +14,22 @@
       &--bold {
         color: black;
         font-size: 16px;
-        font-weight: 500;
+        font-weight: $medium;
       }
     }
     &__value {
       flex-shrink: 0;
-      color: $midnightGray;
+      color: $slateDark;
 
       &--bold {
         color: black;
         font-size: 24px;
-        font-weight: 600;
+        font-weight: $bold;
       }
 
       &.crypto-amount {
-        color: #4f6ef7;
-        font-weight: 500;
+        color: $blue;
+        font-weight: $medium;
       }
     }
   }

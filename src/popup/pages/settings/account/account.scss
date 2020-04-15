@@ -5,6 +5,7 @@
 
   .settings-group {
     margin-bottom: 0;
+    border: none;
 
     &__item {
       &__avatar {
@@ -15,16 +16,16 @@
       &__label {
         .name,
         .email {
-          color: #303133;
+          color: $black;
         }
         .email {
-          font-weight: 500;
+          font-weight: $medium;
         }
       }
       &__note {
-        color: $midnightGray;
+        color: $slateDark;
         font-size: 13px;
-        font-weight: 400;
+        font-weight: $regular;
       }
     }
   }
@@ -39,8 +40,8 @@
   }
   &__title {
     font-size: 20px;
-    color: #303133;
-    font-weight: 600;
+    color: $black;
+    font-weight: $bold;
     margin-top: 10px;
     margin-bottom: 10px;
   }

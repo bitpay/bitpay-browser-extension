@@ -13,17 +13,16 @@
 
   &__merchant-name {
     font-size: 15px;
-    color: $midnightGray;
-    font-weight: 500;
+    color: $slateDark;
+    font-weight: $medium;
     margin-top: 3px;
   }
 
   &__promo {
     font-size: 12px;
-    color: #ff9902; //#30cfa4;
-    color: #30cfa4;
+    color: $blue;
     text-align: center;
-    font-weight: 400;
+    font-weight: $regular;
     margin-top: 3px;
   }
 
@@ -32,9 +31,9 @@
 
     &__amount {
       font-size: 44px;
-      color: #000000;
+      color: black;
       text-align: center;
-      font-weight: 600;
+      font-weight: $bold;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -53,13 +52,13 @@
     &__currency {
       font-size: 16px;
       color: rgba(0, 0, 0, 0.25);
-      font-weight: 500;
+      font-weight: $medium;
     }
 
     &__denoms {
       opacity: 0.75;
       font-size: 12px;
-      color: $midnightGray;
+      color: $slateDark;
       margin: 0 auto;
       max-width: 200px;
       margin-top: 3px;

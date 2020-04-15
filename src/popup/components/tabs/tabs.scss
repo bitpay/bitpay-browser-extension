@@ -1,3 +1,5 @@
+@import "../../../styles/variables";
+
 .tab-bar {
   height: 50px;
   flex-shrink: 0;
@@ -18,7 +20,7 @@
   }
 
   .is-active {
-    font-weight: 600;
+    font-weight: $bold;
     .inactive {
       display: none;
     }

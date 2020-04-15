@@ -1,16 +1,9 @@
 @import "../styles/fonts";
 @import "../styles/reset";
 @import "../styles/variables";
-@import "../popup/components/navbar/navbar";
-@import "../popup/components/tabs/tabs";
-@import "../popup/components/merchant-cta/merchant-cta";
-
-* {
-  font-family: "Heebo", sans-serif;
-}
 
 body {
-  color: $black;
+  color: black;
   background-color: white;
 }
 
@@ -50,7 +43,7 @@ button {
   &__title {
     font-size: 14px;
     color: rgba(black, 0.4);
-    font-weight: 500;
+    font-weight: $medium;
   }
 
   &__subtitle {
@@ -61,5 +54,5 @@ button {
 }
 
 span.MuiTooltip-arrow {
-  color: #303133;
+  color: $black;
 }

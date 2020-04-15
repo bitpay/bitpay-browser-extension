@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './navbar.scss';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { browser } from 'webextension-polyfill-ts';
 import { resizeFrame, FrameDimensions } from '../../../services/frame';

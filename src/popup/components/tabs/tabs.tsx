@@ -1,4 +1,5 @@
 import React from 'react';
+import './tabs.scss';
 import { NavLink, withRouter, RouteComponentProps } from 'react-router-dom';
 
 const Tabs: React.FC<RouteComponentProps> = ({ location: { pathname } }) => {

@@ -4,20 +4,20 @@
   margin-bottom: 20px;
   &__title {
     font-size: 15px;
-    color: $midnightGray;
-    font-weight: 500;
+    color: $slateDark;
+    font-weight: $medium;
     margin-bottom: 3px;
     margin-top: 3px;
     text-align: center;
   }
 
   &__balance {
-    color: #303133;
+    color: $black;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 32px;
-    font-weight: 600;
+    font-weight: $exbold;
 
     > img {
       height: 25px;

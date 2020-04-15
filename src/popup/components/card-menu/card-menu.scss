@@ -1,6 +1,8 @@
+@import "../../../styles/variables";
+
 .card-menu {
   div {
-    background: #081125;
+    background: $oceanBlue;
     border-radius: 6px;
     margin-left: 5px;
     margin-top: -8px;
@@ -19,6 +21,7 @@
     @at-root li#{&} {
       color: white;
       font-size: 12px;
+      font-weight: $medium;
       justify-content: flex-start;
       padding-right: 14px;
       padding-left: 14px;
@@ -30,7 +33,7 @@
         &:nth-child(#{$i}) {
           color: rgba(
             $color: (
-              #ffffff
+              white
             ),
             $alpha:
               1 -

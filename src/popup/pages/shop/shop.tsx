@@ -16,9 +16,9 @@ const listAnimation = {
     y: 0,
     transition: {
       type: 'spring',
-      damping: 15,
-      stiffness: 200,
-      delay: i * 0.05
+      damping: 20,
+      stiffness: 250,
+      delay: i * 0.04
     }
   }),
   delta: { opacity: 0, y: -32 }

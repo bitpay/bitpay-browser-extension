@@ -1,3 +1,5 @@
+@import "../../../styles/variables";
+
 .merchant-cta {
   box-shadow: 0 2px 5px 1px rgba(48, 49, 51, 0.1);
   border-radius: 8px;
@@ -22,40 +24,39 @@
 
     &__merchant {
       font-size: 16px;
-      color: $midnightGray;
-      font-weight: bold;
+      color: $slateDark;
+      font-weight: $bold;
     }
 
     &__caption {
-      opacity: 0.75;
       font-size: 13px;
-      color: $midnightGray;
+      color: rgba($slateDark, 0.75);
+      font-weight: $regular;
     }
 
     &__promo {
       font-size: 13px;
-      color: #ff9902; //#30cfa4;
-      // color: #30cfa4;
-      font-weight: 500;
+      color: $blue;
+      font-weight: $medium;
     }
   }
   > a {
     display: block;
     text-align: center;
-    background: #4f6ef7;
+    background: $blue;
     width: 100%;
     color: white;
     font-size: 12px;
-    font-weight: 500;
-    background: #4f6ef7;
+    font-weight: $medium;
+    background: $blue;
     border-radius: 6px;
     padding: 8px 0;
 
     &.zero {
-      background: #eef1ff;
-      color: #4f6ef7;
+      background: $lightBlue;
+      color: $blue;
       font-size: 16px;
-      font-weight: 500;
+      font-weight: $medium;
       margin-top: 15px;
       padding: 10px 0;
     }
@@ -70,13 +71,13 @@
     }
     &__title {
       font-size: 18px;
-      color: #303133;
-      font-weight: 600;
+      color: $black;
+      font-weight: $bold;
       margin: 6px 0;
     }
     &__description {
       font-size: 13px;
-      color: $midnightGray;
+      color: $slateDark;
       margin: 6px 0;
     }
   }

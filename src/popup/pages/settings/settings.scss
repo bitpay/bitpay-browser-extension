@@ -1,7 +1,7 @@
 @import "../../../styles/variables";
 
 .settings {
-  background: #f6f7fc;
+  background: $feather;
 
   .zero-state {
     background: white;
@@ -50,7 +50,7 @@
       $alpha: 0.5
     );
     text-transform: uppercase;
-    font-weight: 500;
+    font-weight: $medium;
     border-bottom: $input-border;
     padding-top: 12px;
     padding-bottom: 12px;
@@ -58,10 +58,10 @@
   }
 
   &__item {
-    font-weight: 500;
+    font-weight: $medium;
     color: rgba(
       $color: (
-        #434d5a
+        $slateDark
       ),
       $alpha: 0.65
     );
@@ -96,12 +96,12 @@
     }
 
     &--link {
-      color: #4f6ef7;
+      color: $blue;
     }
 
     &--dark {
-      color: #303133;
-      font-weight: 500;
+      color: $black;
+      font-weight: $medium;
       font-size: 14px;
     }
 
@@ -113,17 +113,17 @@
     }
 
     &__label {
-      font-weight: 500;
+      font-weight: $medium;
 
       > div:first-child {
-        font-weight: 600;
-        color: $midnightGray;
+        font-weight: $bold;
+        color: $slateDark;
       }
 
       &__note {
         font-size: 14px;
-        font-weight: 500;
-        color: $midnightGray;
+        font-weight: $medium;
+        color: $slateDark;
         opacity: 0.75;
       }
     }
@@ -131,12 +131,12 @@
     &__value {
       color: rgba(
         $color: (
-          #434d5a
+          $slateDark
         ),
         $alpha: 0.5
       );
       flex-grow: 1;
-      font-weight: 400;
+      font-weight: $regular;
       text-align: right;
       margin-right: -5px;
 
@@ -174,17 +174,17 @@
     > input {
       font-size: 14px;
       width: 100%;
-      font-weight: 500;
-      color: #303133;
+      font-weight: $medium;
+      color: $black;
 
       @include placeholder {
         color: rgba(
           $color: (
-            #434d5a
+            $slateDark
           ),
           $alpha: 0.5
         );
-        font-weight: 400;
+        font-weight: $regular;
       }
     }
 

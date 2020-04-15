@@ -1,3 +1,5 @@
+@import "../../../styles/variables";
+
 .merchant-cell {
   display: flex;
   flex-direction: row;
@@ -26,9 +28,9 @@
   }
 
   &__title {
-    font-weight: 700;
+    font-weight: $bold;
     font-size: 15px;
-    color: #303133;
+    color: $black;
     max-width: 200px;
     white-space: nowrap;
     overflow: hidden;
@@ -36,9 +38,9 @@
   }
 
   &__caption {
-    font-family: 400;
+    font-family: $regular;
     font-size: 12px;
-    color: rgba(#434d5a, 0.75);
+    color: rgba($slateDark, 0.75);
     max-width: 200px;
     white-space: nowrap;
     overflow: hidden;
