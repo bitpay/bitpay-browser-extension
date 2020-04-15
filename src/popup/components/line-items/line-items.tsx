@@ -47,8 +47,11 @@ const LineItems: React.FC<{ cardConfig: CardConfig; card: Partial<GiftCard> & Un
           </div>
         ))}
       {(totalDiscount > 0 || activationFee > 0) && (
-        <div className="line-items__item line-items__item">
-          <div className={`line-items__item__label line-items__item__label${card.date ? '' : '--bold'}`}>
+        <div className="line-items__item line-items__item" style={{ transform: 'translateY(-2px)' }}>
+          <div
+            className={`line-items__item__label line-items__item__label${card.date ? '' : '--bold'}`}
+            style={{ transform: 'translateY(-2px)' }}
+          >
             Total Cost
           </div>
           <div className={`line-items__item__value line-items__item__value${card.date ? '' : '--bold'}`}>
