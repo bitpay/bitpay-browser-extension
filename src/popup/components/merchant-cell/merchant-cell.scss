@@ -28,7 +28,7 @@
   }
 
   &__title {
-    font-weight: 700;
+    font-weight: $bold;
     font-size: 15px;
     color: $black;
     max-width: 200px;
@@ -38,7 +38,7 @@
   }
 
   &__caption {
-    font-family: 400;
+    font-family: $regular;
     font-size: 12px;
     color: rgba($slateDark, 0.75);
     max-width: 200px;

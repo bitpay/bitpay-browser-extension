@@ -12,12 +12,12 @@
     align-items: center;
     justify-content: space-between;
     padding: 10px 12px 12px 16px;
-    font-weight: 500;
+    font-weight: $medium;
     font-size: 13px;
     color: rgba($slateDark, 0.75);
 
     &--action {
-      font-weight: 500;
+      font-weight: $medium;
       font-size: 12px;
       color: $blue;
     }

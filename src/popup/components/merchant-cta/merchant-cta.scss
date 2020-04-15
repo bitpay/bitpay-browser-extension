@@ -25,20 +25,19 @@
     &__merchant {
       font-size: 16px;
       color: $slateDark;
-      font-weight: bold;
+      font-weight: $bold;
     }
 
     &__caption {
-      opacity: 0.75;
       font-size: 13px;
-      color: $slateDark;
+      color: rgba($slateDark, 0.75);
+      font-weight: $regular;
     }
 
     &__promo {
       font-size: 13px;
-      color: #ff9902; //#30cfa4;
-      // color: #30cfa4;
-      font-weight: 500;
+      color: $blue;
+      font-weight: $medium;
     }
   }
   > a {
@@ -48,16 +47,16 @@
     width: 100%;
     color: white;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: $medium;
     background: $blue;
     border-radius: 6px;
     padding: 8px 0;
 
     &.zero {
-      background: #eef1ff;
+      background: $lightBlue;
       color: $blue;
       font-size: 16px;
-      font-weight: 500;
+      font-weight: $medium;
       margin-top: 15px;
       padding: 10px 0;
     }
@@ -73,7 +72,7 @@
     &__title {
       font-size: 18px;
       color: $black;
-      font-weight: 600;
+      font-weight: $bold;
       margin: 6px 0;
     }
     &__description {

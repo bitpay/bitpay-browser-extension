@@ -5,7 +5,7 @@
   &__title {
     font-size: 15px;
     color: $slateDark;
-    font-weight: 500;
+    font-weight: $medium;
     margin-bottom: 3px;
     margin-top: 3px;
     text-align: center;
@@ -17,7 +17,7 @@
     align-items: center;
     justify-content: center;
     font-size: 32px;
-    font-weight: 600;
+    font-weight: $exbold;
 
     > img {
       height: 25px;

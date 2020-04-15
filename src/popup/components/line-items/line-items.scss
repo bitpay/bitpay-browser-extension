@@ -14,7 +14,7 @@
       &--bold {
         color: black;
         font-size: 16px;
-        font-weight: 500;
+        font-weight: $medium;
       }
     }
     &__value {
@@ -24,12 +24,12 @@
       &--bold {
         color: black;
         font-size: 24px;
-        font-weight: 600;
+        font-weight: $bold;
       }
 
       &.crypto-amount {
         color: $blue;
-        font-weight: 500;
+        font-weight: $medium;
       }
     }
   }

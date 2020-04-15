@@ -8,7 +8,7 @@
   padding: 12px;
   color: white;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: $bold;
   background-color: $blue;
   border-radius: 8px;
   cursor: pointer;
@@ -17,14 +17,14 @@
   &--warn {
     color: $warning;
     background-color: rgba($color: $warning, $alpha: 0.1);
-    font-weight: 500;
+    font-weight: $medium;
     padding: 18px;
   }
 
   &--danger {
     color: $caution;
     background-color: rgba($color: $caution, $alpha: 0.1);
-    font-weight: 500;
+    font-weight: $medium;
     padding: 18px;
   }
 
@@ -61,20 +61,19 @@
   }
 
   &--light {
-    background: #eef1ff;
+    background: $lightBlue;
     color: $blue;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: $medium;
     padding: 10px 0;
   }
 
   &--pending {
-    background: #eef1ff;
+    background: $lightBlue;
     color: $blue;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: $medium;
     padding: 10px 0;
-    font-weight: 500;
     height: 60px;
     width: 270px;
     margin-top: 0;

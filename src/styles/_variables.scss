@@ -1,5 +1,7 @@
 // Primary
 $blue: #4f6ef7;
+$lightBlue: #eef1ff;
+$oceanBlue: #081125;
 $midnightBlue: #0c204e;
 $bitpayBlue: #1a3b8b;
 
@@ -7,6 +9,7 @@ $bitpayBlue: #1a3b8b;
 $slateDark: #434d5a;
 $slate: #9ba3ae;
 $air: #ebedf8;
+$fog: #f5f5f7;
 $feather: #f6f7fc;
 $black: #303133;
 
@@ -15,7 +18,7 @@ $caution: #ef476f;
 $success: #2fcfa4;
 $warning: #fdb455;
 
-// font weights
+// Font Weights
 $thin: 200;
 $light: 300;
 $regular: 400;
@@ -24,7 +27,7 @@ $bold: 700;
 $exbold: 800;
 $exblack: 900;
 
-// other variables
+// Utils
 .d-none {
   display: none !important;
 }

@@ -8,7 +8,7 @@ const DiscountText: React.FC<{ merchant: Merchant }> = ({ merchant }) => {
   const discountCurrency = merchant.discount ? merchant.discount.currency : cardConfig && cardConfig.currency;
   const color = merchant.theme === '#ffffff' ? '#4f6ef7' : merchant.theme;
   return (
-    <div className="ellipsis" style={{ color, fontWeight: 500 }}>
+    <div className="ellipsis" style={{ color, fontWeight: 700 }}>
       {formatDiscount(discount as GiftCardDiscount, discountCurrency)} Off Every Purchase
     </div>
   );
