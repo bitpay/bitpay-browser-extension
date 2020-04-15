@@ -111,7 +111,6 @@ if (window.location.origin === process.env.API_ORIGIN) {
     document.head.appendChild(scriptElement);
     window.addEventListener('message', ({ data }) => {
       const { message, params } = JSON.parse(data);
-      console.log('received message data', params);
       if (message !== 'pairing') return;
       browser.runtime.sendMessage(undefined, {
         name: 'ID_CONNECTED',

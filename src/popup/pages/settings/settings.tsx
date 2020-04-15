@@ -38,7 +38,7 @@ const Settings: React.FC<{ email: string; user: BitpayUser }> = ({ email, user }
           )}
         </div>
       </div>
-      {!user && (
+      {email && !user && (
         <div className="settings-group">
           <div className="settings-group__label">Email</div>
           <Link className="settings-group__item settings-group__item--dark" to="/settings/email">

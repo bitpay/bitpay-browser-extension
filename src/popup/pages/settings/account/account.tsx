@@ -3,8 +3,9 @@ import { browser } from 'webextension-polyfill-ts';
 import { BitpayUser } from '../../../../services/bitpay-id';
 import { resizeToFitPage } from '../../../../services/frame';
 import { IOSSwitch } from '../../../components/ios-switch/ios-switch';
-import { set, get } from '../../../../services/storage';
+import { set, get, remove } from '../../../../services/storage';
 import './account.scss';
+import CardMenu from '../../../components/card-menu/card-menu';
 
 const Account: React.FC<{
   user?: BitpayUser;
@@ -12,11 +13,6 @@ const Account: React.FC<{
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   history: any;
 }> = ({ user, setUser, history }) => {
-  console.log('history', history);
-  // if (user) {
-  //   user.givenName = 'Marty';
-  //   user.familyName = 'Alcala';
-  // }
   const ref = useRef<HTMLDivElement>(null);
   const [awaitingAuthentication, setAwaitingAuthentication] = useState(false);
   const connectBitpayId = async (): Promise<void> => {
@@ -33,26 +29,27 @@ const Account: React.FC<{
       return;
     }
     setUser(newUser);
-    resizeToFitPage(ref, 48);
+    resizeToFitPage(ref, 49);
   };
-  // const disconnectId = async (): Promise<void> => {
-  //   // await remove('bitpayUser');
-  //   setUser(undefined);
-  //   history.goBack();
-  // };
+  const disconnect = async (): Promise<void> => {
+    await remove('bitpayUser');
+    setUser(undefined);
+    history.goBack();
+  };
   const handleChange = async (): Promise<void> => {
     const updatedUser = { ...(user as BitpayUser), syncGiftCards: !user?.syncGiftCards };
     await set<BitpayUser>('bitpayUser', updatedUser);
     setUser(updatedUser);
   };
   useEffect(() => {
-    resizeToFitPage(ref, 48);
+    resizeToFitPage(ref, 49);
   }, [ref]);
   return (
     <div className="settings account">
       <div ref={ref}>
         {user ? (
           <div className="account__linked">
+            <CardMenu items={['Disconnect Account']} onClick={disconnect} />
             <div className="settings-group">
               <div className="settings-group__item settings-group__item--dark" style={{ height: '70px' }}>
                 <img

@@ -8,6 +8,7 @@
 
     &__item {
       &__avatar {
+        margin-right: 14px;
         height: 34px;
         width: 34px;
       }
@@ -29,7 +30,7 @@
   }
 
   &__linked {
-    padding-top: 20px;
+    position: relative;
   }
 
   &__zero-state {

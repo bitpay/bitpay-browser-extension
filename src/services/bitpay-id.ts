@@ -78,6 +78,5 @@ export async function generatePairingToken(payload: PairingData): Promise<void> 
     }
     const { email, familyName, givenName } = user;
     await set<BitpayUser>('bitpayUser', { email, familyName, givenName, token, syncGiftCards: true });
-    console.log('BitPayID: successfully paired');
   }
 }
