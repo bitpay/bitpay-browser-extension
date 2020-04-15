@@ -55,6 +55,10 @@ const getExtensionFileType = browser => {
 module.exports = {
   mode: nodeEnv,
 
+  node: {
+    fs: 'empty'
+  },
+
   entry: {
     background: path.join(sourcePath, 'background', 'index.ts'),
     contentScript: path.join(sourcePath, 'content-script', 'index.ts'),

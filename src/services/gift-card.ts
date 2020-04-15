@@ -13,6 +13,7 @@ import {
 } from './gift-card.types';
 import { post } from './utils';
 import { getPrecision } from './currency';
+import { BitpayUser, apiCall } from './bitpay-id';
 
 function getCardConfigFromApiBrandConfig(cardName: string, apiBrandConfig: ApiCardConfig): CardConfig {
   const cards = apiBrandConfig;
@@ -59,15 +60,16 @@ function fetchPublicAvailableCardMap(): Promise<AvailableCardMap> {
   return fetch(url).then(res => res.json());
 }
 
-async function fetchAvailableCardMap(): Promise<AvailableCardMap> {
-  const availableCardMap = await fetchPublicAvailableCardMap();
+async function fetchAvailableCardMap({ user }: { user: BitpayUser }): Promise<AvailableCardMap> {
+  const availableCardMap =
+    user && user.syncGiftCards ? await apiCall(user.token, 'getGiftCardCatalog') : await fetchPublicAvailableCardMap();
   return availableCardMap;
 }
 
 function removeDiscountsForNow(cardConfig: CardConfig): CardConfig {
   return {
-    ...cardConfig,
-    discounts: undefined
+    ...cardConfig
+    // discounts: undefined
   };
 }
 
@@ -86,9 +88,16 @@ function getCardConfigFromApiConfigMap(availableCardMap: AvailableCardMap): Card
   return availableCards;
 }
 
-export async function createBitPayInvoice(params: GiftCardInvoiceParams): Promise<GiftCardOrder> {
-  const url = `${process.env.API_ORIGIN}/gift-cards/pay`;
-  return post(url, params);
+export async function createBitPayInvoice({
+  params,
+  user
+}: {
+  params: GiftCardInvoiceParams;
+  user?: BitpayUser;
+}): Promise<GiftCardOrder> {
+  return user && user.syncGiftCards
+    ? apiCall(user.token, 'createGiftCardInvoice', params)
+    : post(`${process.env.API_ORIGIN}/gift-cards/pay`, params);
 }
 
 export async function redeemGiftCard(data: Partial<GiftCard>): Promise<GiftCard> {
@@ -122,8 +131,17 @@ export async function getBitPayInvoice(id: string): Promise<Invoice> {
   return data;
 }
 
-export function fetchAvailableCards(): Promise<CardConfig[]> {
-  return fetchAvailableCardMap().then(availableCardMap => getCardConfigFromApiConfigMap(availableCardMap));
+export function fetchAvailableCards(params: { user: BitpayUser }): Promise<CardConfig[]> {
+  return fetchAvailableCardMap(params).then(availableCardMap => getCardConfigFromApiConfigMap(availableCardMap));
+}
+
+export function addToSupportedGiftCards(
+  supportedGiftCards: CardConfig[],
+  availableGiftCards: CardConfig[]
+): CardConfig[] {
+  const combinedGiftCards = availableGiftCards.concat(supportedGiftCards);
+  const giftCardsMappedByName = new Map(combinedGiftCards.map(config => [config.name, config]));
+  return Array.from(giftCardsMappedByName.values());
 }
 
 export function sortByDescendingDate(a: { date: Date | string }, b: { date: Date | string }): 1 | -1 {

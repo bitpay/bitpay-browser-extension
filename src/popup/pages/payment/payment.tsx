@@ -8,7 +8,7 @@ import './payment.scss';
 import { resizeToFitPage } from '../../../services/frame';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Payment: React.FC<any> = ({ location, history, setEmail, purchasedGiftCards, setPurchasedGiftCards }) => {
+const Payment: React.FC<any> = ({ location, history, user, setEmail, purchasedGiftCards, setPurchasedGiftCards }) => {
   const ref = useRef<HTMLDivElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
 
@@ -37,7 +37,7 @@ const Payment: React.FC<any> = ({ location, history, setEmail, purchasedGiftCard
       <div ref={ref}>
         <CardHeader cardConfig={cardConfig} card={card} />
         {shouldShowLineItems && <LineItems cardConfig={cardConfig} card={card} />}
-        {!invoiceParams.email && (
+        {!invoiceParams.email && !user && (
           <div className="settings-group">
             <div className="settings-group__label">Email</div>
             <div className="settings-group__input">
@@ -50,6 +50,7 @@ const Payment: React.FC<any> = ({ location, history, setEmail, purchasedGiftCard
           invoiceParams={{ ...invoiceParams, amount, email }}
           cardConfig={cardConfig}
           history={history}
+          user={user}
           setEmail={setEmail}
           purchasedGiftCards={purchasedGiftCards}
           setPurchasedGiftCards={setPurchasedGiftCards}

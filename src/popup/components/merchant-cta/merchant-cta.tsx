@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Merchant } from '../../../services/merchant';
+import { Merchant, getDiscount } from '../../../services/merchant';
 import CardDenoms from '../card-denoms/card-denoms';
 import SuperToast from '../super-toast/super-toast';
+import DiscountText from '../discount-text/discount-text';
 
 const MerchantCta: React.FC<{ merchant?: Merchant; slimCTA: boolean }> = ({ merchant, slimCTA }) => {
   const ctaPath = merchant && (merchant.hasDirectIntegration ? `/brand/${merchant.name}` : `/amount/${merchant.name}`);
-  const hasDiscount = false;
+  const hasDiscount = !!(merchant && getDiscount(merchant));
   return (
     <>
       {merchant ? (
@@ -16,7 +17,9 @@ const MerchantCta: React.FC<{ merchant?: Merchant; slimCTA: boolean }> = ({ merc
             <div className="merchant-cta__content__text ellipsis">
               <div className="merchant-cta__content__merchant ellipsis">{merchant.displayName}</div>
               {hasDiscount ? (
-                <div className="merchant-cta__content__promo ellipsis">3% Off Each Purchase</div>
+                <div className="merchant-cta__content__promo ellipsis">
+                  <DiscountText merchant={merchant} />
+                </div>
               ) : (
                 <>
                   {merchant.hasDirectIntegration ? (

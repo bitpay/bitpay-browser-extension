@@ -8,11 +8,13 @@ import { createBitPayInvoice, redeemGiftCard, getBitPayInvoice } from '../../../
 import Snack from '../snack/snack';
 import { waitForServerEvent, deleteCard } from '../../../services/gift-card-storage';
 import { wait } from '../../../services/utils';
+import { BitpayUser } from '../../../services/bitpay-id';
 
 const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
   cardConfig: CardConfig;
   invoiceParams: GiftCardInvoiceParams;
   setEmail?: (email: string) => void;
+  user?: BitpayUser;
   purchasedGiftCards: GiftCard[];
   setPurchasedGiftCards: (cards: GiftCard[]) => void;
   onInvalidParams?: () => void;
@@ -21,6 +23,7 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
   invoiceParams,
   history,
   setEmail,
+  user,
   purchasedGiftCards,
   setPurchasedGiftCards,
   onInvalidParams = (): void => undefined
@@ -54,7 +57,7 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
       return onInvalidParams();
     }
     setAwaitingPayment(true);
-    const { invoiceId, accessKey, totalDiscount } = await createBitPayInvoice(invoiceParams);
+    const { invoiceId, accessKey, totalDiscount } = await createBitPayInvoice({ params: invoiceParams, user });
     if (setEmail) {
       await set<string>('email', invoiceParams.email as string);
       setEmail(invoiceParams.email as string);
@@ -72,8 +75,8 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
     } as GiftCard;
     await saveGiftCard(unredeemedGiftCard);
     const launchPromise = browser.runtime.sendMessage({
-      name: 'LAUNCH_INVOICE',
-      invoiceId
+      name: 'LAUNCH_WINDOW',
+      url: `${process.env.API_ORIGIN}/invoice?id=${invoiceId}&view=modal`
     });
     const res = await Promise.race([
       launchPromise,
@@ -102,7 +105,7 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
         <Snack message={errorMessage} onClose={(): void => setErrorMessage('')} />
         {awaitingPayment ? (
           <>
-            <div className="action-button action-button--light awaiting-payment">
+            <div className="action-button action-button--pending">
               <img className="action-button__spinner" src="../../assets/icons/spinner.svg" alt="spinner" /> Awaiting
               Payment
             </div>

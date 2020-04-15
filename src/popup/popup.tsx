@@ -9,7 +9,7 @@ import Shop from './pages/shop/shop';
 import './styles.scss';
 import Tabs from './components/tabs/tabs';
 import Navbar from './components/navbar/navbar';
-import { Merchant, getBitPayMerchantFromHost, fetchCachedMerchants } from '../services/merchant';
+import { Merchant, getBitPayMerchantFromHost, fetchCachedMerchants, fetchMerchants } from '../services/merchant';
 import Amount from './pages/amount/amount';
 import Payment from './pages/payment/payment';
 import { get } from '../services/storage';
@@ -20,6 +20,8 @@ import Email from './pages/settings/email/email';
 import Archive from './pages/settings/archive/archive';
 import Legal from './pages/settings/legal/legal';
 import Balance from './pages/card/balance/balance';
+import { BitpayUser } from '../services/bitpay-id';
+import Account from './pages/settings/account/account';
 
 const Popup: React.FC = () => {
   const [initialEntries, setInitialEntries] = useState(['/shop']);
@@ -31,11 +33,20 @@ const Popup: React.FC = () => {
   const [supportedGiftCards, setSupportedGiftCards] = useState([] as CardConfig[]);
   const [purchasedGiftCards, setPurchasedGiftCards] = useState([] as GiftCard[]);
   const [realtimeInvoiceIds, setRealtimeInvoiceIds] = useState([] as string[]);
+  const [user, setUser] = useState(undefined as BitpayUser | undefined);
 
   const updateGiftCard = async (card: GiftCard): Promise<void> => {
     const newCards = await updateCard(card, purchasedGiftCards);
     setPurchasedGiftCards(newCards);
   };
+
+  useEffect(() => {
+    const updateMerchants = async (): Promise<void> => {
+      const newMerchants = await fetchMerchants();
+      setMerchants(newMerchants);
+    };
+    updateMerchants();
+  }, [user]);
 
   useEffect(() => {
     const attemptToRedeemGiftCards = (): void => {
@@ -58,11 +69,12 @@ const Popup: React.FC = () => {
 
   useEffect(() => {
     const getStartPage = async (): Promise<void> => {
-      const [allMerchants, allSupportedGiftCards, allPurchasedGiftCards, receiptEmail] = await Promise.all([
+      const [allMerchants, allSupportedGiftCards, allPurchasedGiftCards, receiptEmail, bitpayUser] = await Promise.all([
         fetchCachedMerchants(),
         get<CardConfig[]>('supportedGiftCards'),
         get<GiftCard[]>('purchasedGiftCards'),
-        get<string>('email')
+        get<string>('email'),
+        get<BitpayUser>('bitpayUser')
       ]);
       const parent = new URLSearchParams(window.location.search).get('url') as string;
       const { host } = new URL(parent);
@@ -75,6 +87,7 @@ const Popup: React.FC = () => {
       setPurchasedGiftCards((allPurchasedGiftCards || []).sort(sortByDescendingDate));
       setClientId(await get<string>('clientId'));
       setEmail(receiptEmail);
+      setUser(bitpayUser);
       setLoaded(true);
     };
     getStartPage();
@@ -93,6 +106,7 @@ const Popup: React.FC = () => {
                   email={email}
                   purchasedGiftCards={purchasedGiftCards}
                   setPurchasedGiftCards={setPurchasedGiftCards}
+                  user={user}
                   {...props}
                 />
               )}
@@ -120,6 +134,7 @@ const Popup: React.FC = () => {
                   clientId={clientId}
                   email={email}
                   setEmail={setEmail}
+                  user={user}
                   purchasedGiftCards={purchasedGiftCards}
                   setPurchasedGiftCards={setPurchasedGiftCards}
                   {...props}
@@ -127,7 +142,11 @@ const Popup: React.FC = () => {
               )}
             />
             <Route path="/shop" render={(props): JSX.Element => <Shop merchants={merchants} {...props} />} />
-            <Route path="/settings" exact render={(props): JSX.Element => <Settings email={email} {...props} />} />
+            <Route
+              path="/settings"
+              exact
+              render={(props): JSX.Element => <Settings email={email} user={user as BitpayUser} {...props} />}
+            />
             <Route
               path="/settings/archive"
               render={(props): JSX.Element => (
@@ -139,6 +158,10 @@ const Popup: React.FC = () => {
               render={(props): JSX.Element => <Email email={email} setEmail={setEmail} {...props} />}
             />
             <Route path="/settings/legal" component={Legal} />
+            <Route
+              path="/settings/account"
+              render={(props): JSX.Element => <Account user={user} setUser={setUser} {...props} />}
+            />
             <Route
               path="/wallet"
               render={(props): JSX.Element => (

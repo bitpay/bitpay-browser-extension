@@ -14,3 +14,7 @@ export async function get<T>(key: string): Promise<T> {
 export function set<T>(key: string, value: T): Promise<void> {
   return browser.storage.local.set({ [getKeyString(key)]: value });
 }
+
+export function remove(key: string): Promise<void> {
+  return browser.storage.local.remove(getKeyString(key));
+}

@@ -10,7 +10,6 @@ const LineItems: React.FC<{ cardConfig: CardConfig; card: Partial<GiftCard> & Un
   cardConfig,
   card
 }) => {
-  // card.discounts = [{ type: 'percentage', amount: 5, code: 'five' }];
   const activationFee = getActivationFee(card.amount, cardConfig);
   const totalDiscount = getTotalDiscount(card.amount, card.discounts || cardConfig.discounts);
   return (
@@ -47,17 +46,16 @@ const LineItems: React.FC<{ cardConfig: CardConfig; card: Partial<GiftCard> & Un
             </div>
           </div>
         ))}
-      {totalDiscount > 0 ||
-        (activationFee > 0 && (
-          <div className="line-items__item line-items__item">
-            <div className={`line-items__item__label line-items__item__label${card.date ? '' : '--bold'}`}>
-              Total Cost
-            </div>
-            <div className={`line-items__item__value line-items__item__value${card.date ? '' : '--bold'}`}>
-              {formatCurrency(card.amount + activationFee - totalDiscount, card.currency, { hideSymbol: !!card.date })}
-            </div>
+      {(totalDiscount > 0 || activationFee > 0) && (
+        <div className="line-items__item line-items__item">
+          <div className={`line-items__item__label line-items__item__label${card.date ? '' : '--bold'}`}>
+            Total Cost
           </div>
-        ))}
+          <div className={`line-items__item__value line-items__item__value${card.date ? '' : '--bold'}`}>
+            {formatCurrency(card.amount + activationFee - totalDiscount, card.currency, { hideSymbol: !!card.date })}
+          </div>
+        </div>
+      )}
       {card.invoice && (
         <div className="line-items__item">
           <div className="line-items__item__label">Amount Paid</div>
