@@ -24,7 +24,7 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
   if (cardConfig && !cardConfig.description) {
     cardConfig.description = cardConfig.terms;
   }
-  const color = merchant.theme === '#ffffff' ? '#24a186' : merchant.theme;
+  const color = merchant.theme === '#ffffff' ? '#4f6ef7' : merchant.theme;
   return (
     <div className="brand-page">
       <div ref={ref}>

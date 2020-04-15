@@ -17,6 +17,11 @@
   height: 48px;
   padding: 0 12px;
   border-bottom: 1px solid rgba(black, 0.05);
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
 
   &__controls {
     position: absolute;
