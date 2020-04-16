@@ -20,7 +20,7 @@ const Cards: React.FC<any> = ({ location, purchasedGiftCards }) => {
       <div className="cards-page">
         <WalletCard type="brand-box" cards={cards} cardConfig={cardConfig} />
         {cards.map((card, index) => (
-          <motion.div whileTap={{ scale: 0.96 }}>
+          <motion.div whileHover={{ scale: 0.98 }} whileTap={{ scale: 1.02 }} key={index}>
             <Link
               to={{
                 pathname: `/card/${card.invoiceId}`,
