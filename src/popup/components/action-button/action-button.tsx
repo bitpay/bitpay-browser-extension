@@ -3,7 +3,7 @@ import './action-button.scss';
 
 import { motion } from 'framer-motion';
 
-function setFlavor(flavor: string): string {
+function setFlavor(flavor?: string): string {
   switch (flavor) {
     case 'warn':
       return ' action-button--warn';
@@ -16,11 +16,16 @@ function setFlavor(flavor: string): string {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ActionButton: React.FC<any> = ({ onClick, children, flavor, disabled, type }) => (
+const ActionButton: React.FC<{
+  onClick?: () => void;
+  flavor?: string;
+  disabled?: boolean;
+  type?: 'button' | 'submit' | 'reset';
+  children?: unknown;
+}> = ({ onClick, children, flavor, disabled, type = 'button' }) => (
   <motion.button
     className={`action-button${setFlavor(flavor)}`}
-    type={type || 'button'}
+    type={type}
     whileTap={{ scale: 0.96 }}
     onClick={onClick}
     disabled={disabled}
