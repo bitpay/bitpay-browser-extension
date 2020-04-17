@@ -1,16 +1,17 @@
 import { browser } from 'webextension-polyfill-ts';
 
 export const launchNewTab = (url: string): void => {
-  browser.tabs.create({ url });
+  browser.runtime.sendMessage({
+    name: 'LAUNCH_TAB',
+    url
+  });
 };
 
 export const goToPage = (link: string): void => {
-  let website = link;
   const detectProtocolPresent = /^https?:\/\//i;
-  if (!detectProtocolPresent.test(link)) {
-    website = `https://${link}`;
-  }
-  browser.tabs.update({
-    url: website
+  const url = detectProtocolPresent.test(link) ? link : `https://${link}`;
+  browser.runtime.sendMessage({
+    name: 'REDIRECT',
+    url
   });
 };
