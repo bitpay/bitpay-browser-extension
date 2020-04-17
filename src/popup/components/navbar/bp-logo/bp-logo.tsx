@@ -12,7 +12,8 @@ const animateLogo = {
     transition: {
       type: 'spring',
       damping: 30,
-      stiffness: 200
+      stiffness: 100,
+      mass: 0.75
     }
   },
   solo: {
@@ -23,7 +24,8 @@ const animateLogo = {
     transition: {
       type: 'spring',
       damping: 30,
-      stiffness: 200
+      stiffness: 100,
+      mass: 0.5
     }
   },
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -32,8 +34,8 @@ const animateLogo = {
     transition: {
       type: 'spring',
       damping: 20,
-      stiffness: 250,
-      mass: 5,
+      stiffness: 200,
+      mass: 0.25,
       delay: i * 0.025
     }
   }),
@@ -42,10 +44,10 @@ const animateLogo = {
     opacity: 1,
     transition: {
       type: 'spring',
-      damping: 20,
-      stiffness: 250,
-      mass: 5,
-      delay: i * 0.025
+      damping: 30,
+      stiffness: 50,
+      mass: 1,
+      delay: i * 0.025 + 0.05
     }
   })
 };
@@ -68,7 +70,7 @@ const BitpayLogo: React.FC<{ solo?: boolean; color?: 'blue' | 'white' }> = ({ so
     <motion.g
       animate={solo ? 'hidden' : 'show'}
       variants={animateLogo}
-      custom={4}
+      custom={solo ? 4 : 0}
       opacity="1"
       id="2_I"
       data-name="2_I"
@@ -80,7 +82,7 @@ const BitpayLogo: React.FC<{ solo?: boolean; color?: 'blue' | 'white' }> = ({ so
     <motion.path
       animate={solo ? 'hidden' : 'show'}
       variants={animateLogo}
-      custom={3}
+      custom={solo ? 3 : 1}
       opacity="1"
       id="3_T"
       data-name="3_T"
@@ -100,7 +102,7 @@ const BitpayLogo: React.FC<{ solo?: boolean; color?: 'blue' | 'white' }> = ({ so
     <motion.path
       animate={solo ? 'hidden' : 'show'}
       variants={animateLogo}
-      custom={1}
+      custom={solo ? 1 : 3}
       opacity="1"
       id="5_A"
       data-name="5_A"
@@ -110,7 +112,7 @@ const BitpayLogo: React.FC<{ solo?: boolean; color?: 'blue' | 'white' }> = ({ so
     <motion.path
       animate={solo ? 'hidden' : 'show'}
       variants={animateLogo}
-      custom={0}
+      custom={solo ? 0 : 4}
       opacity="1"
       id="6_Y"
       data-name="6_Y"

@@ -1,13 +1,14 @@
 import React from 'react';
 import './back-button.scss';
-
 import { motion } from 'framer-motion';
+import { FrameDimensions } from '../../../../services/frame';
 
 const BackButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
   <motion.button
-    initial={{ opacity: 0, x: -65 }}
-    animate={{ opacity: 1, x: 0, y: -1, transition: { duration: 0.05, easing: 'linear' } }}
-    exit={{ opacity: 0, x: -1000, transition: { duration: 0.15, easing: 'linear' } }}
+    key="BackButton"
+    initial={{ opacity: 0, x: -10 }}
+    animate={{ opacity: 1, x: 0, y: -1, transition: { duration: 0.1 } }}
+    exit={{ opacity: 0, x: FrameDimensions.width * -3 }}
     className="back-button"
     type="button"
     onClick={onClick}
