@@ -12,7 +12,7 @@ const cacheValidityDuration = 0; // 1000 * 60;
 const windowIdResolveMap: { [windowId: number]: (message: GiftCardInvoiceMessage) => GiftCardInvoiceMessage } = {};
 
 function getIconPath(bitpayAccepted: boolean): string {
-  return `/assets/icons/favicon${bitpayAccepted ? '-active' : ''}-128.png`;
+  return `/assets/icons/favicon${bitpayAccepted ? '' : '-inactive'}-128.png`;
 }
 
 function setIcon(bitpayAccepted: boolean): void {
