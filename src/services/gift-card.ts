@@ -139,7 +139,7 @@ export function addToSupportedGiftCards(
   supportedGiftCards: CardConfig[],
   availableGiftCards: CardConfig[]
 ): CardConfig[] {
-  const combinedGiftCards = availableGiftCards.concat(supportedGiftCards);
+  const combinedGiftCards = supportedGiftCards.concat(availableGiftCards);
   const giftCardsMappedByName = new Map(combinedGiftCards.map(config => [config.name, config]));
   return Array.from(giftCardsMappedByName.values());
 }
@@ -158,6 +158,12 @@ export function getActivationFee(amount: number, cardConfig: CardConfig): number
     fee => fee.type === 'fixed' && amount >= fee.amountRange.min && amount <= fee.amountRange.max
   );
   return (fixedFee && fixedFee.fee) || 0;
+}
+
+export function isAmountValid(amount: number, cardConfig: CardConfig): boolean {
+  const maxAmount = cardConfig.maxAmount as number;
+  const minAmount = cardConfig.minAmount as number;
+  return cardConfig.supportedAmounts ? true : amount <= maxAmount && amount >= minAmount;
 }
 
 export const getDiscountAmount = (amount: number, discount: GiftCardDiscount): number =>
