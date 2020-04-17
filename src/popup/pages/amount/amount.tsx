@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import CardDenoms from '../../components/card-denoms/card-denoms';
 import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
@@ -22,6 +22,7 @@ const Amount: React.FC<any> = ({
   purchasedGiftCards,
   setPurchasedGiftCards
 }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
   const { cardConfig, merchant } = location.state as { cardConfig: CardConfig; merchant: Merchant };
   const hasFixedDenoms = cardConfig.supportedAmounts && cardConfig.supportedAmounts[0];
   const initialAmount =
@@ -62,8 +63,11 @@ const Amount: React.FC<any> = ({
     setAmount(parseFloat(newAmount.toFixed(precision)));
     setInputValue(`${newAmount.toFixed(precision)}`);
   };
-  const changeAmount = (delta: number): void =>
+  const changeAmount = (delta: number): void => {
     hasFixedDenoms ? changeFixedAmount(delta) : changeVariableAmount(delta);
+    // eslint-disable-next-line no-unused-expressions
+    inputRef.current?.focus();
+  };
   const shakeInput = (): void => {
     setInputError(true);
     setTimeout((): void => {
@@ -119,9 +123,9 @@ const Amount: React.FC<any> = ({
       <div className="amount-page__amount-box__wrapper">
         {!hasFixedDenoms && (
           <input
+            ref={inputRef}
             value={inputValue}
             onChange={(e: React.FormEvent<HTMLInputElement>): void => handleInput(e.currentTarget.value)}
-            onBlur={(e: React.FormEvent<HTMLInputElement>): void => e.currentTarget.focus()}
             className="amount-page__input"
             placeholder="0"
             // eslint-disable-next-line jsx-a11y/no-autofocus
