@@ -21,6 +21,7 @@ export interface GiftCardActivationFee {
 
 export interface CommonCardConfig {
   activationFees?: GiftCardActivationFee[];
+  brandColor?: string;
   cardImage: string;
   currency: string;
   defaultClaimCodeType: ClaimCodeType;
