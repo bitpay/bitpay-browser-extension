@@ -15,3 +15,12 @@ export const goToPage = (link: string): void => {
     url
   });
 };
+
+export const dispatchUrlChange = (window: Window): void => {
+  browser.runtime.sendMessage(undefined, {
+    name: 'URL_CHANGED',
+    url: window.location.href,
+    origin: window.location.origin,
+    host: window.location.host
+  });
+};
