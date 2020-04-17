@@ -8,13 +8,23 @@ const animateLogo = {
     opacity: 1,
     x: 0,
     y: -1,
-    scale: 1
+    scale: 1,
+    transition: {
+      type: 'spring',
+      damping: 30,
+      stiffness: 200
+    }
   },
   solo: {
     opacity: 1,
     x: FrameDimensions.width / 2 - 7,
     y: 2,
-    scale: 1.4
+    scale: 1.4,
+    transition: {
+      type: 'spring',
+      damping: 30,
+      stiffness: 200
+    }
   },
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   hidden: (i: number) => ({
@@ -27,9 +37,17 @@ const animateLogo = {
       delay: i * 0.025
     }
   }),
-  show: {
-    opacity: 1
-  }
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  show: (i: number) => ({
+    opacity: 1,
+    transition: {
+      type: 'spring',
+      damping: 20,
+      stiffness: 250,
+      mass: 5,
+      delay: i * 0.025
+    }
+  })
 };
 
 const BitpayLogo: React.FC<{ solo?: boolean; color?: 'blue' | 'white' }> = ({ solo, color = 'blue' }) => (

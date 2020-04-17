@@ -7,7 +7,7 @@ const BackButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
   <motion.button
     initial={{ opacity: 0, x: -65 }}
     animate={{ opacity: 1, x: 0, y: -1, transition: { duration: 0.05, easing: 'linear' } }}
-    exit={{ opacity: 0, x: -65, transition: { duration: 0.25, easing: 'linear' } }}
+    exit={{ opacity: 0, x: -1000, transition: { duration: 0.15, easing: 'linear' } }}
     className="back-button"
     type="button"
     onClick={onClick}
