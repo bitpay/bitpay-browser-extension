@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import './navbar.scss';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { browser } from 'webextension-polyfill-ts';
+import { AnimatePresence } from 'framer-motion';
 import { resizeFrame, FrameDimensions } from '../../../services/frame';
+
+import BitpayLogo from './bp-logo/bp-logo';
+import BackButton from './back-button/back-button';
 
 const Navbar: React.FC<RouteComponentProps> = ({ history, location }) => {
   const [preCollapseHeight, setPreCollapseHeight] = useState(0);
@@ -29,15 +33,9 @@ const Navbar: React.FC<RouteComponentProps> = ({ history, location }) => {
   const showBackButton = routesWithBackButton.some(route => location.pathname.startsWith(route));
   return (
     <div className="header-bar fixed">
-      {!showBackButton ? (
-        <img className="bp-logo" alt="bitpay" src="../assets/icons/bp-logo-blue.svg" />
-      ) : (
-        <button className="back-button" type="button" onClick={goBack}>
-          <img alt="go back" src="../assets/icons/go-back-icon.svg" />
-        </button>
-      )}
+      <AnimatePresence>{showBackButton && <BackButton onClick={goBack} />}</AnimatePresence>
 
-      {showBackButton && <img className="bp-logo--solo" alt="bitpay" src="../assets/icons/b-logo-blue.svg" />}
+      <BitpayLogo solo={showBackButton} />
 
       <div className="header-bar__controls">
         {!collapsed ? (

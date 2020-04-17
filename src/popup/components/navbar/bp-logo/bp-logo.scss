@@ -1,0 +1,13 @@
+@import "../../../../styles/variables";
+
+.bp-logo {
+  position: absolute;
+  left: 16px;
+
+  &.blue {
+    fill: $bitpayBlue;
+  }
+  &.white {
+    fill: white;
+  }
+}
