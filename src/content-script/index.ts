@@ -109,9 +109,9 @@ if (window.location.origin === process.env.API_ORIGIN) {
         }
       }
     };
-    window.postMessage({ message: 'pairingOnly' });
     `;
     document.head.appendChild(scriptElement);
+    window.postMessage({ message: 'pairingOnly' }, process.env.API_ORIGIN);
     window.addEventListener('message', ({ data }) => {
       const dataObj = typeof data === 'string' ? JSON.parse(data) : data;
       const { message, params } = dataObj;

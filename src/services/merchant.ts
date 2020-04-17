@@ -73,7 +73,7 @@ export function getMerchants(
     displayLink: cardConfig.website,
     tags: [],
     domains: [cardConfig.website],
-    theme: cardConfig.logoBackgroundColor,
+    theme: cardConfig.brandColor || cardConfig.logoBackgroundColor,
     instructions: cardConfig.description,
     giftCards: [cardConfig]
   }));
