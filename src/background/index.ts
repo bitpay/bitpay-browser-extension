@@ -96,6 +96,8 @@ async function pairBitpayId(payload: { secret: string; code?: string }): Promise
 browser.runtime.onMessage.addListener(async (message, sender) => {
   const { tab } = sender;
   switch (message && message.name) {
+    case 'LAUNCH_TAB':
+      return browser.tabs.create({ url: message.url });
     case 'LAUNCH_WINDOW':
       return tab && launchWindowAndListenForEvents(message);
     case 'ID_CONNECTED': {
@@ -112,6 +114,10 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
       const resolveFn = windowIdResolveMap[tab?.windowId as number];
       return resolveFn && resolveFn(message);
     }
+    case 'REDIRECT':
+      return browser.tabs.update({
+        url: message.url
+      });
     case 'URL_CHANGED':
       return handleUrlChange(message.host);
     default:
