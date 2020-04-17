@@ -1,8 +1,8 @@
-import React, { useState, useCallback } from 'react';
-import './code-box.scss';
-
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import copyUtil from '../../../services/copy-util';
+import { wait } from '../../../services/utils';
+import './code-box.scss';
 
 const animateLabels = {
   base: {
@@ -16,16 +16,22 @@ const animateLabels = {
 };
 
 const CodeBox: React.FC<{ code: string; label: string }> = ({ code, label }) => {
+  const mountedRef = useRef(true);
   const [hovering, setHovering] = useState(false);
   const [copied, setCopied] = useState(false);
-  const startCopying = useCallback(() => {
+  const startCopying = useCallback(async () => {
     copyUtil(code);
     if (copied) return;
     setCopied(true);
-    setTimeout((): void => {
-      setCopied(false);
-    }, 1500);
+    await wait(1500);
+    if (mountedRef.current) setCopied(false);
   }, [copied, code]);
+  useEffect(
+    () => (): void => {
+      mountedRef.current = false;
+    },
+    []
+  );
   return (
     <div className="code-box--wrapper">
       <motion.button

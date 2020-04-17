@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { RouteComponentProps, Link } from 'react-router-dom';
-import './brand.scss';
-
+import ReactMarkdown from 'react-markdown';
 import { Merchant, getDiscount } from '../../../services/merchant';
 import { resizeToFitPage, FrameDimensions } from '../../../services/frame';
 import { goToPage } from '../../../services/browser';
 import CardDenoms from '../../components/card-denoms/card-denoms';
 import ActionButton from '../../components/action-button/action-button';
 import DiscountText from '../../components/discount-text/discount-text';
+import './brand.scss';
 
 const Brand: React.FC<RouteComponentProps> = ({ location }) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -68,7 +68,13 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
                 expandText ? ' brand-page__body__content__text--expand' : ''
               }`}
             >
-              {merchant.hasDirectIntegration ? <>{merchant.instructions}</> : <>{cardConfig.description}</>}
+              {merchant.hasDirectIntegration ? (
+                <>{merchant.instructions}</>
+              ) : (
+                <>
+                  <ReactMarkdown source={cardConfig.description} linkTarget="_blank" />
+                </>
+              )}
               {!expandText && (
                 <button
                   type="button"
@@ -86,7 +92,7 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
               <div className="brand-page__body__content">
                 <div className="brand-page__body__content__title">Terms & Conditions</div>
                 <div className="brand-page__body__content__text brand-page__body__content__text--expand">
-                  {cardConfig.terms}
+                  <ReactMarkdown source={cardConfig.terms} linkTarget="_blank" />
                 </div>
               </div>
             </>

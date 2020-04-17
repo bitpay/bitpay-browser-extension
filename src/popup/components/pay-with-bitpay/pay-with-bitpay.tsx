@@ -4,7 +4,7 @@ import { browser } from 'webextension-polyfill-ts';
 import { GiftCard, CardConfig, GiftCardInvoiceParams } from '../../../services/gift-card.types';
 import './pay-with-bitpay.scss';
 import { set } from '../../../services/storage';
-import { createBitPayInvoice, redeemGiftCard, getBitPayInvoice } from '../../../services/gift-card';
+import { createBitPayInvoice, redeemGiftCard, getBitPayInvoice, isAmountValid } from '../../../services/gift-card';
 import Snack from '../snack/snack';
 import { waitForServerEvent, deleteCard } from '../../../services/gift-card-storage';
 import { wait } from '../../../services/utils';
@@ -47,13 +47,8 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
     history.push(`/wallet`);
     history.push({ pathname: `/card/${card.invoiceId}`, state: { card, cardConfig } });
   };
-  const isAmountValid = (): boolean => {
-    const maxAmount = cardConfig.maxAmount as number;
-    const minAmount = cardConfig.minAmount as number;
-    return cardConfig.supportedAmounts ? true : amount <= maxAmount && amount >= minAmount;
-  };
   const launchInvoice = async (): Promise<void> => {
-    if (!isAmountValid()) {
+    if (!isAmountValid(amount, cardConfig)) {
       return onInvalidParams();
     }
     setAwaitingPayment(true);

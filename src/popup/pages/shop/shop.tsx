@@ -43,6 +43,9 @@ const Shop: React.FC<{ merchants: Merchant[]; location: any }> = ({ merchants, l
     resizeToFitPage(ref);
     setScrollPositionAndSearchVal();
   }, [ref, location.state]);
+  useEffect(() => {
+    if (!searchVal) resizeToFitPage(ref);
+  }, [searchVal]);
   const featuredMerchants = merchants.filter(merchant => merchant.featured);
   const filteredMerchants = merchants.filter(merchant =>
     searchVal

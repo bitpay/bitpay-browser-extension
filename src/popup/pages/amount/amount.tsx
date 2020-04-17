@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import './amount.scss';
 import { motion } from 'framer-motion';
 import CardDenoms from '../../components/card-denoms/card-denoms';
 import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
 import { GiftCardInvoiceParams, CardConfig } from '../../../services/gift-card.types';
-import { getCardPrecision } from '../../../services/gift-card';
+import { getCardPrecision, isAmountValid } from '../../../services/gift-card';
 import DiscountText from '../../components/discount-text/discount-text';
 import { Merchant } from '../../../services/merchant';
 import { resizeFrame } from '../../../services/frame';
 import ActionButton from '../../components/action-button/action-button';
+import './amount.scss';
 
 const shkAmp = 12;
 
@@ -94,6 +93,18 @@ const Amount: React.FC<any> = ({
       shakeInput();
     }
   };
+  const goToPaymentPage = (): void => {
+    isAmountValid(amount, cardConfig)
+      ? history.push({
+          pathname: `/payment/${cardConfig.name}`,
+          state: {
+            amount,
+            cardConfig,
+            invoiceParams
+          }
+        })
+      : shakeInput();
+  };
   resizeFrame(360);
   return (
     <div className="amount-page">
@@ -146,18 +157,7 @@ const Amount: React.FC<any> = ({
       <div className="amount-page__cta">
         {(cardConfig.activationFees && cardConfig.activationFees.length) || discount || (!email && !user) ? (
           <div className="action-button__footer" style={{ marginTop: 0 }}>
-            <Link
-              to={{
-                pathname: `/payment/${cardConfig.name}`,
-                state: {
-                  amount,
-                  cardConfig,
-                  invoiceParams
-                }
-              }}
-            >
-              <ActionButton>Continue</ActionButton>
-            </Link>
+            <ActionButton onClick={goToPaymentPage}>Continue</ActionButton>
           </div>
         ) : (
           <PayWithBitpay
