@@ -27,7 +27,7 @@ const Settings: React.FC<{ email: string; user: BitpayUser }> = ({ email, user }
           })}
           to="/settings/account"
         >
-          <img alt="BitPay Logo" src="assets/icons/favicon-active-128.png" />
+          <img alt="BitPay Logo" src="assets/icons/favicon-128.png" />
           {user ? <>{user.email}</> : <>Connect to BitPay</>}
         </Link>
         <div className="settings-group__caption">

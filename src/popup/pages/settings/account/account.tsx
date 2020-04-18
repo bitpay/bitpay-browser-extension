@@ -52,11 +52,7 @@ const Account: React.FC<{
             <CardMenu items={['Disconnect Account']} onClick={disconnect} />
             <div className="settings-group">
               <div className="settings-group__item settings-group__item--dark" style={{ height: '70px' }}>
-                <img
-                  className="settings-group__item__avatar"
-                  alt="BitPay Logo"
-                  src="assets/icons/favicon-active-128.png"
-                />
+                <img className="settings-group__item__avatar" alt="BitPay Logo" src="assets/icons/favicon-128.png" />
                 <div className="settings-group__item__label ellipsis">
                   {user.givenName || user.givenName ? (
                     <>

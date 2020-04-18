@@ -1,5 +1,6 @@
 import { browser } from 'webextension-polyfill-ts';
 import { FrameDimensions } from '../services/frame';
+import { dispatchUrlChange } from '../services/browser';
 
 let iframe: HTMLIFrameElement | undefined;
 
@@ -74,13 +75,17 @@ browser.runtime.onMessage.addListener(message => {
 });
 
 if (document.visibilityState !== 'hidden') {
-  browser.runtime.sendMessage(undefined, {
-    name: 'URL_CHANGED',
-    url: window.location.href,
-    origin: window.location.origin,
-    host: window.location.host
-  });
+  dispatchUrlChange(window);
 }
+document.addEventListener(
+  'visibilitychange',
+  () => {
+    if (document.visibilityState !== 'hidden') {
+      dispatchUrlChange(window);
+    }
+  },
+  false
+);
 
 if (window.location.origin === process.env.API_ORIGIN) {
   if (window.location.href.includes('/invoice')) {

@@ -1,7 +1,6 @@
 import { browser, Tabs } from 'webextension-polyfill-ts';
 import * as uuid from 'uuid';
 import { GiftCardInvoiceMessage } from '../services/gift-card.types';
-import { removeProtocolAndWww } from '../services/utils';
 import { isBitPayAccepted, fetchMerchants, Merchant, fetchCachedMerchants } from '../services/merchant';
 import { get, set } from '../services/storage';
 import { generatePairingToken } from '../services/bitpay-id';
@@ -13,7 +12,7 @@ const cacheValidityDuration = 0; // 1000 * 60;
 const windowIdResolveMap: { [windowId: number]: (message: GiftCardInvoiceMessage) => GiftCardInvoiceMessage } = {};
 
 function getIconPath(bitpayAccepted: boolean): string {
-  return `/assets/icons/favicon${bitpayAccepted ? '-active' : ''}-128.png`;
+  return `/assets/icons/favicon${bitpayAccepted ? '' : '-inactive'}-128.png`;
 }
 
 function setIcon(bitpayAccepted: boolean): void {
@@ -51,16 +50,6 @@ async function createClientIdIfNotExists(): Promise<void> {
 async function sendMessageToTab(message: any, tab: Tabs.Tab): Promise<void> {
   return browser.tabs.sendMessage(tab.id as number, message);
 }
-
-browser.tabs.onActivated.addListener(async data => {
-  const tabs = await browser.tabs.query({ active: true, windowId: data.windowId });
-  const { url } = tabs.find(tab => tab.id === data.tabId) || { url: '' };
-  const host = url && removeProtocolAndWww(url).split('/')[0];
-  const merchants = await getCachedMerchants();
-  const bitpayAccepted = !!(host && isBitPayAccepted(host, merchants));
-  setIcon(bitpayAccepted);
-  await refreshCachedMerchantsIfNeeded();
-});
 
 browser.browserAction.onClicked.addListener(async tab => {
   await browser.tabs.sendMessage(tab.id as number, {
