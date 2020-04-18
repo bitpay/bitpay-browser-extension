@@ -126,6 +126,7 @@ const Amount: React.FC<any> = ({
             ref={inputRef}
             value={inputValue}
             onChange={(e: React.FormEvent<HTMLInputElement>): void => handleInput(e.currentTarget.value)}
+            onBlur={(e: React.FormEvent<HTMLInputElement>): void => e.currentTarget.focus()}
             className="amount-page__input"
             placeholder="0"
             // eslint-disable-next-line jsx-a11y/no-autofocus
