@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import './navbar.scss';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { browser } from 'webextension-polyfill-ts';
+import { motion, AnimatePresence } from 'framer-motion';
 import { resizeFrame, FrameDimensions } from '../../../services/frame';
+
+import BitpayLogo from './bp-logo/bp-logo';
+import BackButton from './back-button/back-button';
 
 const Navbar: React.FC<RouteComponentProps> = ({ history, location }) => {
   const [preCollapseHeight, setPreCollapseHeight] = useState(0);
@@ -29,26 +33,29 @@ const Navbar: React.FC<RouteComponentProps> = ({ history, location }) => {
   const showBackButton = routesWithBackButton.some(route => location.pathname.startsWith(route));
   return (
     <div className="header-bar fixed">
-      {!showBackButton ? (
-        <img className="bp-logo" alt="bitpay" src="../assets/icons/bp-logo-blue.svg" />
-      ) : (
-        <button className="back-button" type="button" onClick={goBack}>
-          <img alt="go back" src="../assets/icons/go-back-icon.svg" />
-        </button>
-      )}
+      <AnimatePresence>{showBackButton && <BackButton onClick={goBack} />}</AnimatePresence>
 
-      {showBackButton && <img className="bp-logo--solo" alt="bitpay" src="../assets/icons/b-logo-blue.svg" />}
+      <BitpayLogo solo={showBackButton} />
 
       <div className="header-bar__controls">
-        {!collapsed ? (
-          <button type="button" onClick={collapse} style={{ marginRight: '7px' }}>
-            <img alt="exit" src="../assets/icons/minimize-icon.svg" />
-          </button>
-        ) : (
-          <button type="button" onClick={expand} style={{ marginRight: '7px' }}>
-            <img alt="exit" src="../assets/icons/expand-icon.svg" />
-          </button>
-        )}
+        <motion.button
+          whileTap={{ scale: 0.96 }}
+          type="button"
+          onClick={collapsed ? expand : collapse}
+          className="header-bar__controls__toggle--wrapper"
+        >
+          <AnimatePresence>
+            <motion.img
+              initial={{ opacity: 0, rotate: 90 }}
+              animate={{ opacity: 1, rotate: 0 }}
+              exit={{ opacity: 0, rotate: 180 }}
+              alt="toggle"
+              src={`../assets/icons/${collapsed ? 'expand' : 'minimize'}-icon.svg`}
+              key={`${collapsed ? 'expand' : 'minimize'}`}
+              className="header-bar__controls__toggle"
+            />
+          </AnimatePresence>
+        </motion.button>
 
         <button type="button" onClick={close}>
           <img alt="exit" src="../assets/icons/exit-icon.svg" />
