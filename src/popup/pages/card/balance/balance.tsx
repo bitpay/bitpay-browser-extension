@@ -83,7 +83,7 @@ const Balance: React.FC<{
               ) : null}
             </div>
           </div>
-          <div style={{ padding: '0 15px' }}>
+          <div className="balance__button">
             <ActionButton type="submit" disabled={!formValid}>
               Save
             </ActionButton>

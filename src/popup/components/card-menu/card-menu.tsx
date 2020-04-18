@@ -22,7 +22,6 @@ const CardMenu: React.FC<{ items: string[]; onClick: (arg0: string) => void }> =
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: 'left' }}
         className="card-menu"
-        style={{ boxShadow: 'none' }}
       >
         {items.map((option: string, index: number) => (
           <MenuItem className="card-menu__item" key={index} onClick={(): void => itemClick(option)}>

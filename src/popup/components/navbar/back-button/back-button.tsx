@@ -6,7 +6,7 @@ import { FrameDimensions } from '../../../../services/frame';
 const BackButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
   <motion.button
     key="BackButton"
-    initial={{ opacity: 0, x: -10 }}
+    initial={{ opacity: 0, x: -20 }}
     animate={{ opacity: 1, x: 0, y: -1, transition: { duration: 0.1 } }}
     exit={{ opacity: 0, x: FrameDimensions.width * -3 }}
     className="back-button"
@@ -14,7 +14,7 @@ const BackButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
     onClick={onClick}
   >
     <img alt="go back" src="../assets/icons/go-back-icon.svg" />
-    <span style={{ transform: 'translate(-0.5px, 0.5px)' }}>Back</span>
+    <span className="back-button--text">Back</span>
   </motion.button>
 );
 

@@ -51,7 +51,7 @@ const Account: React.FC<{
           <div className="account__linked">
             <CardMenu items={['Disconnect Account']} onClick={disconnect} />
             <div className="settings-group">
-              <div className="settings-group__item settings-group__item--dark" style={{ height: '70px' }}>
+              <div className="settings-group__item settings-group__item--dark">
                 <img className="settings-group__item__avatar" alt="BitPay Logo" src="assets/icons/favicon-128.png" />
                 <div className="settings-group__item__label ellipsis">
                   {user.givenName || user.givenName ? (
@@ -87,7 +87,7 @@ const Account: React.FC<{
                 Authentication
               </div>
             ) : (
-              <button type="button" onClick={connectBitpayId} style={{ display: 'block', height: '60px' }}>
+              <button type="button" onClick={connectBitpayId} className="account__zero-state__sign-in">
                 <img src="assets/sign-in-with-bitpay.svg" alt="Sign in with BitPay" />
               </button>
             )}

@@ -161,7 +161,7 @@ const Amount: React.FC<any> = ({
       </div>
       <div className="amount-page__cta">
         {(cardConfig.activationFees && cardConfig.activationFees.length) || discount || (!email && !user) ? (
-          <div className="action-button__footer" style={{ marginTop: 0 }}>
+          <div className="action-button__footer">
             <ActionButton onClick={goToPaymentPage}>Continue</ActionButton>
           </div>
         ) : (

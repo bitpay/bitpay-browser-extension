@@ -14,11 +14,7 @@ const SearchBar: React.FC<any> = ({ output, value }) => (
           type="text"
         />
         {value ? (
-          <button
-            onClick={(): void => output('')}
-            type="button"
-            style={{ cursor: 'pointer', backgroundColor: 'transparent' }}
-          >
+          <button onClick={(): void => output('')} type="button">
             <img className="search-bar__box__icon" alt="search" src="../assets/icons/search-clear-icon.svg" />
           </button>
         ) : (

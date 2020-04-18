@@ -26,6 +26,12 @@
     margin-top: 3px;
   }
 
+  &__cta {
+    .action-button__footer {
+      margin-top: 0;
+    }
+  }
+
   &__amount-box {
     width: 100%;
 
