@@ -63,10 +63,14 @@ const Amount: React.FC<any> = ({
     setAmount(parseFloat(newAmount.toFixed(precision)));
     setInputValue(`${newAmount.toFixed(precision)}`);
   };
+  const focusInput = (): void => {
+    setTimeout(() => {
+      if (inputRef && inputRef.current) inputRef.current.focus();
+    });
+  };
   const changeAmount = (delta: number): void => {
     hasFixedDenoms ? changeFixedAmount(delta) : changeVariableAmount(delta);
-    // eslint-disable-next-line no-unused-expressions
-    inputRef.current?.focus();
+    focusInput();
   };
   const shakeInput = (): void => {
     setInputError(true);
@@ -126,6 +130,7 @@ const Amount: React.FC<any> = ({
             ref={inputRef}
             value={inputValue}
             onChange={(e: React.FormEvent<HTMLInputElement>): void => handleInput(e.currentTarget.value)}
+            onBlur={focusInput}
             className="amount-page__input"
             placeholder="0"
             // eslint-disable-next-line jsx-a11y/no-autofocus
