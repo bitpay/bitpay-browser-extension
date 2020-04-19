@@ -26,12 +26,9 @@ const CodeBox: React.FC<{ code: string; label: string }> = ({ code, label }) => 
     await wait(1500);
     if (mountedRef.current) setCopied(false);
   }, [copied, code]);
-  const changeHovering = useCallback(
-    (val: boolean) => (): void => {
-      setHovering(val);
-    },
-    []
-  );
+  const changeHovering = (val: boolean) => (): void => {
+    setHovering(val);
+  };
   useEffect(
     () => (): void => {
       mountedRef.current = false;

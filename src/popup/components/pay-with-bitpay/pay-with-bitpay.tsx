@@ -94,10 +94,18 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
     await saveGiftCard(finalGiftCard);
     showCard(finalGiftCard);
   };
+  const snackOnClose = (): void => {
+    setErrorMessage('');
+  };
+  const payButton = (): Promise<void> =>
+    launchInvoice().catch(err => {
+      setErrorMessage(err.message || 'An unexpected error occurred');
+      setAwaitingPayment(false);
+    });
   return (
     <>
       <div className="pay-with-bitpay">
-        <Snack message={errorMessage} onClose={(): void => setErrorMessage('')} />
+        <Snack message={errorMessage} onClose={snackOnClose} />
         {awaitingPayment ? (
           <>
             <div className="action-button action-button--pending">
@@ -109,12 +117,7 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
           <button
             className={`${invoiceParams.email ? '' : 'disabled'}`}
             type="button"
-            onClick={(): Promise<void> =>
-              launchInvoice().catch(err => {
-                setErrorMessage(err.message || 'An unexpected error occurred');
-                setAwaitingPayment(false);
-              })
-            }
+            onClick={payButton}
             disabled={!invoiceParams.email}
           >
             <img src="../../assets/pay-with-bitpay.svg" alt="Pay with BitPay" />
