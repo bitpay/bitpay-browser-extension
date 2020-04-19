@@ -7,7 +7,7 @@ import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/ho
 
 const CardMenu: React.FC<{ items: string[]; onClick: (arg0: string) => void }> = ({ items, onClick }) => {
   const popupState = usePopupState({ variant: 'popover', popupId: 'cardActions' });
-  const itemClick = (item: string): void => {
+  const itemClick = (item: string) => (): void => {
     onClick(item);
     popupState.close();
   };
@@ -24,7 +24,7 @@ const CardMenu: React.FC<{ items: string[]; onClick: (arg0: string) => void }> =
         className="card-menu"
       >
         {items.map((option: string, index: number) => (
-          <MenuItem className="card-menu__item" key={index} onClick={(): void => itemClick(option)}>
+          <MenuItem className="card-menu__item" key={index} onClick={itemClick(option)}>
             {option}
           </MenuItem>
         ))}
