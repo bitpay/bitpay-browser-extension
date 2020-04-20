@@ -9,6 +9,7 @@
   border-radius: 8px;
   transition: all 300ms ease-in-out;
   cursor: pointer;
+  user-select: none;
 
   &:hover {
     background: darken(#f8fbfd, 1%);
