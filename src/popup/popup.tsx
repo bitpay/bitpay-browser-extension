@@ -51,6 +51,8 @@ const Popup: React.FC = () => {
       const newMerchants = await fetchMerchants();
       setMerchants(newMerchants);
       setSupportedMerchant(getMerchantFromUrl(parentUrl, newMerchants));
+      const newSupportedGiftCards = await get<CardConfig[]>('supportedGiftCards');
+      setSupportedGiftCards(newSupportedGiftCards);
     };
     if (parentUrl) updateMerchants();
   }, [user, parentUrl]);
