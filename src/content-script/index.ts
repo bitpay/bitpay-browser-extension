@@ -103,19 +103,6 @@ if (window.location.origin === process.env.API_ORIGIN) {
       });
     });
   } else if (window.location.href.includes('/wallet-card')) {
-    const scriptElement = document.createElement('script');
-    scriptElement.innerHTML = `
-    window.webkit = {
-      messageHandlers: {
-        cordova_iab: {
-          postMessage: message => {
-            window.postMessage(message);
-          }
-        }
-      }
-    };
-    `;
-    document.head.appendChild(scriptElement);
     window.postMessage({ message: 'pairingOnly' }, process.env.API_ORIGIN);
     window.addEventListener('message', ({ data }) => {
       const dataObj = typeof data === 'string' ? JSON.parse(data) : data;
