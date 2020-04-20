@@ -1,4 +1,8 @@
 .balance {
   padding-left: 0;
   padding-right: 0;
+
+  &__button {
+    padding: 0 15px;
+  }
 }

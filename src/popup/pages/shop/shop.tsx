@@ -105,7 +105,7 @@ const Shop: React.FC<{ merchants: Merchant[]; location: any }> = ({ merchants, l
             ))}
           </>
         ) : (
-          <div className="zero-state" style={{ marginTop: '50%' }}>
+          <div className="zero-state">
             <div className="zero-state__title">No Results</div>
             <div className="zero-state__subtitle">Please try searching something else</div>
           </div>

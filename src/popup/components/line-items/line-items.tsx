@@ -6,6 +6,8 @@ import { formatCurrency } from '../../../services/currency';
 import { getTotalDiscount, getDiscountAmount, getActivationFee } from '../../../services/gift-card';
 import './line-items.scss';
 
+const totalCostLineItem = { transform: 'translateY(-2px)' };
+
 const LineItems: React.FC<{ cardConfig: CardConfig; card: Partial<GiftCard> & UnsoldGiftCard }> = ({
   cardConfig,
   card
@@ -47,10 +49,10 @@ const LineItems: React.FC<{ cardConfig: CardConfig; card: Partial<GiftCard> & Un
           </div>
         ))}
       {(totalDiscount > 0 || activationFee > 0) && (
-        <div className="line-items__item line-items__item" style={{ transform: 'translateY(-2px)' }}>
+        <div className="line-items__item line-items__item" style={totalCostLineItem}>
           <div
             className={`line-items__item__label line-items__item__label${card.date ? '' : '--bold'}`}
-            style={{ transform: 'translateY(-2px)' }}
+            style={totalCostLineItem}
           >
             Total Cost
           </div>

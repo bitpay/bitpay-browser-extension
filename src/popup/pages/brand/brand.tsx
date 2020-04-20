@@ -25,6 +25,11 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
     cardConfig.description = cardConfig.terms;
   }
   const color = merchant.theme === '#ffffff' ? '#4f6ef7' : merchant.theme;
+  const bubbleStyle = { color: { color, borderColor: color }, contents: { transform: 'translateY(-0.5px)' } };
+  const bodyStyle = {
+    scroll: { paddingBottom: pageHeight > FrameDimensions.maxFrameHeight - ctaHeight ? '96px' : 'auto' },
+    divider: { marginTop: '2px' }
+  };
   return (
     <div className="brand-page">
       <div ref={ref}>
@@ -45,8 +50,8 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
               {merchant.hasDirectIntegration ? <>{merchant.caption}</> : <CardDenoms cardConfig={cardConfig} />}
             </div>
             {getDiscount(merchant) && (
-              <div className="brand-page__header__block__discount" style={{ color, borderColor: color }}>
-                <div style={{ transform: 'translateY(-0.5px)' }}>
+              <div className="brand-page__header__block__discount" style={bubbleStyle.color}>
+                <div style={bubbleStyle.contents}>
                   <DiscountText merchant={merchant} />
                 </div>
               </div>
@@ -54,11 +59,8 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
           </div>
         </div>
 
-        <div
-          className="brand-page__body"
-          style={{ paddingBottom: pageHeight > FrameDimensions.maxFrameHeight - ctaHeight ? '96px' : 'auto' }}
-        >
-          <div className="brand-page__body__divider" style={{ marginTop: '2px' }} />
+        <div className="brand-page__body" style={bodyStyle.scroll}>
+          <div className="brand-page__body__divider" style={bodyStyle.divider} />
           <div className="brand-page__body__content">
             <div className="brand-page__body__content__title">
               {merchant.hasDirectIntegration ? <>Payment Instructions</> : <>About</>}
