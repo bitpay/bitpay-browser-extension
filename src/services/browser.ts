@@ -24,3 +24,9 @@ export const dispatchUrlChange = (window: Window): void => {
     host: window.location.host
   });
 };
+
+export const refreshMerchantCache = (): void => {
+  browser.runtime.sendMessage(undefined, {
+    name: 'REFRESH_MERCHANT_CACHE'
+  });
+};

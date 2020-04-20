@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MemoryRouter as Router, Route, Switch } from 'react-router-dom';
 import Brand from './pages/brand/brand';
 import Card from './pages/card/card';
@@ -22,8 +22,11 @@ import Legal from './pages/settings/legal/legal';
 import Balance from './pages/card/balance/balance';
 import { BitpayUser } from '../services/bitpay-id';
 import Account from './pages/settings/account/account';
+import { refreshMerchantCache } from '../services/browser';
 
 const Popup: React.FC = () => {
+  const popupLaunchTime = useRef(Date.now());
+  const parentUrl = useRef(new URLSearchParams(window.location.search).get('url') as string);
   const [initialEntries, setInitialEntries] = useState(['/shop']);
   const [loaded, setLoaded] = useState(false);
   const [clientId, setClientId] = useState('');
@@ -33,7 +36,6 @@ const Popup: React.FC = () => {
   const [supportedGiftCards, setSupportedGiftCards] = useState([] as CardConfig[]);
   const [purchasedGiftCards, setPurchasedGiftCards] = useState([] as GiftCard[]);
   const [realtimeInvoiceIds, setRealtimeInvoiceIds] = useState([] as string[]);
-  const [parentUrl, setParentUrl] = useState('');
   const [user, setUser] = useState(undefined as BitpayUser | undefined);
 
   const getMerchantFromUrl = (url: string, allMerchants: Merchant[]): Merchant | undefined => {
@@ -47,15 +49,17 @@ const Popup: React.FC = () => {
   };
 
   useEffect(() => {
+    if (Date.now() - popupLaunchTime.current < 1000) return;
     const updateMerchants = async (): Promise<void> => {
       const newMerchants = await fetchMerchants();
       setMerchants(newMerchants);
-      setSupportedMerchant(getMerchantFromUrl(parentUrl, newMerchants));
+      setSupportedMerchant(getMerchantFromUrl(parentUrl.current, newMerchants));
       const newSupportedGiftCards = await get<CardConfig[]>('supportedGiftCards');
       setSupportedGiftCards(newSupportedGiftCards);
+      refreshMerchantCache();
     };
-    if (parentUrl) updateMerchants();
-  }, [user, parentUrl]);
+    updateMerchants();
+  }, [user]);
 
   useEffect(() => {
     const attemptToRedeemGiftCards = (): void => {
@@ -85,9 +89,7 @@ const Popup: React.FC = () => {
         get<string>('email'),
         get<BitpayUser>('bitpayUser')
       ]);
-      const parent = new URLSearchParams(window.location.search).get('url') as string;
-      setParentUrl(parent);
-      const merchant = getMerchantFromUrl(parent, allMerchants);
+      const merchant = getMerchantFromUrl(parentUrl.current, allMerchants);
       const initialPath = merchant ? `/wallet` : '/shop';
       setInitialEntries([initialPath || '/shop']);
       setMerchants(allMerchants);
