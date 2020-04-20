@@ -4,8 +4,9 @@ import { BitpayUser } from '../../../../services/bitpay-id';
 import { resizeToFitPage } from '../../../../services/frame';
 import { IOSSwitch } from '../../../components/ios-switch/ios-switch';
 import { set, get, remove } from '../../../../services/storage';
-import './account.scss';
 import CardMenu from '../../../components/card-menu/card-menu';
+import { SignInWithBitpayImage } from '../../../components/svg/sign-in-with-bitpay-image';
+import './account.scss';
 
 const Account: React.FC<{
   user?: BitpayUser;
@@ -88,7 +89,7 @@ const Account: React.FC<{
               </div>
             ) : (
               <button type="button" onClick={connectBitpayId} className="account__zero-state__sign-in">
-                <img src="assets/sign-in-with-bitpay.svg" alt="Sign in with BitPay" />
+                <SignInWithBitpayImage />
               </button>
             )}
           </div>

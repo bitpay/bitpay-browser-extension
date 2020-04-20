@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+import classNames from 'classnames';
 import { browser } from 'webextension-polyfill-ts';
 import { GiftCard, CardConfig, GiftCardInvoiceParams } from '../../../services/gift-card.types';
-import './pay-with-bitpay.scss';
 import { set } from '../../../services/storage';
 import { createBitPayInvoice, redeemGiftCard, getBitPayInvoice, isAmountValid } from '../../../services/gift-card';
 import Snack from '../snack/snack';
 import { waitForServerEvent, deleteCard } from '../../../services/gift-card-storage';
 import { wait } from '../../../services/utils';
 import { BitpayUser } from '../../../services/bitpay-id';
+import { PayWithBitpayImage } from '../svg/pay-with-bitpay-image';
+import './pay-with-bitpay.scss';
 
 const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
   cardConfig: CardConfig;
@@ -115,12 +117,15 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
           </>
         ) : (
           <button
-            className={`${invoiceParams.email ? '' : 'disabled'}`}
+            className={classNames({
+              'disabled': !invoiceParams.email,
+              'pay-with-bitpay__pay-button': true
+            })}
             type="button"
             onClick={payButton}
             disabled={!invoiceParams.email}
           >
-            <img src="../../assets/pay-with-bitpay.svg" alt="Pay with BitPay" />
+            <PayWithBitpayImage></PayWithBitpayImage>
           </button>
         )}
       </div>
