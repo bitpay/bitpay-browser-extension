@@ -55,7 +55,7 @@ const Settings: React.FC<{ email: string; user: BitpayUser }> = ({ email, user }
         <button
           type="button"
           className="settings-group__item"
-          onClick={(): void => launchNewTab('https://github.com/msalcala11/extension')}
+          onClick={(): void => launchNewTab('https://github.com/bitpay/bitpay-browser-extension')}
         >
           <div className="settings-group__item__label">Version</div>
           <div className="settings-group__item__value">1.0.0</div>
