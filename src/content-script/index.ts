@@ -69,6 +69,10 @@ function resizeIframe(frame: HTMLIFrameElement, height: number = FrameDimensions
   frame.style.height = `${height}px`;
 }
 
+function getInputByClassName(className: string): HTMLInputElement | undefined {
+  return document.getElementsByClassName(className)[0] as HTMLInputElement | undefined;
+}
+
 browser.runtime.onMessage.addListener(async message => {
   const messageName = message && message.name;
   switch (messageName) {
@@ -80,9 +84,12 @@ browser.runtime.onMessage.addListener(async message => {
         cssSelectors: CheckoutPageCssSelectors;
         claimInfo: { claimCode: string; pin?: string };
       };
-      (document.getElementsByClassName(cssSelectors.claimCodeInput)[0] as HTMLInputElement).value = claimInfo.claimCode;
-      if (claimInfo.pin)
-        (document.getElementsByClassName(cssSelectors.pinInput)[0] as HTMLInputElement).value = claimInfo.pin;
+      // eslint-disable-next-line no-case-declarations
+      const claimCodeInput = getInputByClassName(cssSelectors.claimCodeInput);
+      // eslint-disable-next-line no-case-declarations
+      const pinInput = getInputByClassName(cssSelectors.pinInput);
+      if (claimCodeInput) claimCodeInput.value = claimInfo.claimCode;
+      if (claimInfo.pin && pinInput) pinInput.value = claimInfo.pin;
       return;
     case 'POPUP_CLOSED':
       return iframe && removeIframe(iframe);
