@@ -12,7 +12,7 @@ export const resizeFrame = (height: number): void => {
   browser.runtime.sendMessage({ name: `POPUP_RESIZED`, height });
 };
 
-export const resizeToFitPage = (ref: React.RefObject<HTMLDivElement>, padding = 0): void => {
+export const resizeToFitPage = (ref: React.RefObject<HTMLDivElement>, padding = 0, delay = 10): void => {
   setTimeout(() => {
     const fullHeight = ref.current ? ref.current.scrollHeight + padding : FrameDimensions.minExpandedFrameHeight;
     const height =
@@ -23,5 +23,5 @@ export const resizeToFitPage = (ref: React.RefObject<HTMLDivElement>, padding = 
         ? FrameDimensions.maxFrameHeight
         : fullHeight;
     resizeFrame(height);
-  }, 10);
+  }, delay);
 };

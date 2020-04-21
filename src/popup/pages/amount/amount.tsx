@@ -17,6 +17,7 @@ const Amount: React.FC<any> = ({
   location,
   clientId,
   email,
+  initialAmount,
   user,
   history,
   purchasedGiftCards,
@@ -25,16 +26,17 @@ const Amount: React.FC<any> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const { cardConfig, merchant } = location.state as { cardConfig: CardConfig; merchant: Merchant };
   const hasFixedDenoms = cardConfig.supportedAmounts && cardConfig.supportedAmounts[0];
-  const initialAmount =
-    cardConfig.supportedAmounts && cardConfig.supportedAmounts[0] ? cardConfig.supportedAmounts[0] : 0;
-  const [amount, setAmount] = useState(initialAmount);
-  const [inputValue, setInputValue] = useState('');
+  const preloadedAmount =
+    initialAmount ||
+    (cardConfig.supportedAmounts && cardConfig.supportedAmounts[0] ? cardConfig.supportedAmounts[0] : 0);
+  const [amount, setAmount] = useState(preloadedAmount);
+  const [inputValue, setInputValue] = useState(preloadedAmount ? `${preloadedAmount}` : '');
   const [inputError, setInputError] = useState(false);
   const discount = (cardConfig.discounts || [])[0];
   const invoiceParams: GiftCardInvoiceParams = {
     brand: cardConfig.name,
     currency: cardConfig.currency,
-    amount: initialAmount,
+    amount: preloadedAmount,
     clientId,
     discounts: discount ? [discount.code] : [],
     email: (user && user.email) || email

@@ -1,4 +1,5 @@
 import { browser } from 'webextension-polyfill-ts';
+import { CardConfig } from './gift-card.types';
 
 export const launchNewTab = (url: string): void => {
   browser.runtime.sendMessage({
@@ -22,5 +23,13 @@ export const dispatchUrlChange = (window: Window): void => {
     url: window.location.href,
     origin: window.location.origin,
     host: window.location.host
+  });
+};
+
+export const injectClaimInfo = (cardConfig: CardConfig, claimInfo: { claimCode: string; pin?: string }): void => {
+  browser.runtime.sendMessage(undefined, {
+    name: 'INJECT_CLAIM_INFO',
+    cssSelectors: cardConfig.cssSelectors,
+    claimInfo
   });
 };

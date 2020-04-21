@@ -1,13 +1,20 @@
 import { browser, Tabs } from 'webextension-polyfill-ts';
 import * as uuid from 'uuid';
 import { GiftCardInvoiceMessage } from '../services/gift-card.types';
-import { isBitPayAccepted, fetchMerchants, Merchant, fetchCachedMerchants } from '../services/merchant';
+import {
+  isBitPayAccepted,
+  fetchMerchants,
+  Merchant,
+  fetchCachedMerchants,
+  getBitPayMerchantFromHost
+} from '../services/merchant';
 import { get, set } from '../services/storage';
 import { generatePairingToken } from '../services/bitpay-id';
+import { wait } from '../services/utils';
 
 let cachedMerchants: Merchant[] | undefined;
 let cacheDate = 0;
-const cacheValidityDuration = 0; // 1000 * 60;
+const cacheValidityDuration = 1000 * 60;
 
 const windowIdResolveMap: { [windowId: number]: (message: GiftCardInvoiceMessage) => GiftCardInvoiceMessage } = {};
 
@@ -52,8 +59,10 @@ async function sendMessageToTab(message: any, tab: Tabs.Tab): Promise<void> {
 }
 
 browser.browserAction.onClicked.addListener(async tab => {
+  const merchant = tab.url && getBitPayMerchantFromHost(new URL(tab.url).host, await getCachedMerchants());
   await browser.tabs.sendMessage(tab.id as number, {
-    name: 'EXTENSION_ICON_CLICKED'
+    name: 'EXTENSION_ICON_CLICKED',
+    merchant
   });
 });
 

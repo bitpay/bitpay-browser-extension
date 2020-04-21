@@ -1,8 +1,15 @@
 import { browser } from 'webextension-polyfill-ts';
 import { FrameDimensions } from '../services/frame';
 import { dispatchUrlChange } from '../services/browser';
+import { Merchant } from '../services/merchant';
+import { CheckoutPageCssSelectors } from '../services/gift-card.types';
 
 let iframe: HTMLIFrameElement | undefined;
+
+const getOrderTotal = (selector: string): number | undefined => {
+  const element = document.getElementsByClassName(selector)[0];
+  return element ? parseFloat(element.innerHTML.trim().replace(/[^0-9.]/g, '')) : undefined;
+};
 
 function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string } {
   const innerFrameStyles = `
@@ -29,10 +36,12 @@ function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string
   return { outerFrameStyles, innerFrameStyles };
 }
 
-function createIframe(): HTMLIFrameElement {
+function createIframe({ merchant }: { merchant?: Merchant }): HTMLIFrameElement {
   const outerFrame = document.createElement('iframe');
   const baseUrl = browser.runtime.getURL('popup.html');
-  const innerFrameSrc = `${baseUrl}?url=${window.location.href}`;
+  const cardConfig = merchant && merchant.giftCards[0];
+  const orderTotal = cardConfig?.cssSelectors && getOrderTotal(cardConfig.cssSelectors.orderTotal);
+  const innerFrameSrc = `${baseUrl}?url=${window.location.href}${orderTotal ? `&amount=${orderTotal}` : ''}`;
   const { innerFrameStyles, outerFrameStyles } = getIframeStyles();
   outerFrame.srcdoc = `
     <html style="height: 100%">
@@ -60,11 +69,21 @@ function resizeIframe(frame: HTMLIFrameElement, height: number = FrameDimensions
   frame.style.height = `${height}px`;
 }
 
-browser.runtime.onMessage.addListener(message => {
+browser.runtime.onMessage.addListener(async message => {
   const messageName = message && message.name;
   switch (messageName) {
     case 'EXTENSION_ICON_CLICKED':
-      return iframe ? removeIframe(iframe) : addIframe(createIframe());
+      return iframe ? removeIframe(iframe) : addIframe(createIframe({ merchant: message.merchant }));
+    case 'INJECT_CLAIM_INFO':
+      // eslint-disable-next-line no-case-declarations
+      const { cssSelectors, claimInfo } = message as {
+        cssSelectors: CheckoutPageCssSelectors;
+        claimInfo: { claimCode: string; pin?: string };
+      };
+      (document.getElementsByClassName(cssSelectors.claimCodeInput)[0] as HTMLInputElement).value = claimInfo.claimCode;
+      if (claimInfo.pin)
+        (document.getElementsByClassName(cssSelectors.pinInput)[0] as HTMLInputElement).value = claimInfo.pin;
+      return;
     case 'POPUP_CLOSED':
       return iframe && removeIframe(iframe);
     case 'POPUP_RESIZED':
@@ -128,4 +147,5 @@ if (window.location.origin === process.env.API_ORIGIN) {
     });
   }
 }
+
 export {};

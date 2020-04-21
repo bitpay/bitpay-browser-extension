@@ -4,6 +4,12 @@ export enum ClaimCodeType {
   link = 'link'
 }
 
+export interface CheckoutPageCssSelectors {
+  orderTotal: string;
+  claimCodeInput: string;
+  pinInput: string;
+}
+
 export interface GiftCardDiscount {
   code: string;
   type: 'flatrate' | 'percentage';
@@ -23,6 +29,7 @@ export interface CommonCardConfig {
   activationFees?: GiftCardActivationFee[];
   brandColor?: string;
   cardImage: string;
+  cssSelectors?: CheckoutPageCssSelectors;
   currency: string;
   defaultClaimCodeType: ClaimCodeType;
   description: string;

@@ -4,17 +4,14 @@ import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
 import { GiftCardInvoiceParams, CardConfig, UnsoldGiftCard } from '../../../services/gift-card.types';
 import LineItems from '../../components/line-items/line-items';
 import CardHeader from '../../components/card-header/card-header';
-import './payment.scss';
 import { resizeToFitPage } from '../../../services/frame';
+import './payment.scss';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Payment: React.FC<any> = ({ location, history, user, setEmail, purchasedGiftCards, setPurchasedGiftCards }) => {
   const ref = useRef<HTMLDivElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    resizeToFitPage(ref, 77);
-  }, [ref]);
   const amount = location.state.amount as number;
   const invoiceParams = location.state.invoiceParams as GiftCardInvoiceParams;
   const [email, setReceiptEmail] = useState(invoiceParams.email || '');
@@ -32,6 +29,9 @@ const Payment: React.FC<any> = ({ location, history, user, setEmail, purchasedGi
   const onEmailChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     emailRef.current?.validity.valid ? setReceiptEmail(event.target.value) : setReceiptEmail('');
   };
+  useEffect(() => {
+    resizeToFitPage(ref, 77, 100);
+  }, [ref]);
   return (
     <div className="payment">
       <div ref={ref}>

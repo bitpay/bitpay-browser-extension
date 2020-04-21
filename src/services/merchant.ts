@@ -75,7 +75,15 @@ export function getMerchants(
     domains: [cardConfig.website],
     theme: cardConfig.brandColor || cardConfig.logoBackgroundColor,
     instructions: cardConfig.description,
-    giftCards: [cardConfig]
+    giftCards:
+      cardConfig.name === 'Amazon.com'
+        ? [
+            {
+              ...cardConfig,
+              cssSelectors: { orderTotal: 'grand-total-price', claimCodeInput: 'pmts-claim-code' }
+            } as CardConfig
+          ]
+        : [cardConfig]
   }));
   return [...directIntegrationMerchants, ...giftCardMerchants].sort(sortByDisplayName);
 }
@@ -109,3 +117,51 @@ export function getDiscount(merchant: Merchant) {
   const cardConfig = merchant.giftCards[0];
   return merchant.discount || (cardConfig && cardConfig.discounts && cardConfig.discounts[0]);
 }
+
+export const getMerchantInitialEntries = ({
+  merchant,
+  orderTotal,
+  extensionClientId,
+  bitpayUser,
+  receiptEmail
+}: {
+  merchant?: Merchant;
+  extensionClientId: string;
+  orderTotal?: number;
+  bitpayUser?: BitpayUser;
+  receiptEmail?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+}): { pathname: string; state: any }[] => {
+  const cardConfig = merchant?.giftCards[0];
+  // eslint-disable-next-line no-nested-ternary
+  const pathname = orderTotal
+    ? cardConfig?.discounts
+      ? `/payment/${merchant?.name}`
+      : `/amount/${merchant?.name}`
+    : merchant
+    ? `/wallet`
+    : '/shop';
+  const state = orderTotal
+    ? {
+        cardConfig,
+        merchant,
+        amount: orderTotal,
+        invoiceParams: {
+          brand: cardConfig?.name,
+          currency: cardConfig?.currency,
+          amount: orderTotal,
+          clientId: extensionClientId,
+          discounts: cardConfig?.discounts ? [cardConfig.discounts[0].code] : [],
+          email: (bitpayUser && bitpayUser.email) || receiptEmail
+        }
+      }
+    : {};
+  const entries = orderTotal
+    ? [
+        { pathname: '/wallet', state },
+        ...(cardConfig?.discounts ? [{ pathname: `/amount/${merchant?.name}`, state }] : []),
+        { pathname, state }
+      ]
+    : [{ pathname, state }];
+  return entries;
+};

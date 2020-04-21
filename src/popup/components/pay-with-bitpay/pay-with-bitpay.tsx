@@ -9,6 +9,7 @@ import Snack from '../snack/snack';
 import { waitForServerEvent, deleteCard } from '../../../services/gift-card-storage';
 import { wait } from '../../../services/utils';
 import { BitpayUser } from '../../../services/bitpay-id';
+import { injectClaimInfo } from '../../../services/browser';
 
 const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
   cardConfig: CardConfig;
@@ -93,6 +94,9 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
     } as GiftCard;
     await saveGiftCard(finalGiftCard);
     showCard(finalGiftCard);
+    if (finalGiftCard.status === 'SUCCESS' && cardConfig.cssSelectors) {
+      injectClaimInfo(cardConfig, { claimCode: finalGiftCard.claimCode, pin: finalGiftCard.pin });
+    }
   };
   return (
     <>
