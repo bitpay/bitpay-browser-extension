@@ -7,7 +7,7 @@ const SearchBar: React.FC<any> = ({ output, value }) => (
     <div className="search-bar">
       <div className="search-bar__box">
         <input
-          value={value}
+          value={value || ''}
           onChange={(e: React.FormEvent<HTMLInputElement>): void => output(e.currentTarget.value)}
           className="search-bar__box__input"
           placeholder="Search Brand or Category"

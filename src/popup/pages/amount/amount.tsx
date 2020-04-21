@@ -32,6 +32,7 @@ const Amount: React.FC<any> = ({
   const [amount, setAmount] = useState(preloadedAmount);
   const [inputValue, setInputValue] = useState(preloadedAmount ? `${preloadedAmount}` : '');
   const [inputError, setInputError] = useState(false);
+  const [inputDirty, setInputDirty] = useState(false);
   const discount = (cardConfig.discounts || [])[0];
   const invoiceParams: GiftCardInvoiceParams = {
     brand: cardConfig.name,
@@ -45,6 +46,8 @@ const Amount: React.FC<any> = ({
   const baseDelta = precision === 2 ? 0.01 : 1;
   const maxAmount = cardConfig.maxAmount as number;
   const minAmount = cardConfig.minAmount as number;
+  const paymentPageAvailable =
+    (cardConfig.activationFees && cardConfig.activationFees.length) || discount || (!email && !user);
   const changeFixedAmount = (delta: number): void => {
     const denoms = cardConfig.supportedAmounts as number[];
     const maxIndex = denoms.length - 1;
@@ -115,6 +118,15 @@ const Amount: React.FC<any> = ({
         })
       : shakeInput();
   };
+  const handleKeyDown = (key: number): void => {
+    if (paymentPageAvailable && key === 13) {
+      goToPaymentPage();
+    }
+    if (!inputDirty && key !== 8) {
+      handleInput('');
+    }
+    setInputDirty(true);
+  };
   resizeFrame(360);
   return (
     <div className="amount-page">
@@ -133,6 +145,7 @@ const Amount: React.FC<any> = ({
             value={inputValue}
             onChange={(e: React.FormEvent<HTMLInputElement>): void => handleInput(e.currentTarget.value)}
             onBlur={focusInput}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>): void => handleKeyDown(e.keyCode)}
             className="amount-page__input"
             placeholder="0"
             // eslint-disable-next-line jsx-a11y/no-autofocus
@@ -166,7 +179,7 @@ const Amount: React.FC<any> = ({
         </div>
       </div>
       <div className="amount-page__cta">
-        {(cardConfig.activationFees && cardConfig.activationFees.length) || discount || (!email && !user) ? (
+        {paymentPageAvailable ? (
           <div className="action-button__footer">
             <ActionButton onClick={goToPaymentPage}>Continue</ActionButton>
           </div>
