@@ -10,7 +10,6 @@ import {
 } from '../services/merchant';
 import { get, set } from '../services/storage';
 import { generatePairingToken } from '../services/bitpay-id';
-import { wait } from '../services/utils';
 
 let cachedMerchants: Merchant[] | undefined;
 let cacheDate = 0;
@@ -36,7 +35,9 @@ async function refreshCachedMerchants(): Promise<void> {
 }
 
 async function refreshCachedMerchantsIfNeeded(): Promise<void> {
-  if (Date.now() > cacheDate + cacheValidityDuration) await fetchMerchants();
+  if (Date.now() < cacheDate + cacheValidityDuration) return;
+  await fetchMerchants();
+  await refreshCachedMerchants();
 }
 
 async function handleUrlChange(host: string): Promise<void> {
@@ -116,6 +117,8 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
       return browser.tabs.update({
         url: message.url
       });
+    case 'REFRESH_MERCHANT_CACHE':
+      return refreshCachedMerchants();
     case 'URL_CHANGED':
       return handleUrlChange(message.host);
     default:

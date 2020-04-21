@@ -4,8 +4,9 @@ import { BitpayUser } from '../../../../services/bitpay-id';
 import { resizeToFitPage } from '../../../../services/frame';
 import { IOSSwitch } from '../../../components/ios-switch/ios-switch';
 import { set, get, remove } from '../../../../services/storage';
-import './account.scss';
 import CardMenu from '../../../components/card-menu/card-menu';
+import { SignInWithBitpayImage } from '../../../components/svg/sign-in-with-bitpay-image';
+import './account.scss';
 
 const Account: React.FC<{
   user?: BitpayUser;
@@ -51,7 +52,7 @@ const Account: React.FC<{
           <div className="account__linked">
             <CardMenu items={['Disconnect Account']} onClick={disconnect} />
             <div className="settings-group">
-              <div className="settings-group__item settings-group__item--dark" style={{ height: '70px' }}>
+              <div className="settings-group__item settings-group__item--dark">
                 <img className="settings-group__item__avatar" alt="BitPay Logo" src="assets/icons/favicon-128.png" />
                 <div className="settings-group__item__label ellipsis">
                   {user.givenName || user.givenName ? (
@@ -87,8 +88,8 @@ const Account: React.FC<{
                 Authentication
               </div>
             ) : (
-              <button type="button" onClick={connectBitpayId} style={{ display: 'block', height: '60px' }}>
-                <img src="assets/sign-in-with-bitpay.svg" alt="Sign in with BitPay" />
+              <button type="button" onClick={connectBitpayId} className="account__zero-state__sign-in">
+                <SignInWithBitpayImage />
               </button>
             )}
           </div>

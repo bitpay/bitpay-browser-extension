@@ -26,6 +26,12 @@ const CodeBox: React.FC<{ code: string; label: string }> = ({ code, label }) => 
     await wait(1500);
     if (mountedRef.current) setCopied(false);
   }, [copied, code]);
+  const changeHovering = useCallback(
+    (val: boolean) => (): void => {
+      setHovering(val);
+    },
+    []
+  );
   useEffect(
     () => (): void => {
       mountedRef.current = false;
@@ -38,8 +44,8 @@ const CodeBox: React.FC<{ code: string; label: string }> = ({ code, label }) => 
         className="code-box"
         whileHover={{ scale: 0.98 }}
         whileTap={{ scale: 1.03 }}
-        onHoverStart={(): void => setHovering(true)}
-        onHoverEnd={(): void => setHovering(false)}
+        onHoverStart={changeHovering(true)}
+        onHoverEnd={changeHovering(false)}
         onTapStart={startCopying}
         type="button"
       >

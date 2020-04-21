@@ -8,6 +8,9 @@
     border: none;
 
     &__item {
+      &--dark {
+        height: 70px;
+      }
       &__avatar {
         margin-right: 14px;
         height: 34px;
@@ -37,6 +40,11 @@
   &__zero-state {
     padding: 15px;
     text-align: center;
+
+    &__sign-in {
+      display: block;
+      height: 60px;
+    }
   }
   &__title {
     font-size: 20px;

@@ -1,40 +1,34 @@
 import React from 'react';
-import { Snackbar } from '@material-ui/core';
+import { Snackbar, SnackbarOrigin } from '@material-ui/core';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import IconButton from '@material-ui/core/IconButton';
 import './snack.scss';
 
+const position: React.CSSProperties = { top: '15px', left: '15px', right: '15px' };
+const anchorOrigin: SnackbarOrigin = { vertical: 'top', horizontal: 'center' };
+const menu: React.CSSProperties = {
+  textAlign: 'left',
+  background: '#081125',
+  borderRadius: '9px',
+  color: 'rgba(255, 255, 255, .75)',
+  fontSize: '12px'
+};
+const icon: React.CSSProperties = { color: 'rgba(255, 255, 255, 0.5)' };
+const title: React.CSSProperties = { color: 'white', fontSize: '15px' };
+
 const Snack: React.FC<{ message: string; onClose: () => void }> = ({ message, onClose }) => (
   <div className="snack">
-    <Snackbar
-      style={{ top: '15px', left: '15px', right: '15px' }}
-      open={!!message}
-      autoHideDuration={6000}
-      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      onClose={onClose}
-    >
+    <Snackbar style={position} open={!!message} autoHideDuration={6000} anchorOrigin={anchorOrigin} onClose={onClose}>
       <Alert
-        style={{
-          textAlign: 'left',
-          background: '#081125',
-          borderRadius: '9px',
-          color: 'rgba(255, 255, 255, .75)',
-          fontSize: '12px'
-        }}
+        style={menu}
         severity="error"
         action={
-          <IconButton
-            aria-label="close"
-            color="inherit"
-            size="small"
-            style={{ color: 'rgba(255, 255, 255, 0.5)' }}
-            onClick={onClose}
-          >
+          <IconButton aria-label="close" color="inherit" size="small" style={icon} onClick={onClose}>
             <img src="/assets/icons/close.svg" alt="close" />
           </IconButton>
         }
       >
-        <AlertTitle style={{ color: 'white', fontSize: '15px' }}>Please Try Again!</AlertTitle>
+        <AlertTitle style={title}>Please Try Again!</AlertTitle>
         {message}
       </Alert>
     </Snackbar>

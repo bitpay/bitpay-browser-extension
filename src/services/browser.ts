@@ -33,3 +33,9 @@ export const injectClaimInfo = (cardConfig: CardConfig, claimInfo: { claimCode: 
     claimInfo
   });
 };
+
+export const refreshMerchantCache = (): void => {
+  browser.runtime.sendMessage(undefined, {
+    name: 'REFRESH_MERCHANT_CACHE'
+  });
+};
