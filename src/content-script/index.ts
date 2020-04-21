@@ -7,7 +7,7 @@ import { CheckoutPageCssSelectors } from '../services/gift-card.types';
 let iframe: HTMLIFrameElement | undefined;
 
 const getOrderTotal = (selector: string): number | undefined => {
-  const element = document.getElementsByClassName(selector)[0];
+  const element = document.querySelector(selector);
   return element ? parseFloat(element.innerHTML.trim().replace(/[^0-9.]/g, '')) : undefined;
 };
 
@@ -40,7 +40,7 @@ function createIframe({ merchant }: { merchant?: Merchant }): HTMLIFrameElement 
   const outerFrame = document.createElement('iframe');
   const baseUrl = browser.runtime.getURL('popup.html');
   const cardConfig = merchant && merchant.giftCards[0];
-  const orderTotal = cardConfig?.cssSelectors && getOrderTotal(cardConfig.cssSelectors.orderTotal);
+  const orderTotal = cardConfig?.cssSelectors && getOrderTotal(cardConfig.cssSelectors.orderTotal[0]);
   const innerFrameSrc = `${baseUrl}?url=${window.location.href}${orderTotal ? `&amount=${orderTotal}` : ''}`;
   const { innerFrameStyles, outerFrameStyles } = getIframeStyles();
   outerFrame.srcdoc = `
@@ -69,8 +69,11 @@ function resizeIframe(frame: HTMLIFrameElement, height: number = FrameDimensions
   frame.style.height = `${height}px`;
 }
 
-function getInputByClassName(className: string): HTMLInputElement | undefined {
-  return document.getElementsByClassName(className)[0] as HTMLInputElement | undefined;
+function injectValueIntoInputsWithSelectors(selectors: string[], value: string): void {
+  selectors.forEach(selector => {
+    const input = document.querySelector(selector) as HTMLInputElement | undefined;
+    if (input) input.value = value;
+  });
 }
 
 browser.runtime.onMessage.addListener(async message => {
@@ -84,12 +87,8 @@ browser.runtime.onMessage.addListener(async message => {
         cssSelectors: CheckoutPageCssSelectors;
         claimInfo: { claimCode: string; pin?: string };
       };
-      // eslint-disable-next-line no-case-declarations
-      const claimCodeInput = getInputByClassName(cssSelectors.claimCodeInput);
-      // eslint-disable-next-line no-case-declarations
-      const pinInput = getInputByClassName(cssSelectors.pinInput);
-      if (claimCodeInput) claimCodeInput.value = claimInfo.claimCode;
-      if (claimInfo.pin && pinInput) pinInput.value = claimInfo.pin;
+      injectValueIntoInputsWithSelectors(cssSelectors.claimCodeInput, claimInfo.claimCode);
+      if (claimInfo.pin) injectValueIntoInputsWithSelectors(cssSelectors.pinInput, claimInfo.pin);
       return;
     case 'POPUP_CLOSED':
       return iframe && removeIframe(iframe);

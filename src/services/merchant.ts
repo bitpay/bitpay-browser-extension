@@ -80,7 +80,10 @@ export function getMerchants(
         ? [
             {
               ...cardConfig,
-              cssSelectors: { orderTotal: 'grand-total-price', claimCodeInput: 'pmts-claim-code' }
+              cssSelectors: {
+                orderTotal: ['.grand-total-price'],
+                claimCodeInput: ['.pmts-claim-code', '#spc-gcpromoinput']
+              }
             } as CardConfig
           ]
         : [cardConfig]

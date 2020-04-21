@@ -5,9 +5,9 @@ export enum ClaimCodeType {
 }
 
 export interface CheckoutPageCssSelectors {
-  orderTotal: string;
-  claimCodeInput: string;
-  pinInput: string;
+  orderTotal: string[];
+  claimCodeInput: string[];
+  pinInput: string[];
 }
 
 export interface GiftCardDiscount {
