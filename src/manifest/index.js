@@ -15,7 +15,7 @@ const manifestInput = {
   },
 
   description: 'Spend crypto anywhere',
-  homepage_url: 'https://github.com/msalcala11/extension',
+  homepage_url: 'https://github.com/bitpay/bitpay-browser-extension',
   short_name: 'Pay with BitPay',
 
   permissions: ['activeTab', 'storage', 'http://*/*', 'https://*/*'],

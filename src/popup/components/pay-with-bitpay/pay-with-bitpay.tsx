@@ -74,7 +74,7 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
     await saveGiftCard(unredeemedGiftCard);
     const launchPromise = browser.runtime.sendMessage({
       name: 'LAUNCH_WINDOW',
-      url: `${process.env.API_ORIGIN}/invoice?id=${invoiceId}&view=modal`
+      url: `${process.env.API_ORIGIN}/invoice?id=${invoiceId}&view=popup`
     });
     const res = await Promise.race([
       launchPromise,
