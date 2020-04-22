@@ -122,7 +122,7 @@ const Amount: React.FC<any> = ({
     if (paymentPageAvailable && key === 13) {
       goToPaymentPage();
     }
-    if (!inputDirty && key !== 8) {
+    if (!inputDirty && inputValue !== '' && key !== 8) {
       handleInput('');
     }
     setInputDirty(true);
