@@ -89,7 +89,7 @@ const Shop: React.FC<{ merchants: Merchant[]; location: any }> = ({ merchants, l
         {filteredMerchants.length > 0 ? (
           <>
             <div className="shop-page__section-header">
-              {searchVal ? <>Search Results</> : <>Shop {merchants?.length} Brands</>}
+              {searchVal ? <>Search Results</> : <>Shop {filteredMerchants?.length} Brands</>}
             </div>
             {filteredMerchants.map(merchant => (
               <Link
