@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { resizeFrame } from '../../../services/frame';
 import { BitpayUser } from '../../../services/bitpay-id';
 import { launchNewTab } from '../../../services/browser';
+import Gravatar from '../../components/gravatar/gravatar';
 
 const Settings: React.FC<{ email: string; user: BitpayUser }> = ({ email, user }) => {
   resizeFrame(450);
@@ -27,7 +28,10 @@ const Settings: React.FC<{ email: string; user: BitpayUser }> = ({ email, user }
           })}
           to="/settings/account"
         >
-          <img alt="BitPay Logo" src="assets/icons/favicon-128.png" />
+          {user ?
+            <Gravatar email={user.email} size="16" /> :
+            <img alt="BitPay Logo" src="assets/icons/favicon-128.png" />
+          }
           {user ? <>{user.email}</> : <>Connect to BitPay</>}
         </Link>
         <div className="settings-group__caption">
