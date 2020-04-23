@@ -40,7 +40,7 @@ export const IOSSwitch = withStyles(theme => ({
   focusVisible: {}
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }))<any>((props: any) => {
-  const { classes } = props;
+  const { classes, ...others } = props;
   return (
     <Switch
       focusVisibleClassName={classes.focusVisible}
@@ -52,7 +52,7 @@ export const IOSSwitch = withStyles(theme => ({
         track: classes.track,
         checked: classes.checked
       }}
-      {...props}
+      {...others}
     />
   );
 });
