@@ -136,6 +136,7 @@ export interface CardConfigMap {
 }
 
 export interface Invoice {
+  url: string;
   paymentTotals: { [currency: string]: number };
   paymentDisplayTotals: { [currency: string]: string };
   amountPaid: number;
