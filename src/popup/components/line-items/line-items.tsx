@@ -14,7 +14,7 @@ const LineItems: React.FC<{ cardConfig: CardConfig; card: Partial<GiftCard> & Un
   const activationFee = getActivationFee(card.amount, cardConfig);
   const totalDiscount = getTotalDiscount(card.amount, card.discounts || cardConfig.discounts);
   const openInvoice = (url: string) => (): void => {
-    launchNewTab(url);
+    launchNewTab(`${url}&view=popup`);
   };
   return (
     <div className="line-items">
