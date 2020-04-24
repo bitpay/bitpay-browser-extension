@@ -6,6 +6,7 @@ import { IOSSwitch } from '../../../components/ios-switch/ios-switch';
 import { set, get, remove } from '../../../../services/storage';
 import CardMenu from '../../../components/card-menu/card-menu';
 import { SignInWithBitpayImage } from '../../../components/svg/sign-in-with-bitpay-image';
+import Gravatar from '../../../components/gravatar/gravatar';
 import './account.scss';
 
 const Account: React.FC<{
@@ -53,7 +54,9 @@ const Account: React.FC<{
             <CardMenu items={['Disconnect Account']} onClick={disconnect} />
             <div className="settings-group">
               <div className="settings-group__item settings-group__item--dark">
-                <img className="settings-group__item__avatar" alt="BitPay Logo" src="assets/icons/favicon-128.png" />
+                <div className="settings-group__item__avatar">
+                  <Gravatar email={user.email} size="34" />
+                </div>
                 <div className="settings-group__item__label ellipsis">
                   {user.givenName || user.givenName ? (
                     <>
