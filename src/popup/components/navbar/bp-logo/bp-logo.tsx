@@ -55,6 +55,7 @@ const animateLogo = {
 const BitpayLogo: React.FC<{ solo?: boolean; color?: 'blue' | 'white' }> = ({ solo, color = 'blue' }) => (
   <motion.svg
     className={`bp-logo ${color}`}
+    initial="base"
     animate={solo ? 'solo' : 'base'}
     variants={animateLogo}
     opacity="1"
@@ -68,6 +69,7 @@ const BitpayLogo: React.FC<{ solo?: boolean; color?: 'blue' | 'white' }> = ({ so
       transform="translate(-73.6 -73.1)"
     />
     <motion.g
+      initial="show"
       animate={solo ? 'hidden' : 'show'}
       variants={animateLogo}
       custom={solo ? 4 : 0}
@@ -80,6 +82,7 @@ const BitpayLogo: React.FC<{ solo?: boolean; color?: 'blue' | 'white' }> = ({ so
       <path id="i_BODY" d="M149.56,104.6l-3.66,15.357h4.144l3.639-15.357Z" transform="translate(-145.9 -100.161)" />
     </motion.g>
     <motion.path
+      initial="show"
       animate={solo ? 'hidden' : 'show'}
       variants={animateLogo}
       custom={solo ? 3 : 1}
@@ -90,6 +93,7 @@ const BitpayLogo: React.FC<{ solo?: boolean; color?: 'blue' | 'white' }> = ({ so
       transform="translate(-160.433 -81.312)"
     />
     <motion.path
+      initial="show"
       animate={solo ? 'hidden' : 'show'}
       variants={animateLogo}
       custom={2}
@@ -100,6 +104,7 @@ const BitpayLogo: React.FC<{ solo?: boolean; color?: 'blue' | 'white' }> = ({ so
       transform="translate(-193.466 -98.052)"
     />
     <motion.path
+      initial="show"
       animate={solo ? 'hidden' : 'show'}
       variants={animateLogo}
       custom={solo ? 1 : 3}
@@ -110,6 +115,7 @@ const BitpayLogo: React.FC<{ solo?: boolean; color?: 'blue' | 'white' }> = ({ so
       transform="translate(-259.084 -97.894)"
     />
     <motion.path
+      initial="show"
       animate={solo ? 'hidden' : 'show'}
       variants={animateLogo}
       custom={solo ? 0 : 4}
