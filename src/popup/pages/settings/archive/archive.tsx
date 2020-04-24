@@ -6,7 +6,7 @@ import { GiftCard, CardConfig } from '../../../../services/gift-card.types';
 import { formatCurrency } from '../../../../services/currency';
 import { sortByDescendingDate } from '../../../../services/gift-card';
 import './archive.scss';
-import { wait } from "../../../../services/utils";
+import { wait } from '../../../../services/utils';
 
 const Archive: React.FC<{ purchasedGiftCards: GiftCard[]; supportedGiftCards: CardConfig[]; location: any }> = ({
   purchasedGiftCards,
