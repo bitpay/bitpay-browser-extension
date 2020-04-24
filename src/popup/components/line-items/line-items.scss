@@ -2,13 +2,13 @@
 
 .line-items {
   padding: 0 15px;
-  font-size: 14px;
   &__item {
     display: flex;
     align-items: center;
     margin: 16px 0;
     &__label {
       flex-grow: 1;
+      font-size: 14px;
       color: rgba($color: #73808c, $alpha: 0.8);
 
       &--bold {
@@ -20,6 +20,7 @@
     }
     &__value {
       flex-shrink: 0;
+      font-size: 14px;
       color: $slateDark;
 
       &--bold {
