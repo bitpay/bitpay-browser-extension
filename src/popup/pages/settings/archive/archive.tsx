@@ -8,6 +8,7 @@ import { sortByDescendingDate } from '../../../../services/gift-card';
 import './archive.scss';
 import { wait } from '../../../../services/utils';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Archive: React.FC<{ purchasedGiftCards: GiftCard[]; supportedGiftCards: CardConfig[]; location: any }> = ({
   purchasedGiftCards,
   supportedGiftCards,
