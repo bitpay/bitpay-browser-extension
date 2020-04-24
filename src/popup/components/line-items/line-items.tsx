@@ -1,5 +1,6 @@
 import React from 'react';
 import { format } from 'date-fns';
+import { launchNewTab } from '../../../services/browser';
 import { formatDiscount } from '../../../services/merchant';
 import { CardConfig, GiftCard, UnsoldGiftCard } from '../../../services/gift-card.types';
 import { formatCurrency } from '../../../services/currency';
@@ -12,6 +13,9 @@ const LineItems: React.FC<{ cardConfig: CardConfig; card: Partial<GiftCard> & Un
 }) => {
   const activationFee = getActivationFee(card.amount, cardConfig);
   const totalDiscount = getTotalDiscount(card.amount, card.discounts || cardConfig.discounts);
+  const openInvoice = (url: string) => (): void => {
+    launchNewTab(url);
+  };
   return (
     <div className="line-items">
       {card.date && (
@@ -59,9 +63,13 @@ const LineItems: React.FC<{ cardConfig: CardConfig; card: Partial<GiftCard> & Un
       {card.invoice && (
         <div className="line-items__item">
           <div className="line-items__item__label">Amount Paid</div>
-          <div className="line-items__item__value crypto-amount">
+          <button
+            className="line-items__item__value crypto-amount"
+            onClick={openInvoice(card.invoice.url)}
+            type="button"
+          >
             {card.invoice.displayAmountPaid} {card.invoice.transactionCurrency}
-          </div>
+          </button>
         </div>
       )}
     </div>
