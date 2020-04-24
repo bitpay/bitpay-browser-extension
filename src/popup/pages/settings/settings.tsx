@@ -28,10 +28,11 @@ const Settings: React.FC<{ email: string; user: BitpayUser }> = ({ email, user }
           })}
           to="/settings/account"
         >
-          {user ?
-            <Gravatar email={user.email} size="16" /> :
+          {user ? (
+            <Gravatar email={user.email} size="16" />
+          ) : (
             <img alt="BitPay Logo" src="assets/icons/favicon-128.png" />
-          }
+          )}
           {user ? <>{user.email}</> : <>Connect to BitPay</>}
         </Link>
         <div className="settings-group__caption">
