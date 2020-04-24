@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { resizeFrame } from '../../../../services/frame';
@@ -6,15 +6,32 @@ import { GiftCard, CardConfig } from '../../../../services/gift-card.types';
 import { formatCurrency } from '../../../../services/currency';
 import { sortByDescendingDate } from '../../../../services/gift-card';
 import './archive.scss';
+import { wait } from '../../../../services/utils';
 
-const Archive: React.FC<{ purchasedGiftCards: GiftCard[]; supportedGiftCards: CardConfig[] }> = ({
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const Archive: React.FC<{ purchasedGiftCards: GiftCard[]; supportedGiftCards: CardConfig[]; location: any }> = ({
   purchasedGiftCards,
-  supportedGiftCards
+  supportedGiftCards,
+  location
 }) => {
-  resizeFrame(450);
   const archivedGiftCards = purchasedGiftCards.filter(card => card.archived).sort(sortByDescendingDate);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const setScrollPosition = async (): Promise<void> => {
+      if (location.state) {
+        await wait(0);
+        if (ref.current) ref.current.scrollTop = location.state.scrollTop || 0;
+      }
+    };
+    resizeFrame(450);
+    setScrollPosition();
+  }, [ref, location.state]);
+  const handleClick = (): void => {
+    location.state = { scrollTop: ref.current?.scrollTop as number };
+  };
+
   return (
-    <div className="settings archive">
+    <div className="settings archive" ref={ref}>
       {archivedGiftCards.length ? (
         <div className="settings-group">
           <div className="settings-group__label">Archive</div>
@@ -26,6 +43,7 @@ const Archive: React.FC<{ purchasedGiftCards: GiftCard[]; supportedGiftCards: Ca
                 className="settings-group__item"
                 key={index}
                 to={{ pathname: `/card/${card.invoiceId}`, state: { card, cardConfig } }}
+                onClick={handleClick}
               >
                 <img
                   className="settings-group__item__avatar"
