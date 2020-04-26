@@ -42,15 +42,25 @@ export function formatDiscount(
   return discount.amount.toString();
 }
 
-export function getBitPayMerchantFromHost(host: string, merchants: Merchant[]): Merchant | undefined {
-  const bareHost = host.replace(/^www\./, '');
-  const hasDomainMatch = (domains: string[] = []): boolean =>
-    domains.some(domain => removeProtocolAndWww(domain).startsWith(bareHost));
-  return merchants.find(merchant => hasDomainMatch(merchant.domains));
+export function doesUrlMatch(url: string, supportedUrl: string): boolean {
+  const urlWithoutProtocol = removeProtocolAndWww(supportedUrl);
+  const regExp = new RegExp(
+    `(https?:\\/\\/(.+?\\.)?${urlWithoutProtocol}(\\/[A-Za-z0-9\\-\\._~:\\/\\?#\\[\\]@!$&'\\(\\)\\*\\+,;\\=]*)?)`,
+    'g'
+  );
+  return regExp.test(url);
 }
 
-export function isBitPayAccepted(host: string, merchants: Merchant[]): boolean {
-  return !!getBitPayMerchantFromHost(host, merchants);
+export function doAnyUrlsMatch(url: string, supportedUrls: string[]): boolean {
+  return supportedUrls.some(supportedUrl => doesUrlMatch(url, supportedUrl));
+}
+
+export function getBitPayMerchantFromUrl(url: string, merchants: Merchant[]): Merchant | undefined {
+  return merchants.find(merchant => doAnyUrlsMatch(url, merchant.domains));
+}
+
+export function isBitPayAccepted(url: string, merchants: Merchant[]): boolean {
+  return !!getBitPayMerchantFromUrl(url, merchants);
 }
 
 export function getMerchants(
@@ -62,32 +72,39 @@ export function getMerchants(
     hasDirectIntegration: true,
     giftCards: []
   }));
-  const giftCardMerchants = availableGiftCardBrands.map(cardConfig => ({
-    hasDirectIntegration: false,
-    name: cardConfig.name,
-    displayName: cardConfig.displayName,
-    caption: cardConfig.description,
-    featured: cardConfig.featured,
-    icon: cardConfig.icon,
-    link: cardConfig.website,
-    displayLink: cardConfig.website,
-    tags: [],
-    domains: [cardConfig.website],
-    theme: cardConfig.brandColor || cardConfig.logoBackgroundColor,
-    instructions: cardConfig.description,
-    giftCards:
-      cardConfig.name === 'Amazon.com'
-        ? [
-            {
-              ...cardConfig,
-              cssSelectors: {
-                orderTotal: ['.grand-total-price'],
-                claimCodeInput: ['.pmts-claim-code', '#spc-gcpromoinput']
-              }
-            } as CardConfig
-          ]
-        : [cardConfig]
-  }));
+  const giftCardMerchants = availableGiftCardBrands
+    .map(cardConfig => ({
+      // eslint-disable-next-line no-nested-ternary
+      ...(cardConfig.name === 'Amazon.com'
+        ? ({
+            ...cardConfig,
+            cssSelectors: {
+              orderTotal: ['.grand-total-price'],
+              claimCodeInput: ['.pmts-claim-code', '#spc-gcpromoinput']
+            }
+          } as CardConfig)
+        : cardConfig.name === 'Outback Steakhouse'
+        ? {
+            ...cardConfig,
+            supportedUrls: ['outbackonlineordering.com', 'outback.com']
+          }
+        : cardConfig)
+    }))
+    .map(cardConfig => ({
+      hasDirectIntegration: false,
+      name: cardConfig.name,
+      displayName: cardConfig.displayName,
+      caption: cardConfig.description,
+      featured: cardConfig.featured,
+      icon: cardConfig.icon,
+      link: cardConfig.website,
+      displayLink: cardConfig.website,
+      tags: [],
+      domains: [cardConfig.website].concat(cardConfig.supportedUrls || []),
+      theme: cardConfig.brandColor || cardConfig.logoBackgroundColor,
+      instructions: cardConfig.description,
+      giftCards: [cardConfig]
+    }));
   return [...directIntegrationMerchants, ...giftCardMerchants].sort(sortByDisplayName);
 }
 
