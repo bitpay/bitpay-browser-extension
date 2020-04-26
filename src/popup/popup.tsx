@@ -11,7 +11,7 @@ import Tabs from './components/tabs/tabs';
 import Navbar from './components/navbar/navbar';
 import {
   Merchant,
-  getBitPayMerchantFromHost,
+  getBitPayMerchantFromUrl,
   fetchCachedMerchants,
   fetchMerchants,
   getMerchantInitialEntries
@@ -46,11 +46,6 @@ const Popup: React.FC = () => {
   const [realtimeInvoiceIds, setRealtimeInvoiceIds] = useState([] as string[]);
   const [user, setUser] = useState(undefined as BitpayUser | undefined);
 
-  const getMerchantFromUrl = (url: string, allMerchants: Merchant[]): Merchant | undefined => {
-    const { host } = new URL(url);
-    return getBitPayMerchantFromHost(host, allMerchants);
-  };
-
   const updateGiftCard = async (card: GiftCard): Promise<void> => {
     const newCards = await updateCard(card, purchasedGiftCards);
     setPurchasedGiftCards(newCards);
@@ -61,7 +56,7 @@ const Popup: React.FC = () => {
     const updateMerchants = async (): Promise<void> => {
       const newMerchants = await fetchMerchants();
       setMerchants(newMerchants);
-      setSupportedMerchant(getMerchantFromUrl(parentUrl.current, newMerchants));
+      setSupportedMerchant(getBitPayMerchantFromUrl(parentUrl.current, newMerchants));
       const newSupportedGiftCards = await get<CardConfig[]>('supportedGiftCards');
       setSupportedGiftCards(newSupportedGiftCards);
       refreshMerchantCache();
@@ -106,7 +101,7 @@ const Popup: React.FC = () => {
         get<string>('clientId')
       ]);
       const orderTotal = parseFloat(new URLSearchParams(window.location.search).get('amount') as string);
-      const merchant = getMerchantFromUrl(parentUrl.current, allMerchants);
+      const merchant = getBitPayMerchantFromUrl(parentUrl.current, allMerchants);
       const entries = getMerchantInitialEntries({ merchant, extensionClientId, bitpayUser, receiptEmail, orderTotal });
       setInitialEntries(entries);
       setInitialIndex(entries.length - 1);

@@ -49,6 +49,7 @@ export interface CommonCardConfig {
   redeemButtonText?: string;
   redeemInstructions?: string;
   redeemUrl?: string;
+  supportedUrls?: string[];
   terms: string;
   website: string;
 }
