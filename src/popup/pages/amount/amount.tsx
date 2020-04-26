@@ -1,19 +1,28 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, Dispatch, SetStateAction } from 'react';
+import { RouteComponentProps } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import CardDenoms from '../../components/card-denoms/card-denoms';
 import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
-import { GiftCardInvoiceParams, CardConfig } from '../../../services/gift-card.types';
+import { GiftCardInvoiceParams, CardConfig, GiftCard } from '../../../services/gift-card.types';
 import { getCardPrecision, isAmountValid } from '../../../services/gift-card';
 import DiscountText from '../../components/discount-text/discount-text';
 import { Merchant } from '../../../services/merchant';
 import { resizeFrame } from '../../../services/frame';
 import ActionButton from '../../components/action-button/action-button';
+import { BitpayUser } from '../../../services/bitpay-id';
 import './amount.scss';
 
 const shkAmp = 12;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Amount: React.FC<any> = ({
+const Amount: React.FC<RouteComponentProps & {
+  clientId: string;
+  email: string;
+  initialAmount?: number;
+  user?: BitpayUser;
+  purchasedGiftCards: GiftCard[];
+  setPurchasedGiftCards: Dispatch<SetStateAction<GiftCard[]>>;
+  supportedMerchant?: Merchant;
+}> = ({
   location,
   clientId,
   email,
@@ -21,13 +30,15 @@ const Amount: React.FC<any> = ({
   user,
   history,
   purchasedGiftCards,
-  setPurchasedGiftCards
+  setPurchasedGiftCards,
+  supportedMerchant
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { cardConfig, merchant } = location.state as { cardConfig: CardConfig; merchant: Merchant };
   const hasFixedDenoms = cardConfig.supportedAmounts && cardConfig.supportedAmounts[0];
+  const onMerchantWebsite = supportedMerchant?.name === merchant.name;
   const preloadedAmount =
-    initialAmount ||
+    (onMerchantWebsite && isAmountValid(initialAmount || 0, cardConfig) && initialAmount) ||
     (cardConfig.supportedAmounts && cardConfig.supportedAmounts[0] ? cardConfig.supportedAmounts[0] : 0);
   const [amount, setAmount] = useState(preloadedAmount);
   const [inputValue, setInputValue] = useState(preloadedAmount ? `${preloadedAmount}` : '');
@@ -190,6 +201,7 @@ const Amount: React.FC<any> = ({
             history={history}
             purchasedGiftCards={purchasedGiftCards}
             setPurchasedGiftCards={setPurchasedGiftCards}
+            supportedMerchant={supportedMerchant}
             onInvalidParams={(): void => shakeInput()}
           />
         )}

@@ -6,7 +6,7 @@ import {
   fetchMerchants,
   Merchant,
   fetchCachedMerchants,
-  getBitPayMerchantFromHost
+  getBitPayMerchantFromUrl
 } from '../services/merchant';
 import { get, set } from '../services/storage';
 import { generatePairingToken } from '../services/bitpay-id';
@@ -40,9 +40,9 @@ async function refreshCachedMerchantsIfNeeded(): Promise<void> {
   await refreshCachedMerchants();
 }
 
-async function handleUrlChange(host: string): Promise<void> {
+async function handleUrlChange(url: string): Promise<void> {
   const merchants = await getCachedMerchants();
-  const bitpayAccepted = !!(host && isBitPayAccepted(host, merchants));
+  const bitpayAccepted = !!(url && isBitPayAccepted(url, merchants));
   await setIcon(bitpayAccepted);
   await refreshCachedMerchantsIfNeeded();
 }
@@ -60,7 +60,7 @@ async function sendMessageToTab(message: any, tab: Tabs.Tab): Promise<void> {
 }
 
 browser.browserAction.onClicked.addListener(async tab => {
-  const merchant = tab.url && getBitPayMerchantFromHost(new URL(tab.url).host, await getCachedMerchants());
+  const merchant = tab.url && getBitPayMerchantFromUrl(tab.url, await getCachedMerchants());
   await browser.tabs.sendMessage(tab.id as number, {
     name: 'EXTENSION_ICON_CLICKED',
     merchant
@@ -120,7 +120,7 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
     case 'REFRESH_MERCHANT_CACHE':
       return refreshCachedMerchants();
     case 'URL_CHANGED':
-      return handleUrlChange(message.host);
+      return handleUrlChange(message.url);
     default:
       return tab && sendMessageToTab(message, tab);
   }
