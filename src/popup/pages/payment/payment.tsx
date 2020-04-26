@@ -1,21 +1,32 @@
 /* eslint-disable jsx-a11y/no-autofocus */
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, Dispatch, SetStateAction } from 'react';
+import { RouteComponentProps } from 'react-router-dom';
 import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
-import { GiftCardInvoiceParams, CardConfig, UnsoldGiftCard } from '../../../services/gift-card.types';
+import { GiftCardInvoiceParams, CardConfig, UnsoldGiftCard, GiftCard } from '../../../services/gift-card.types';
 import LineItems from '../../components/line-items/line-items';
 import CardHeader from '../../components/card-header/card-header';
 import { resizeToFitPage } from '../../../services/frame';
+import { BitpayUser } from '../../../services/bitpay-id';
+import { Merchant } from '../../../services/merchant';
 import './payment.scss';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Payment: React.FC<any> = ({ location, history, user, setEmail, purchasedGiftCards, setPurchasedGiftCards }) => {
+const Payment: React.FC<RouteComponentProps & {
+  user?: BitpayUser;
+  setEmail: Dispatch<SetStateAction<string>>;
+  purchasedGiftCards: GiftCard[];
+  setPurchasedGiftCards: Dispatch<SetStateAction<GiftCard[]>>;
+  supportedMerchant?: Merchant;
+}> = ({ location, history, user, setEmail, purchasedGiftCards, setPurchasedGiftCards, supportedMerchant }) => {
   const ref = useRef<HTMLDivElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
 
-  const amount = location.state.amount as number;
-  const invoiceParams = location.state.invoiceParams as GiftCardInvoiceParams;
+  const { amount, invoiceParams, cardConfig } = location.state as {
+    amount: number;
+    invoiceParams: GiftCardInvoiceParams;
+    cardConfig: CardConfig;
+  };
+
   const [email, setReceiptEmail] = useState(invoiceParams.email || '');
-  const cardConfig = location.state.cardConfig as CardConfig;
   const card: UnsoldGiftCard = {
     amount,
     currency: invoiceParams.currency,
@@ -54,6 +65,7 @@ const Payment: React.FC<any> = ({ location, history, user, setEmail, purchasedGi
           setEmail={setEmail}
           purchasedGiftCards={purchasedGiftCards}
           setPurchasedGiftCards={setPurchasedGiftCards}
+          supportedMerchant={supportedMerchant}
         />
       </div>
     </div>
