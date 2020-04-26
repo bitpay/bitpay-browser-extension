@@ -13,6 +13,12 @@ export interface Merchant extends DirectIntegration {
   giftCards: CardConfig[];
 }
 
+export interface InitialEntry {
+  pathname: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  state: any;
+}
+
 export function spreadAmounts(values: Array<number>, currency: string): string {
   const currencySymbol = currencySymbols[currency];
   let caption = '';
@@ -138,6 +144,11 @@ export function getDiscount(merchant: Merchant) {
   return merchant.discount || (cardConfig && cardConfig.discounts && cardConfig.discounts[0]);
 }
 
+export const getDirectIntegrationInitialEntries = (merchant: Merchant): InitialEntry[] => [
+  { pathname: '/shop', state: {} },
+  { pathname: `/brand/${merchant.name}`, state: { merchant } }
+];
+
 export const getMerchantInitialEntries = ({
   merchant,
   orderTotal,
@@ -151,7 +162,8 @@ export const getMerchantInitialEntries = ({
   bitpayUser?: BitpayUser;
   receiptEmail?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-}): { pathname: string; state: any }[] => {
+}): InitialEntry[] => {
+  if (merchant && merchant.hasDirectIntegration) return getDirectIntegrationInitialEntries(merchant);
   const cardConfig = merchant?.giftCards[0];
   // eslint-disable-next-line no-nested-ternary
   const pathname = orderTotal
