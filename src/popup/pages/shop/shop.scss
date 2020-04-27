@@ -87,8 +87,7 @@
         }
         &:not(:last-child) {
           &:after {
-            right: -10px;
-            left: -10px;
+            transform: scaleX(1.25);
           }
         }
       }
