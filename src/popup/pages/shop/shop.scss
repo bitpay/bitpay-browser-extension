@@ -59,11 +59,12 @@
         &:after {
           content: "";
           height: 1px;
-          width: calc(100% - #{$left-padding});
           background: $border-color;
           bottom: 0;
           right: 0;
+          left: calc(#{$left-padding});
           position: absolute;
+          transition: all 250ms linear;
         }
       }
 
@@ -83,6 +84,12 @@
       &:hover {
         &:before {
           opacity: 1;
+        }
+        &:not(:last-child) {
+          &:after {
+            right: -10px;
+            left: -10px;
+          }
         }
       }
 
