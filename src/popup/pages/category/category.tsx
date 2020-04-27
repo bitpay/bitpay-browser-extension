@@ -85,7 +85,7 @@ const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location
             {renderList.map((merchant, index) => (
               <motion.div
                 custom={index}
-                initial={index > 8 || isDirty ? 'base' : 'delta'}
+                initial={index > 7 || isDirty ? 'base' : 'delta'}
                 animate="base"
                 variants={listAnimation}
                 key={merchant.name}

@@ -111,25 +111,33 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
                     </div>
                     {merchants
                       .filter(merchant => category.merchants.includes(merchant.displayName))
+                      .sort(
+                        (a: Merchant, b: Merchant) =>
+                          category.merchants.indexOf(a.displayName) - category.merchants.indexOf(b.displayName)
+                      )
                       .map((merchant, index) => (
-                        <motion.div
-                          custom={index}
-                          initial={isDirty ? 'base' : 'delta'}
-                          animate="base"
-                          variants={listAnimation}
-                          key={merchant.name}
-                        >
-                          <Link
-                            to={{
-                              pathname: `/brand/${merchant.name}`,
-                              state: { merchant }
-                            }}
-                            key={merchant.name}
-                            onClick={handleClick}
-                          >
-                            <MerchantCell key={merchant.name} merchant={merchant} />
-                          </Link>
-                        </motion.div>
+                        <>
+                          {index < 3 && (
+                            <motion.div
+                              custom={index}
+                              initial={isDirty ? 'base' : 'delta'}
+                              animate="base"
+                              variants={listAnimation}
+                              key={merchant.name}
+                            >
+                              <Link
+                                to={{
+                                  pathname: `/brand/${merchant.name}`,
+                                  state: { merchant }
+                                }}
+                                key={merchant.name}
+                                onClick={handleClick}
+                              >
+                                <MerchantCell key={merchant.name} merchant={merchant} />
+                              </Link>
+                            </motion.div>
+                          )}
+                        </>
                       ))}
                     <div className="shop-page__divider" />
                   </React.Fragment>
