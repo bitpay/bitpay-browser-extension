@@ -13,6 +13,12 @@ export interface Merchant extends DirectIntegration {
   giftCards: CardConfig[];
 }
 
+export interface InitialEntry {
+  pathname: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  state: any;
+}
+
 export function spreadAmounts(values: Array<number>, currency: string): string {
   const currencySymbol = currencySymbols[currency];
   let caption = '';
@@ -42,15 +48,25 @@ export function formatDiscount(
   return discount.amount.toString();
 }
 
-export function getBitPayMerchantFromHost(host: string, merchants: Merchant[]): Merchant | undefined {
-  const bareHost = host.replace(/^www\./, '');
-  const hasDomainMatch = (domains: string[] = []): boolean =>
-    domains.some(domain => removeProtocolAndWww(domain).startsWith(bareHost));
-  return merchants.find(merchant => hasDomainMatch(merchant.domains));
+export function doesUrlMatch(url: string, supportedUrl: string): boolean {
+  const urlWithoutProtocol = removeProtocolAndWww(supportedUrl);
+  const regExp = new RegExp(
+    `(https?:\\/\\/(.+?\\.)?${urlWithoutProtocol}(\\/[A-Za-z0-9\\-\\._~:\\/\\?#\\[\\]@!$&'\\(\\)\\*\\+,;\\=]*)?)`,
+    'g'
+  );
+  return regExp.test(url);
 }
 
-export function isBitPayAccepted(host: string, merchants: Merchant[]): boolean {
-  return !!getBitPayMerchantFromHost(host, merchants);
+export function doAnyUrlsMatch(url: string, supportedUrls: string[]): boolean {
+  return supportedUrls.some(supportedUrl => doesUrlMatch(url, supportedUrl));
+}
+
+export function getBitPayMerchantFromUrl(url: string, merchants: Merchant[]): Merchant | undefined {
+  return merchants.find(merchant => doAnyUrlsMatch(url, merchant.domains));
+}
+
+export function isBitPayAccepted(url: string, merchants: Merchant[]): boolean {
+  return !!getBitPayMerchantFromUrl(url, merchants);
 }
 
 export function getMerchants(
@@ -72,21 +88,10 @@ export function getMerchants(
     link: cardConfig.website,
     displayLink: cardConfig.website,
     tags: [],
-    domains: [cardConfig.website],
+    domains: [cardConfig.website].concat(cardConfig.supportedUrls || []),
     theme: cardConfig.brandColor || cardConfig.logoBackgroundColor,
     instructions: cardConfig.description,
-    giftCards:
-      cardConfig.name === 'Amazon.com'
-        ? [
-            {
-              ...cardConfig,
-              cssSelectors: {
-                orderTotal: ['.grand-total-price'],
-                claimCodeInput: ['.pmts-claim-code', '#spc-gcpromoinput']
-              }
-            } as CardConfig
-          ]
-        : [cardConfig]
+    giftCards: [cardConfig]
   }));
   return [...directIntegrationMerchants, ...giftCardMerchants].sort(sortByDisplayName);
 }
@@ -121,6 +126,11 @@ export function getDiscount(merchant: Merchant) {
   return merchant.discount || (cardConfig && cardConfig.discounts && cardConfig.discounts[0]);
 }
 
+export const getDirectIntegrationInitialEntries = (merchant: Merchant): InitialEntry[] => [
+  { pathname: '/shop', state: {} },
+  { pathname: `/brand/${merchant.name}`, state: { merchant } }
+];
+
 export const getMerchantInitialEntries = ({
   merchant,
   orderTotal,
@@ -134,7 +144,8 @@ export const getMerchantInitialEntries = ({
   bitpayUser?: BitpayUser;
   receiptEmail?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-}): { pathname: string; state: any }[] => {
+}): InitialEntry[] => {
+  if (merchant && merchant.hasDirectIntegration) return getDirectIntegrationInitialEntries(merchant);
   const cardConfig = merchant?.giftCards[0];
   // eslint-disable-next-line no-nested-ternary
   const pathname = orderTotal

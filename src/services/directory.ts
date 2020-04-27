@@ -31,7 +31,7 @@ export const getDirectIntegrations = (res: DirectIntegrationMap): DirectIntegrat
   Object.keys(res).map(name => ({ ...res[name], name }));
 
 export function fetchDirectIntegrations(): Promise<DirectIntegration[]> {
-  return fetch(`${process.env.API_ORIGIN}/merchant-directory`)
+  return fetch(`${process.env.API_ORIGIN}/merchant-directory/integrations`)
     .then(res => res.json())
     .then((merchantMap: DirectIntegrationMap) => getDirectIntegrations(merchantMap));
 }

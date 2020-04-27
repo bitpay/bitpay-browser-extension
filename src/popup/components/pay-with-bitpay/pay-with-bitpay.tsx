@@ -11,6 +11,7 @@ import { wait } from '../../../services/utils';
 import { BitpayUser } from '../../../services/bitpay-id';
 import { injectClaimInfo } from '../../../services/browser';
 import { PayWithBitpayImage } from '../svg/pay-with-bitpay-image';
+import { Merchant } from '../../../services/merchant';
 import './pay-with-bitpay.scss';
 
 const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
@@ -20,6 +21,7 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
   user?: BitpayUser;
   purchasedGiftCards: GiftCard[];
   setPurchasedGiftCards: (cards: GiftCard[]) => void;
+  supportedMerchant?: Merchant;
   onInvalidParams?: () => void;
 }> = ({
   cardConfig,
@@ -29,11 +31,13 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
   user,
   purchasedGiftCards,
   setPurchasedGiftCards,
+  supportedMerchant,
   onInvalidParams = (): void => undefined
 }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [awaitingPayment, setAwaitingPayment] = useState(false);
   const { amount, currency } = invoiceParams;
+  const onMerchantWebsite = supportedMerchant?.name === cardConfig.name;
   const saveGiftCard = async (card: GiftCard): Promise<void> => {
     const newPurchasedGiftCards = [...purchasedGiftCards, card];
     setPurchasedGiftCards(newPurchasedGiftCards);
@@ -96,7 +100,7 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
     } as GiftCard;
     await saveGiftCard(finalGiftCard);
     showCard(finalGiftCard);
-    if (finalGiftCard.status === 'SUCCESS' && cardConfig.cssSelectors) {
+    if (finalGiftCard.status === 'SUCCESS' && cardConfig.cssSelectors && onMerchantWebsite) {
       injectClaimInfo(cardConfig, { claimCode: finalGiftCard.claimCode, pin: finalGiftCard.pin });
     }
   };
