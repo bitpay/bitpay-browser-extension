@@ -54,12 +54,12 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
   const categories = directory.categories
     ? Object.keys(directory.categories).map(key => directory.categories[key])
     : null;
-  const featuredMerchants = merchants.filter(merchant => merchant.featured);
-  const filteredMerchants = merchants.filter(merchant =>
-    searchVal
-      ? merchant.name.toLowerCase().includes(searchVal.toLowerCase()) ||
-        merchant.tags.find(category => category.includes(searchVal.toLowerCase()))
-      : !merchant.featured
+  const curation = directory.curated ? Object.keys(directory.curated).map(key => directory.curated[key]) : null;
+  const filteredMerchants = merchants.filter(
+    merchant =>
+      searchVal &&
+      (merchant.name.toLowerCase().includes(searchVal.toLowerCase()) ||
+        merchant.tags.find(category => category.includes(searchVal.toLowerCase())))
   );
   const handleClick = (): void => {
     location.state = { scrollTop: ref.current?.scrollTop as number, searchVal };
@@ -68,71 +68,87 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
     <div className="shop-page" ref={ref}>
       <SearchBar output={setSearchVal} value={searchVal} />
       <div className="shop-page__content">
-        {!searchVal && (
+        {searchVal ? (
           <>
-            <div className="shop-page__section-header">Popular Brands</div>
-            {featuredMerchants.map((merchant, index) => (
-              <motion.div
-                custom={index}
-                initial={isDirty ? 'base' : 'delta'}
-                animate="base"
-                variants={listAnimation}
-                key={merchant.name}
-              >
-                <Link
-                  to={{
-                    pathname: `/brand/${merchant.name}`,
-                    state: { merchant }
-                  }}
-                  key={merchant.name}
-                  onClick={handleClick}
-                >
-                  <MerchantCell key={merchant.name} merchant={merchant} />
-                </Link>
-              </motion.div>
-            ))}
-            <div className="shop-page__divider" />
-          </>
-        )}
-        {filteredMerchants.length > 0 ? (
-          <>
-            <div className="shop-page__section-header">
-              {searchVal ? <>Search Results</> : <>Shop {filteredMerchants?.length} Brands</>}
-            </div>
-            {filteredMerchants.map(merchant => (
-              <Link
-                to={{
-                  pathname: `/brand/${merchant.name}`,
-                  state: { merchant }
-                }}
-                key={merchant.name}
-                onClick={handleClick}
-              >
-                <MerchantCell key={merchant.name} merchant={merchant} />
-              </Link>
-            ))}
-            <div className="shop-page__divider" />
+            {filteredMerchants.length > 0 ? (
+              <>
+                <div className="shop-page__section-header">
+                  {searchVal ? <>Search Results</> : <>Shop {filteredMerchants?.length} Brands</>}
+                </div>
+                {filteredMerchants.map(merchant => (
+                  <Link
+                    to={{
+                      pathname: `/brand/${merchant.name}`,
+                      state: { merchant }
+                    }}
+                    key={merchant.name}
+                    onClick={handleClick}
+                  >
+                    <MerchantCell key={merchant.name} merchant={merchant} />
+                  </Link>
+                ))}
+                <div className="shop-page__divider" />
+              </>
+            ) : (
+              <div className="zero-state">
+                <div className="zero-state__title">No Results</div>
+                <div className="zero-state__subtitle">Please try searching something else</div>
+              </div>
+            )}
           </>
         ) : (
-          <div className="zero-state">
-            <div className="zero-state__title">No Results</div>
-            <div className="zero-state__subtitle">Please try searching something else</div>
-          </div>
-        )}
-        {categories && (
           <>
-            <div className="shop-page__section-header shop-page__section-header--large">
-              Categories
-              <div className="shop-page__section-header--action">See All Brands</div>
-            </div>
-            <div className="shop-page__categories">
-              {categories.map(category => (
-                <div className="shop-page__categories__item" key={category.displayName}>
-                  <div className="shop-page__categories__item__icon">{category.emoji}</div>
-                  {category.displayName}
+            {curation && curation.length > 0 && (
+              <>
+                {curation.map(category => (
+                  <React.Fragment key={category.displayName}>
+                    <div className="shop-page__section-header">
+                      {category.displayName}
+                      <div className="shop-page__section-header--action">See All</div>
+                    </div>
+                    {merchants
+                      .filter(merchant => category.merchants.includes(merchant.displayName))
+                      .map((merchant, index) => (
+                        <motion.div
+                          custom={index}
+                          initial={isDirty ? 'base' : 'delta'}
+                          animate="base"
+                          variants={listAnimation}
+                          key={merchant.name}
+                        >
+                          <Link
+                            to={{
+                              pathname: `/brand/${merchant.name}`,
+                              state: { merchant }
+                            }}
+                            key={merchant.name}
+                            onClick={handleClick}
+                          >
+                            <MerchantCell key={merchant.name} merchant={merchant} />
+                          </Link>
+                        </motion.div>
+                      ))}
+                    <div className="shop-page__divider" />
+                  </React.Fragment>
+                ))}
+              </>
+            )}
+            {categories && categories.length > 0 && (
+              <>
+                <div className="shop-page__section-header shop-page__section-header--large">
+                  Categories
+                  <div className="shop-page__section-header--action">See All Brands</div>
                 </div>
-              ))}
-            </div>
+                <div className="shop-page__categories">
+                  {categories.map(category => (
+                    <div className="shop-page__categories__item" key={category.displayName}>
+                      <div className="shop-page__categories__item__icon">{category.emoji}</div>
+                      {category.displayName}
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </>
         )}
       </div>

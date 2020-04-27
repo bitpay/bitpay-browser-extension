@@ -43,17 +43,12 @@
     $left-padding: 16px;
     $cell-height: 52px;
 
-    &:last-child {
-      margin-bottom: 10px;
-    }
-
     &__item {
       font-weight: $medium;
       font-size: 14px;
       color: $blue;
       display: flex;
       align-items: center;
-      background: white;
       position: relative;
       padding: 0 $left-padding + 2;
       width: 100%;
@@ -69,6 +64,25 @@
           bottom: 0;
           right: 0;
           position: absolute;
+        }
+      }
+
+      &:before {
+        content: "";
+        background: darken(#f8fbfd, 1%);
+        top: 0;
+        bottom: 0;
+        right: -10px;
+        left: -10px;
+        position: absolute;
+        z-index: -1;
+        transition: all 250ms ease-in-out;
+        opacity: 0;
+      }
+
+      &:hover {
+        &:before {
+          opacity: 1;
         }
       }
 
