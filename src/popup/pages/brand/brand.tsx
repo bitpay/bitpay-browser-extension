@@ -12,7 +12,8 @@ import './brand.scss';
 const Brand: React.FC<RouteComponentProps> = ({ location }) => {
   const ref = useRef<HTMLDivElement>(null);
   const { merchant } = location.state as { merchant: Merchant };
-  const [expandText, setExpandText] = useState(false);
+  const initiallyExpanded = merchant.hasDirectIntegration && merchant.instructions.length < 300;
+  const [expandText, setExpandText] = useState(initiallyExpanded);
   const [pageHeight, setPageHeight] = useState(0);
   const ctaHeight = 125;
   useEffect((): void => {
