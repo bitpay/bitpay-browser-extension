@@ -28,6 +28,7 @@ import Balance from './pages/card/balance/balance';
 import { BitpayUser } from '../services/bitpay-id';
 import Account from './pages/settings/account/account';
 import { refreshMerchantCache } from '../services/browser';
+import { fetchDirectory, Directory } from '../services/directory';
 import './styles.scss';
 
 const Popup: React.FC = () => {
@@ -39,6 +40,7 @@ const Popup: React.FC = () => {
   const [loaded, setLoaded] = useState(false);
   const [clientId, setClientId] = useState('');
   const [email, setEmail] = useState('');
+  const [directory, setDirectory] = useState({} as Directory);
   const [merchants, setMerchants] = useState([] as Merchant[]);
   const [supportedMerchant, setSupportedMerchant] = useState(undefined as Merchant | undefined);
   const [supportedGiftCards, setSupportedGiftCards] = useState([] as CardConfig[]);
@@ -50,6 +52,14 @@ const Popup: React.FC = () => {
     const newCards = await updateCard(card, purchasedGiftCards);
     setPurchasedGiftCards(newCards);
   };
+
+  useEffect(() => {
+    const updateDirectory = async (): Promise<void> => {
+      const directoryFetch = await fetchDirectory().catch();
+      return directoryFetch && setDirectory(directoryFetch);
+    };
+    updateDirectory();
+  }, []);
 
   useEffect(() => {
     if (Date.now() - popupLaunchTime.current < 1000) return;
@@ -169,7 +179,10 @@ const Popup: React.FC = () => {
                 />
               )}
             />
-            <Route path="/shop" render={(props): JSX.Element => <Shop merchants={merchants} {...props} />} />
+            <Route
+              path="/shop"
+              render={(props): JSX.Element => <Shop directory={directory} merchants={merchants} {...props} />}
+            />
             <Route
               path="/settings"
               exact

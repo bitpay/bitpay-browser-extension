@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import SearchBar from '../../components/search-bar/search-bar';
 import MerchantCell from '../../components/merchant-cell/merchant-cell';
 import { Merchant } from '../../../services/merchant';
+import { Directory } from '../../../services/directory';
 import { resizeToFitPage } from '../../../services/frame';
 import { wait } from '../../../services/utils';
 
@@ -25,7 +26,11 @@ const listAnimation = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Shop: React.FC<{ merchants: Merchant[]; location: any }> = ({ merchants, location }) => {
+const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: any }> = ({
+  directory,
+  merchants,
+  location
+}) => {
   const [searchVal, setSearchVal] = useState('' as string);
   const [isDirty, setDirty] = useState(false);
   useEffect(() => {
@@ -46,6 +51,9 @@ const Shop: React.FC<{ merchants: Merchant[]; location: any }> = ({ merchants, l
   useEffect(() => {
     if (!searchVal) resizeToFitPage(ref);
   }, [searchVal]);
+  const categories = directory.categories
+    ? Object.keys(directory.categories).map(key => directory.categories[key])
+    : null;
   const featuredMerchants = merchants.filter(merchant => merchant.featured);
   const filteredMerchants = merchants.filter(merchant =>
     searchVal
@@ -103,12 +111,29 @@ const Shop: React.FC<{ merchants: Merchant[]; location: any }> = ({ merchants, l
                 <MerchantCell key={merchant.name} merchant={merchant} />
               </Link>
             ))}
+            <div className="shop-page__divider" />
           </>
         ) : (
           <div className="zero-state">
             <div className="zero-state__title">No Results</div>
             <div className="zero-state__subtitle">Please try searching something else</div>
           </div>
+        )}
+        {categories && (
+          <>
+            <div className="shop-page__section-header shop-page__section-header--large">
+              Categories
+              <div className="shop-page__section-header--action">See All Brands</div>
+            </div>
+            <div className="shop-page__categories">
+              {categories.map(category => (
+                <div className="shop-page__categories__item" key={category.displayName}>
+                  <div className="shop-page__categories__item__icon">{category.emoji}</div>
+                  {category.displayName}
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

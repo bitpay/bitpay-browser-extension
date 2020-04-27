@@ -22,6 +22,12 @@
       font-size: 12px;
       color: $blue;
     }
+
+    &--large {
+      font-weight: $bold;
+      font-size: 16px;
+      color: $fossil;
+    }
   }
 
   &__divider {
@@ -29,6 +35,49 @@
     height: 1px;
     width: 90%;
     margin: 24px auto;
+  }
+
+  &__categories {
+    $border-color: rgba(0, 0, 0, 0.05);
+    $input-border: 1px solid $border-color;
+    $left-padding: 16px;
+    $cell-height: 52px;
+
+    &:last-child {
+      margin-bottom: 10px;
+    }
+
+    &__item {
+      font-weight: $medium;
+      font-size: 14px;
+      color: $blue;
+      display: flex;
+      align-items: center;
+      background: white;
+      position: relative;
+      padding: 0 $left-padding + 2;
+      width: 100%;
+      text-align: left;
+      height: $cell-height;
+
+      &:not(:last-child) {
+        &:after {
+          content: "";
+          height: 1px;
+          width: calc(100% - #{$left-padding});
+          background: $border-color;
+          bottom: 0;
+          right: 0;
+          position: absolute;
+        }
+      }
+
+      &__icon {
+        font-size: 18px;
+        margin-right: 10px;
+        transform: translateY(-1px);
+      }
+    }
   }
 
   .zero-state {
