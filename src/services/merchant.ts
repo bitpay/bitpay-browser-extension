@@ -78,39 +78,21 @@ export function getMerchants(
     hasDirectIntegration: true,
     giftCards: []
   }));
-  const giftCardMerchants = availableGiftCardBrands
-    .map(cardConfig => ({
-      // eslint-disable-next-line no-nested-ternary
-      ...(cardConfig.name === 'Amazon.com'
-        ? ({
-            ...cardConfig,
-            cssSelectors: {
-              orderTotal: ['.grand-total-price'],
-              claimCodeInput: ['.pmts-claim-code', '#spc-gcpromoinput']
-            }
-          } as CardConfig)
-        : cardConfig.name === 'Outback Steakhouse'
-        ? {
-            ...cardConfig,
-            supportedUrls: ['outbackonlineordering.com', 'outback.com']
-          }
-        : cardConfig)
-    }))
-    .map(cardConfig => ({
-      hasDirectIntegration: false,
-      name: cardConfig.name,
-      displayName: cardConfig.displayName,
-      caption: cardConfig.description,
-      featured: cardConfig.featured,
-      icon: cardConfig.icon,
-      link: cardConfig.website,
-      displayLink: cardConfig.website,
-      tags: [],
-      domains: [cardConfig.website].concat(cardConfig.supportedUrls || []),
-      theme: cardConfig.brandColor || cardConfig.logoBackgroundColor,
-      instructions: cardConfig.description,
-      giftCards: [cardConfig]
-    }));
+  const giftCardMerchants = availableGiftCardBrands.map(cardConfig => ({
+    hasDirectIntegration: false,
+    name: cardConfig.name,
+    displayName: cardConfig.displayName,
+    caption: cardConfig.description,
+    featured: cardConfig.featured,
+    icon: cardConfig.icon,
+    link: cardConfig.website,
+    displayLink: cardConfig.website,
+    tags: [],
+    domains: [cardConfig.website].concat(cardConfig.supportedUrls || []),
+    theme: cardConfig.brandColor || cardConfig.logoBackgroundColor,
+    instructions: cardConfig.description,
+    giftCards: [cardConfig]
+  }));
   return [...directIntegrationMerchants, ...giftCardMerchants].sort(sortByDisplayName);
 }
 
