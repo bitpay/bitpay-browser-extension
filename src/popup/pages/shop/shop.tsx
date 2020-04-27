@@ -33,24 +33,6 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
 }) => {
   const [searchVal, setSearchVal] = useState('' as string);
   const [isDirty, setDirty] = useState(false);
-  useEffect(() => {
-    if (searchVal) setDirty(true);
-  }, [searchVal]);
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const setScrollPositionAndSearchVal = async (): Promise<void> => {
-      if (location.state) {
-        setSearchVal(location.state.searchVal);
-        await wait(0);
-        if (ref.current) ref.current.scrollTop = location.state.scrollTop || 0;
-      }
-    };
-    resizeToFitPage(ref);
-    setScrollPositionAndSearchVal();
-  }, [ref, location.state]);
-  useEffect(() => {
-    if (!searchVal) resizeToFitPage(ref);
-  }, [searchVal]);
   const categories = directory.categories
     ? Object.keys(directory.categories).map(key => directory.categories[key])
     : null;
@@ -64,6 +46,24 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
   const handleClick = (): void => {
     location.state = { scrollTop: ref.current?.scrollTop as number, searchVal };
   };
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (searchVal) setDirty(true);
+  }, [searchVal]);
+  useEffect(() => {
+    const setScrollPositionAndSearchVal = async (): Promise<void> => {
+      if (location.state) {
+        setSearchVal(location.state.searchVal);
+        await wait(0);
+        if (ref.current) ref.current.scrollTop = location.state.scrollTop || 0;
+      }
+    };
+    resizeToFitPage(ref);
+    setScrollPositionAndSearchVal();
+  }, [ref, location.state]);
+  useEffect(() => {
+    if (!searchVal) resizeToFitPage(ref);
+  }, [searchVal, categories]);
   return (
     <div className="shop-page" ref={ref}>
       <SearchBar output={setSearchVal} value={searchVal} />
@@ -72,9 +72,7 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
           <>
             {filteredMerchants.length > 0 ? (
               <>
-                <div className="shop-page__section-header">
-                  {searchVal ? <>Search Results</> : <>Shop {filteredMerchants?.length} Brands</>}
-                </div>
+                <div className="shop-page__section-header">Search Results</div>
                 {filteredMerchants.map(merchant => (
                   <Link
                     to={{
@@ -104,7 +102,12 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
                   <React.Fragment key={category.displayName}>
                     <div className="shop-page__section-header">
                       {category.displayName}
-                      <div className="shop-page__section-header--action">See All</div>
+                      <Link
+                        className="shop-page__section-header--action"
+                        to={{ pathname: `/category/${category.displayName}`, state: { curation: category } }}
+                      >
+                        See All
+                      </Link>
                     </div>
                     {merchants
                       .filter(merchant => category.merchants.includes(merchant.displayName))
@@ -133,21 +136,28 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
                 ))}
               </>
             )}
+            <div className="shop-page__section-header shop-page__section-header--large">
+              Categories
+              <Link
+                className="shop-page__section-header--action"
+                to={{ pathname: '/category/all', state: { curation: null, category: null } }}
+              >
+                See All Brands
+              </Link>
+            </div>
             {categories && categories.length > 0 && (
-              <>
-                <div className="shop-page__section-header shop-page__section-header--large">
-                  Categories
-                  <div className="shop-page__section-header--action">See All Brands</div>
-                </div>
-                <div className="shop-page__categories">
-                  {categories.map(category => (
-                    <div className="shop-page__categories__item" key={category.displayName}>
-                      <div className="shop-page__categories__item__icon">{category.emoji}</div>
-                      {category.displayName}
-                    </div>
-                  ))}
-                </div>
-              </>
+              <div className="shop-page__categories">
+                {categories.map(category => (
+                  <Link
+                    className="shop-page__categories__item"
+                    key={category.displayName}
+                    to={{ pathname: `/category/${category.emoji}`, state: { category } }}
+                  >
+                    <div className="shop-page__categories__item__icon">{category.emoji}</div>
+                    {category.displayName}
+                  </Link>
+                ))}
+              </div>
             )}
           </>
         )}

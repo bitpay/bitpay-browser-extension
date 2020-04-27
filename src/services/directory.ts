@@ -4,14 +4,14 @@ export interface DirectoryCategory {
   tags: string[];
 }
 
-export interface DirectoryTopLevelCategory {
+export interface DirectoryCuration {
   displayName: string;
   merchants: string[];
 }
 
 export interface Directory {
   curated: {
-    [category: string]: DirectoryTopLevelCategory;
+    [category: string]: DirectoryCuration;
   };
   categories: {
     [category: string]: DirectoryCategory;

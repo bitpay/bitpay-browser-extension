@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MemoryRouter as Router, Route, Switch } from 'react-router-dom';
+import Category from './pages/category/category';
 import Brand from './pages/brand/brand';
 import Card from './pages/card/card';
 import Cards from './pages/cards/cards';
@@ -147,6 +148,10 @@ const Popup: React.FC = () => {
                   {...props}
                 />
               )}
+            />
+            <Route
+              path="/category/:category"
+              render={(props): JSX.Element => <Category merchants={merchants} {...props} />}
             />
             <Route path="/brand/:brand" component={Brand} />
             <Route
