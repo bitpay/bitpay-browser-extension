@@ -116,7 +116,7 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
                           category.merchants.indexOf(a.displayName) - category.merchants.indexOf(b.displayName)
                       )
                       .map((merchant, index) => (
-                        <>
+                        <React.Fragment key={merchant.name}>
                           {index < 3 && (
                             <motion.div
                               custom={index}
@@ -137,7 +137,7 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
                               </Link>
                             </motion.div>
                           )}
-                        </>
+                        </React.Fragment>
                       ))}
                     <div className="shop-page__divider" />
                   </React.Fragment>
