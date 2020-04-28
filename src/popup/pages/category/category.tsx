@@ -32,12 +32,12 @@ const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location
   const { category, curation } = location.state as { category?: DirectoryCategory; curation?: DirectoryCuration };
   const [searchVal, setSearchVal] = useState('' as string);
   const [isDirty, setDirty] = useState(false);
-  const baseSet = ((): Merchant[] => {
+  const baseSet = (): Merchant[] => {
     if (curation) return merchants.filter(merchant => curation.merchants.includes(merchant.displayName));
     if (category) return merchants.filter(merchant => category.tags.some(tag => merchant.tags.includes(tag)));
     return merchants;
-  })();
-  const renderList = baseSet.filter(merchant =>
+  };
+  const renderList = baseSet().filter(merchant =>
     searchVal
       ? merchant.name.toLowerCase().includes(searchVal.toLowerCase()) ||
         merchant.tags.find(tag => tag.includes(searchVal.toLowerCase()))
