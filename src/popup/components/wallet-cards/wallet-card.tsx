@@ -30,19 +30,19 @@ const WalletCard: React.FC<{
       {type === 'pocket' ? (
         <div className="wallet-card">
           <div className="wallet-card__card" style={cardBackgroundStyle}>
-            <img src={cardConfig.logo} alt={`${cardConfig.displayName} logo`} />
+            <img id="pocketCardLogo" src={cardConfig.logo} alt={`${cardConfig.displayName} logo`} />
             <div className="wallet-card__card__balance">
               {formatCurrency(totalBalance, cardConfig.currency, { customPrecision: 'minimal' })}
             </div>
           </div>
           <div className="wallet-card__slot">
-            <img src="../../assets/slot.svg" alt="slot" />
+            <img id="pocketCardSlot" src="../../assets/slot.svg" alt="slot" />
           </div>
         </div>
       ) : (
         <div className={`wallet-card--${type}`} style={type === 'brand-box' ? cardBackgroundStyle : {}}>
           {type === 'brand-box' ? (
-            <img src={cardConfig.logo} alt={`${cardConfig.displayName} logo`} />
+            <img id="brandBoxCardLogo" src={cardConfig.logo} alt={`${cardConfig.displayName} logo`} />
           ) : (
             <div className="wallet-card--card-box__text">
               <div className="wallet-card--card-box__text__label">Gift Card</div>
