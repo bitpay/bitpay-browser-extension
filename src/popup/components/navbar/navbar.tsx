@@ -29,7 +29,7 @@ const Navbar: React.FC<RouteComponentProps> = ({ history, location }) => {
   const close = (): void => {
     browser.runtime.sendMessage({ name: 'POPUP_CLOSED' });
   };
-  const routesWithBackButton = ['/brand', '/card', '/amount', '/payment', '/settings/'];
+  const routesWithBackButton = ['/brand', '/card', '/amount', '/payment', '/settings/', '/category'];
   const showBackButton = routesWithBackButton.some(route => location.pathname.startsWith(route));
   return (
     <div className="header-bar fixed">

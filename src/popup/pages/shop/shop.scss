@@ -22,6 +22,25 @@
       font-size: 12px;
       color: $blue;
     }
+
+    &--emoji {
+      justify-content: flex-start;
+      transform: translateY(-2px);
+      margin-right: 4px;
+      font-size: 15px;
+      color: black;
+    }
+
+    &--large {
+      font-weight: $bold;
+      font-size: 16px;
+      color: $fossil;
+    }
+
+    &--wrapper {
+      display: flex;
+      align-items: center;
+    }
   }
 
   &__divider {
@@ -29,6 +48,69 @@
     height: 1px;
     width: 90%;
     margin: 24px auto;
+  }
+
+  &__categories {
+    $border-color: rgba(0, 0, 0, 0.05);
+    $input-border: 1px solid $border-color;
+    $left-padding: 16px;
+    $cell-height: 52px;
+
+    &__item {
+      font-weight: $medium;
+      font-size: 14px;
+      color: $blue;
+      display: flex;
+      align-items: center;
+      position: relative;
+      padding: 0 $left-padding + 2;
+      width: 100%;
+      text-align: left;
+      height: $cell-height;
+
+      &:not(:last-child) {
+        &:after {
+          content: "";
+          height: 1px;
+          background: $border-color;
+          bottom: 0;
+          right: 0;
+          left: calc(#{$left-padding});
+          position: absolute;
+          transition: all 250ms linear;
+        }
+      }
+
+      &:before {
+        content: "";
+        background: darken(#f8fbfd, 1%);
+        top: 0;
+        bottom: 0;
+        right: -10px;
+        left: -10px;
+        position: absolute;
+        z-index: -1;
+        transition: all 250ms ease-in-out;
+        opacity: 0;
+      }
+
+      &:hover {
+        &:before {
+          opacity: 1;
+        }
+        &:not(:last-child) {
+          &:after {
+            transform: scaleX(1.25);
+          }
+        }
+      }
+
+      &__icon {
+        font-size: 18px;
+        margin-right: 10px;
+        transform: translateY(-1px);
+      }
+    }
   }
 
   .zero-state {

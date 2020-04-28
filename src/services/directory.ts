@@ -1,3 +1,23 @@
+export interface DirectoryCategory {
+  displayName: string;
+  emoji: string;
+  tags: string[];
+}
+
+export interface DirectoryCuration {
+  displayName: string;
+  merchants: string[];
+}
+
+export interface Directory {
+  curated: {
+    [category: string]: DirectoryCuration;
+  };
+  categories: {
+    [category: string]: DirectoryCategory;
+  };
+}
+
 export interface DirectIntegrationApiObject {
   displayName: string;
   caption: string;
@@ -34,4 +54,8 @@ export function fetchDirectIntegrations(): Promise<DirectIntegration[]> {
   return fetch(`${process.env.API_ORIGIN}/merchant-directory/integrations`)
     .then(res => res.json())
     .then((merchantMap: DirectIntegrationMap) => getDirectIntegrations(merchantMap));
+}
+
+export function fetchDirectory(): Promise<Directory> {
+  return fetch(`${process.env.API_ORIGIN}/merchant-directory/directory`).then(res => res.json());
 }

@@ -25,7 +25,7 @@ const animateLogo = {
       type: 'spring',
       damping: 30,
       stiffness: 100,
-      mass: 0.5
+      mass: 0.75
     }
   },
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
