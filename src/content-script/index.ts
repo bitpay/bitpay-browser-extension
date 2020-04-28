@@ -22,15 +22,17 @@ function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string
   `;
   const outerFrameStyles = `
     ${innerFrameStyles}
+    clip: auto!important;
+    display: block!important;
     width: ${FrameDimensions.width}px;
     height: ${FrameDimensions.collapsedHeight}px;
-    position: fixed;
+    opacity: 1!important;
+    position: fixed!important;
     top: 10px;
     right: 10px;
-    display: block;
     box-shadow: 0 0 14px 4px rgba(0,0,0,0.1); 
     border-radius: 8px;
-    z-index: 2147483647;
+    z-index: 2147483647!important;
     transition: height 250ms ease 0s;
   `;
   return { outerFrameStyles, innerFrameStyles };
