@@ -104,7 +104,11 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
                       {category.displayName}
                       <Link
                         className="shop-page__section-header--action"
-                        to={{ pathname: `/category/${category.displayName}`, state: { curation: category } }}
+                        to={{
+                          pathname: `/category/${category.displayName}`,
+                          state: { curation: category }
+                        }}
+                        onClick={handleClick}
                       >
                         See All
                       </Link>
@@ -148,7 +152,11 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
               Categories
               <Link
                 className="shop-page__section-header--action"
-                to={{ pathname: '/category/all', state: { curation: null, category: null } }}
+                to={{
+                  pathname: '/category/all',
+                  state: { curation: null, category: null }
+                }}
+                onClick={handleClick}
               >
                 See All Brands
               </Link>
@@ -159,7 +167,11 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
                   <Link
                     className="shop-page__categories__item"
                     key={category.displayName}
-                    to={{ pathname: `/category/${category.emoji}`, state: { category } }}
+                    to={{
+                      pathname: `/category/${category.emoji}`,
+                      state: { category }
+                    }}
+                    onClick={handleClick}
                   >
                     <div className="shop-page__categories__item__icon">{category.emoji}</div>
                     {category.displayName}
