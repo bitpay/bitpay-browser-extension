@@ -100,7 +100,11 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
                       </Link>
                     </div>
                     {merchants
-                      .filter(merchant => category.merchants.includes(merchant.displayName))
+                      .filter(
+                        merchant =>
+                          category.merchants.includes(merchant.displayName) ||
+                          (category.displayName === 'Popular Brands' && merchant.featured)
+                      )
                       .sort(
                         (a: Merchant, b: Merchant) =>
                           category.merchants.indexOf(a.displayName) - category.merchants.indexOf(b.displayName)
