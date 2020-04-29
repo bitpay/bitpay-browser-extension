@@ -97,8 +97,7 @@ function dragElementFunc(dragEle: HTMLElement): void {
   let pos4 = 0;
   const windowInnerHeight = window.innerHeight;
   const windowInnerWidth = window.innerWidth;
-  const paddingX = 75;
-  const paddingY = 10;
+  const padding = 10;
   let rect: ClientRect;
   const viewport = {
     bottom: 0,
@@ -120,49 +119,62 @@ function dragElementFunc(dragEle: HTMLElement): void {
 
     const newLeft = dragEle.offsetLeft - pos1;
     const newTop = dragEle.offsetTop - pos2;
-
     const leftBound = newLeft < viewport.left;
     const topBound = newTop < viewport.top;
     const rightBound = newLeft + rect.width > viewport.right;
     const bottomBound = newTop + rect.height > viewport.bottom;
+
     if (leftBound || topBound || rightBound || bottomBound) {
-      if (rightBound && !topBound && !bottomBound) {
+      if (bottomBound) {
+        const left = leftBound || rightBound ? dragEle.style.left : newLeft;
         browser.runtime.sendMessage({
           name: 'RESET_FRAME_POSITION',
-          top: newTop,
-          left: windowInnerWidth - FrameDimensions.width - 10
+          top: windowInnerHeight - rect.height - padding,
+          left
         });
-        dragEle.style.top = `${newTop}px`;
-        dragEle.style.left = `${window.innerWidth - 235}px`;
+        dragEle.style.top = `calc(${windowInnerHeight} - ${rect.height} - ${padding})px`;
+        dragEle.style.left = `${left}px`;
       }
     } else {
       // set the element's new position:
-      browser.runtime.sendMessage({ name: 'RESET_FRAME_POSITION', top: newTop, left: newLeft - paddingX });
+      browser.runtime.sendMessage({ name: 'RESET_FRAME_POSITION', top: newTop, left: newLeft });
       dragEle.style.top = `${newTop}px`;
       dragEle.style.left = `${newLeft}px`;
     }
   }
 
   function closeDragElement(): void {
+    dragEle.style.height = `${FrameDimensions.collapsedHeight}px`;
+    dragEle.style.width = '160px';
+    if (dragEle.style.left) {
+      dragEle.style.left = `calc(${dragEle.style.left} + 75px)`;
+    } else {
+      dragEle.style.right = '75px';
+    }
     // stop moving when mouse button is released:
     document.onmouseup = null;
     document.onmousemove = null;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-function-return-type
-  function dragMouseDown(e: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function dragMouseDown(e: any): void {
+    if (iframe) {
+      dragEle.style.height = iframe.style.height;
+      dragEle.style.width = iframe.style.width;
+      dragEle.style.right = iframe.style.right;
+      dragEle.style.left = iframe.style.left;
+    }
     // eslint-disable-next-line no-param-reassign
     e = e || window.event;
     e.preventDefault();
     // get the mouse cursor position at startup:
     pos3 = e.clientX;
     pos4 = e.clientY;
-
     rect = dragEle.getBoundingClientRect();
-    viewport.bottom = windowInnerHeight - paddingY;
-    viewport.left = paddingX;
-    viewport.right = windowInnerWidth - paddingX;
-    viewport.top = paddingY;
+    viewport.bottom = windowInnerHeight - padding;
+    viewport.left = padding;
+    viewport.right = windowInnerWidth - padding;
+    viewport.top = padding;
     document.onmouseup = closeDragElement;
     // call a function whenever the cursor moves:
     document.onmousemove = elementDrag;
