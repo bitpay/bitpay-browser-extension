@@ -9,21 +9,7 @@ import { Merchant } from '../../../services/merchant';
 import { Directory } from '../../../services/directory';
 import { resizeToFitPage } from '../../../services/frame';
 import { wait } from '../../../services/utils';
-
-const listAnimation = {
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  base: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      type: 'spring',
-      damping: 20,
-      stiffness: 250,
-      delay: i * 0.04
-    }
-  }),
-  delta: { opacity: 0, y: -32 }
-};
+import { listAnimation } from '../../../services/animations';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: any }> = ({
@@ -31,6 +17,7 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
   merchants,
   location
 }) => {
+  const ref = useRef<HTMLDivElement>(null);
   const [searchVal, setSearchVal] = useState('' as string);
   const [isDirty, setDirty] = useState(false);
   const categories = directory.categories
@@ -46,7 +33,6 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
   const handleClick = (): void => {
     location.state = { scrollTop: ref.current?.scrollTop as number, searchVal };
   };
-  const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (searchVal) setDirty(true);
   }, [searchVal]);
