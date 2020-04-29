@@ -29,7 +29,7 @@ import Balance from './pages/card/balance/balance';
 import { BitpayUser } from '../services/bitpay-id';
 import Account from './pages/settings/account/account';
 import { refreshMerchantCache } from '../services/browser';
-import { Directory } from '../services/directory';
+import { Directory, saturateDirectory, fetchDirectory } from '../services/directory';
 import './styles.scss';
 
 const Popup: React.FC = () => {
@@ -57,7 +57,8 @@ const Popup: React.FC = () => {
   useEffect(() => {
     if (Date.now() - popupLaunchTime.current < 1000) return;
     const updateMerchants = async (): Promise<void> => {
-      const newMerchants = await fetchMerchants();
+      const [newDirectory, newMerchants] = await Promise.all([fetchDirectory(), fetchMerchants()]);
+      setDirectory(saturateDirectory(newDirectory, newMerchants));
       setMerchants(newMerchants);
       setSupportedMerchant(getBitPayMerchantFromUrl(parentUrl.current, newMerchants));
       const newSupportedGiftCards = await get<CardConfig[]>('supportedGiftCards');
@@ -111,7 +112,7 @@ const Popup: React.FC = () => {
       setInitialEntries(entries);
       setInitialIndex(entries.length - 1);
       setAmount(orderTotal);
-      setDirectory(directoryIndex);
+      setDirectory(saturateDirectory(directoryIndex, allMerchants));
       setMerchants(allMerchants);
       setSupportedMerchant(merchant);
       setSupportedGiftCards(allSupportedGiftCards || []);
