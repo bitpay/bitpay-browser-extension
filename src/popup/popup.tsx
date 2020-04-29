@@ -29,7 +29,7 @@ import Balance from './pages/card/balance/balance';
 import { BitpayUser } from '../services/bitpay-id';
 import Account from './pages/settings/account/account';
 import { refreshMerchantCache } from '../services/browser';
-import { fetchDirectory, Directory } from '../services/directory';
+import { Directory } from '../services/directory';
 import './styles.scss';
 
 const Popup: React.FC = () => {
@@ -53,14 +53,6 @@ const Popup: React.FC = () => {
     const newCards = await updateCard(card, purchasedGiftCards);
     setPurchasedGiftCards(newCards);
   };
-
-  useEffect(() => {
-    const updateDirectory = async (): Promise<void> => {
-      const directoryFetch = await fetchDirectory().catch();
-      return directoryFetch && setDirectory(directoryFetch);
-    };
-    updateDirectory();
-  }, []);
 
   useEffect(() => {
     if (Date.now() - popupLaunchTime.current < 1000) return;
@@ -97,6 +89,7 @@ const Popup: React.FC = () => {
   useEffect(() => {
     const getStartPage = async (): Promise<void> => {
       const [
+        directoryIndex,
         allMerchants,
         allSupportedGiftCards,
         allPurchasedGiftCards,
@@ -104,6 +97,7 @@ const Popup: React.FC = () => {
         bitpayUser,
         extensionClientId
       ] = await Promise.all([
+        get<Directory>('directory'),
         fetchCachedMerchants(),
         get<CardConfig[]>('supportedGiftCards'),
         get<GiftCard[]>('purchasedGiftCards'),
@@ -117,6 +111,7 @@ const Popup: React.FC = () => {
       setInitialEntries(entries);
       setInitialIndex(entries.length - 1);
       setAmount(orderTotal);
+      setDirectory(directoryIndex);
       setMerchants(allMerchants);
       setSupportedMerchant(merchant);
       setSupportedGiftCards(allSupportedGiftCards || []);
