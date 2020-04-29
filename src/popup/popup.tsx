@@ -56,11 +56,11 @@ const Popup: React.FC = () => {
 
   useEffect(() => {
     const updateDirectory = async (): Promise<void> => {
-      const directoryFetch = await fetchDirectory().catch();
-      return directoryFetch && setDirectory(directoryFetch);
+      const saturate = await fetchDirectory(merchants).catch();
+      return setDirectory(saturate);
     };
     updateDirectory();
-  }, []);
+  }, [merchants]);
 
   useEffect(() => {
     if (Date.now() - popupLaunchTime.current < 1000) return;
