@@ -1,5 +1,3 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable indent */
 import React, { useRef, useState, useEffect } from 'react';
 import './category.scss';
 import { Link } from 'react-router-dom';
@@ -51,6 +49,7 @@ const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location
         clearTimeout(timer);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
     if (searchVal) setDirty(true);
@@ -58,14 +57,15 @@ const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location
   useEffect(() => {
     const setScrollPositionAndSearchVal = async (): Promise<void> => {
       if (location.state) {
-        setSearchVal(location.state.searchVal);
-        await wait(renderList.length > 24 ? 401 : 0);
+        if (location.state.searchVal) setSearchVal(location.state.searchVal);
+        await wait(renderList.length > 24 ? 400 : 0);
         if (scrollRef.current) scrollRef.current.scrollTop = location.state.scrollTop || 0;
       }
     };
     resizeToFitPage(contentRef);
     setScrollPositionAndSearchVal();
-  }, [scrollRef, contentRef, location.state, renderList]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scrollRef, contentRef, location.state]);
   useEffect(() => {
     resizeToFitPage(contentRef, resizeSwitch(renderList.length));
   }, [searchVal, renderList]);

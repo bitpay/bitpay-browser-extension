@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './shop.scss';
-
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SearchBar from '../../components/search-bar/search-bar';
