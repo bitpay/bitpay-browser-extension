@@ -87,7 +87,7 @@ export function getMerchants(
     icon: cardConfig.icon,
     link: cardConfig.website,
     displayLink: cardConfig.website,
-    tags: [],
+    tags: cardConfig.tags || [],
     domains: [cardConfig.website].concat(cardConfig.supportedUrls || []),
     theme: cardConfig.brandColor || cardConfig.logoBackgroundColor,
     instructions: cardConfig.description,
