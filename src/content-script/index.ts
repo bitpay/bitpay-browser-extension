@@ -33,11 +33,7 @@ function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string
     right: 10px;
     box-shadow: 0 0 14px 4px rgba(0,0,0,0.1); 
     border-radius: 8px;
-<<<<<<< Updated upstream
-    z-index: 2147483647!important;
-=======
     z-index: ${FrameDimensions.zIndex};
->>>>>>> Stashed changes
     transition: height 250ms ease 0s;
   `;
   const dragElementStyles = `
