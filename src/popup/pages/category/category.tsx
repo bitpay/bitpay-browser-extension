@@ -14,7 +14,8 @@ import { listAnimation } from '../../../services/animations';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location, merchants }) => {
-  const ref = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const { category, curation } = location.state as { category?: DirectoryCategory; curation?: DirectoryCuration };
   const [searchVal, setSearchVal] = useState('' as string);
   const [isDirty, setDirty] = useState(false);
@@ -31,7 +32,7 @@ const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location
       : baseSet
   );
   const handleClick = (): void => {
-    location.state = { scrollTop: ref.current?.scrollTop as number, searchVal, category, curation };
+    location.state = { scrollTop: scrollRef.current?.scrollTop as number, searchVal, category, curation };
   };
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
@@ -53,20 +54,20 @@ const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location
     const setScrollPositionAndSearchVal = async (): Promise<void> => {
       if (location.state) {
         setSearchVal(location.state.searchVal);
-        await wait(renderList.length > 24 ? 400 : 0);
-        if (ref.current) ref.current.scrollTop = location.state.scrollTop || 0;
+        await wait(renderList.length > 24 ? 401 : 0);
+        if (scrollRef.current) scrollRef.current.scrollTop = location.state.scrollTop || 0;
       }
     };
-    resizeToFitPage(ref);
+    resizeToFitPage(contentRef);
     setScrollPositionAndSearchVal();
-  }, [ref, location.state]);
+  }, [scrollRef, contentRef, location.state, renderList]);
   useEffect(() => {
-    resizeToFitPage(ref, renderList.length > 3 ? 100 : 0);
+    resizeToFitPage(contentRef, renderList.length > 3 ? 100 : 0);
   }, [searchVal, renderList]);
   return (
-    <div className="category-page">
+    <div className="category-page" ref={scrollRef}>
       <SearchBar output={setSearchVal} value={searchVal} />
-      <div className="shop-page__content" ref={ref}>
+      <div className="shop-page__content" ref={contentRef}>
         {loaded ? (
           <>
             {renderList.length > 0 ? (
