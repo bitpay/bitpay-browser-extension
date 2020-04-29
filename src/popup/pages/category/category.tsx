@@ -21,8 +21,8 @@ const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location
   const [isDirty, setDirty] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const baseSet = ((): Merchant[] => {
-    if (curation) return merchants.filter(merchant => curation.merchants.includes(merchant.displayName));
-    if (category) return merchants.filter(merchant => category.tags.some(tag => merchant.tags.includes(tag)));
+    if (curation) return curation.availableMerchants;
+    if (category) return category.availableMerchants;
     return merchants;
   })();
   const renderList = baseSet.filter(merchant =>
@@ -31,6 +31,11 @@ const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location
         merchant.tags.find(tag => tag.includes(searchVal.toLowerCase()))
       : baseSet
   );
+  const resizeSwitch = (length: number): number => {
+    if (length > 3) return 100;
+    if (length > 2) return 50;
+    return 0;
+  };
   const handleClick = (): void => {
     location.state = { scrollTop: scrollRef.current?.scrollTop as number, searchVal, category, curation };
   };
@@ -62,7 +67,7 @@ const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location
     setScrollPositionAndSearchVal();
   }, [scrollRef, contentRef, location.state, renderList]);
   useEffect(() => {
-    resizeToFitPage(contentRef, renderList.length > 3 ? 100 : 0);
+    resizeToFitPage(contentRef, resizeSwitch(renderList.length));
   }, [searchVal, renderList]);
   return (
     <div className="category-page" ref={scrollRef}>

@@ -20,10 +20,8 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
   const ref = useRef<HTMLDivElement>(null);
   const [searchVal, setSearchVal] = useState('' as string);
   const [isDirty, setDirty] = useState(false);
-  const categories = directory.categories
-    ? Object.keys(directory.categories).map(key => directory.categories[key])
-    : null;
-  const curation = directory.curated ? Object.keys(directory.curated).map(key => directory.curated[key]) : null;
+  const categories = directory.categories ? Object.keys(directory.categories) : null;
+  const curation = directory.curated ? Object.keys(directory.curated) : null;
   const filteredMerchants = merchants.filter(
     merchant =>
       searchVal &&
@@ -49,7 +47,7 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
   }, [ref, location.state]);
   useEffect(() => {
     if (!searchVal) resizeToFitPage(ref);
-  }, [searchVal, categories]);
+  }, [searchVal, directory]);
   return (
     <div className="shop-page" ref={ref}>
       <SearchBar output={setSearchVal} value={searchVal} />
@@ -82,92 +80,86 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
           </>
         ) : (
           <>
-            {curation && curation.length > 0 && (
+            {directory && (
               <>
-                {curation.map(category => (
-                  <React.Fragment key={category.displayName}>
-                    <div className="shop-page__section-header">
-                      {category.displayName}
-                      <Link
-                        className="shop-page__section-header--action"
-                        to={{
-                          pathname: `/category/${category.displayName}`,
-                          state: { curation: category }
-                        }}
-                        onClick={handleClick}
-                      >
-                        See All
-                      </Link>
-                    </div>
-                    {merchants
-                      .filter(
-                        merchant =>
-                          category.merchants.includes(merchant.displayName) ||
-                          (category.displayName === 'Popular Brands' && merchant.featured)
-                      )
-                      .sort(
-                        (a: Merchant, b: Merchant) =>
-                          category.merchants.indexOf(a.displayName) - category.merchants.indexOf(b.displayName)
-                      )
-                      .map((merchant, index) => (
-                        <React.Fragment key={merchant.name}>
-                          {index < 3 && (
-                            <motion.div
-                              custom={index}
-                              initial={isDirty ? 'base' : 'delta'}
-                              animate="base"
-                              variants={listAnimation}
-                              key={merchant.name}
-                            >
-                              <Link
-                                to={{
-                                  pathname: `/brand/${merchant.name}`,
-                                  state: { merchant }
-                                }}
+                {curation && curation.length > 0 && (
+                  <>
+                    {curation.map(category => (
+                      <React.Fragment key={category}>
+                        <div className="shop-page__section-header">
+                          {directory.curated[category].displayName}
+                          <Link
+                            className="shop-page__section-header--action"
+                            to={{
+                              pathname: `/category/${directory.curated[category].displayName}`,
+                              state: { curation: directory.curated[category] }
+                            }}
+                            onClick={handleClick}
+                          >
+                            See All
+                          </Link>
+                        </div>
+                        {directory.curated[category].availableMerchants.map((merchant, index) => (
+                          <React.Fragment key={merchant.name}>
+                            {index < 3 && (
+                              <motion.div
+                                custom={index}
+                                initial={isDirty ? 'base' : 'delta'}
+                                animate="base"
+                                variants={listAnimation}
                                 key={merchant.name}
-                                onClick={handleClick}
                               >
-                                <MerchantCell key={merchant.name} merchant={merchant} />
-                              </Link>
-                            </motion.div>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    <div className="shop-page__divider" />
-                  </React.Fragment>
-                ))}
-              </>
-            )}
-            <div className="shop-page__section-header shop-page__section-header--large">
-              Categories
-              <Link
-                className="shop-page__section-header--action"
-                to={{
-                  pathname: '/category/all',
-                  state: { curation: null, category: null }
-                }}
-                onClick={handleClick}
-              >
-                See All Brands
-              </Link>
-            </div>
-            {categories && categories.length > 0 && (
-              <div className="shop-page__categories">
-                {categories.map(category => (
+                                <Link
+                                  to={{
+                                    pathname: `/brand/${merchant.name}`,
+                                    state: { merchant }
+                                  }}
+                                  key={merchant.name}
+                                  onClick={handleClick}
+                                >
+                                  <MerchantCell key={merchant.name} merchant={merchant} />
+                                </Link>
+                              </motion.div>
+                            )}
+                          </React.Fragment>
+                        ))}
+                        <div className="shop-page__divider" />
+                      </React.Fragment>
+                    ))}
+                  </>
+                )}
+                <div className="shop-page__section-header shop-page__section-header--large">
+                  Categories
                   <Link
-                    className="shop-page__categories__item"
-                    key={category.displayName}
+                    className="shop-page__section-header--action"
                     to={{
-                      pathname: `/category/${category.emoji}`,
-                      state: { category }
+                      pathname: '/category/all',
+                      state: { curation: null, category: null }
                     }}
                     onClick={handleClick}
                   >
-                    <div className="shop-page__categories__item__icon">{category.emoji}</div>
-                    {category.displayName}
+                    See All Brands
                   </Link>
-                ))}
-              </div>
+                </div>
+                {categories && categories.length > 0 && (
+                  <div className="shop-page__categories">
+                    {categories.map(category => (
+                      <Link
+                        className="shop-page__categories__item"
+                        key={category}
+                        to={{
+                          pathname: `/category/${directory.categories[category].emoji}`,
+                          state: { category: directory.categories[category] }
+                        }}
+                        onClick={handleClick}
+                      >
+                        <div className="shop-page__categories__item__icon">{directory.categories[category].emoji}</div>
+                        {directory.categories[category].displayName}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </>
         )}
