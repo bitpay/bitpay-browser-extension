@@ -101,8 +101,6 @@ export const saturateDirectory = (directoryApiObject: DirectoryApiObject, mercha
   return directory;
 };
 
-export async function fetchDirectory(merchants: Merchant[]): Promise<Directory> {
-  const res = await fetch(`${process.env.API_ORIGIN}/merchant-directory/directory`);
-  const directoryApiObject = await res.json();
-  return saturateDirectory(directoryApiObject, merchants);
+export async function fetchDirectory(): Promise<Directory> {
+  return fetch(`${process.env.API_ORIGIN}/merchant-directory/directory`).then(res => res.json());
 }
