@@ -31,12 +31,12 @@ const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location
       : baseSet
   );
   const handleClick = (): void => {
-    location.state = { scrollTop: ref.current?.scrollTop as number, searchVal };
+    location.state = { scrollTop: ref.current?.scrollTop as number, searchVal, category, curation };
   };
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
     if (renderList.length > 24) {
-      timer = setTimeout(() => setLoaded(true), 500);
+      timer = setTimeout(() => setLoaded(true), 400);
     } else {
       setLoaded(true);
     }
@@ -53,7 +53,7 @@ const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location
     const setScrollPositionAndSearchVal = async (): Promise<void> => {
       if (location.state) {
         setSearchVal(location.state.searchVal);
-        await wait(0);
+        await wait(renderList.length > 24 ? 400 : 0);
         if (ref.current) ref.current.scrollTop = location.state.scrollTop || 0;
       }
     };
