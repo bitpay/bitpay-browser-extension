@@ -61,12 +61,12 @@ const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location
     setScrollPositionAndSearchVal();
   }, [ref, location.state]);
   useEffect(() => {
-    resizeToFitPage(ref);
+    resizeToFitPage(ref, renderList.length > 3 ? 100 : 0);
   }, [searchVal, renderList]);
   return (
-    <div className="category-page" ref={ref}>
+    <div className="category-page">
       <SearchBar output={setSearchVal} value={searchVal} />
-      <div className="shop-page__content">
+      <div className="shop-page__content" ref={ref}>
         {loaded ? (
           <>
             {renderList.length > 0 ? (
