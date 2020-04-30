@@ -21,7 +21,7 @@
     "build": "yarn run build:chrome && yarn run build:firefox && yarn run build:opera",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "watch": "jest --watch",
+    "test:watch": "jest --watch",
     "test": "jest"
   },
   "dependencies": {
