@@ -5,7 +5,8 @@ export enum FrameDimensions {
   height = 350,
   width = 300,
   maxFrameHeight = 600,
-  minExpandedFrameHeight = 200
+  minExpandedFrameHeight = 200,
+  zIndex = 2147483647
 }
 
 export const resizeFrame = (height: number): void => {
