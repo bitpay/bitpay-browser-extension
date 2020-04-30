@@ -86,6 +86,7 @@ const Amount: React.FC<RouteComponentProps & {
   };
   const changeAmount = (delta: number): void => {
     hasFixedDenoms ? changeFixedAmount(delta) : changeVariableAmount(delta);
+    setInputDirty(false);
     focusInput();
   };
   const shakeInput = (): void => {
