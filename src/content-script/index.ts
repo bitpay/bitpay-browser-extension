@@ -34,7 +34,7 @@ function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string
     box-shadow: 0 0 14px 4px rgba(0,0,0,0.1); 
     border-radius: 8px;
     z-index: ${FrameDimensions.zIndex} !important;
-    transition: height 250ms ease 0s;
+    transition: height 250ms ease 0s, boxShadow 250ms ease-in-out, transform 250ms cubic-bezier(.25,.8,.25,1);
   `;
   const dragElementStyles = `
     width: 160px; 
@@ -43,7 +43,7 @@ function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string
     top: 10px;
     right: 75px;
     display: block;
-    cursor: move;
+    cursor: grab;
     z-index: ${FrameDimensions.zIndex + 10};
    `;
   return { outerFrameStyles, innerFrameStyles, dragElementStyles };
@@ -159,11 +159,19 @@ function dragElementFunc(dragEle: HTMLElement): void {
   function closeDragElement(): void {
     dragEle.style.height = `${FrameDimensions.collapsedHeight}px`;
     dragEle.style.width = '160px';
+    dragEle.style.cursor = 'grab';
+
     if (dragEle.style.left) {
       dragEle.style.left = `calc(${dragEle.style.left} + 75px)`;
     } else {
       dragEle.style.right = '75px';
     }
+
+    if(iframe) {
+      iframe.style.transform = 'translate3d(0px, 0px, 0px)';
+      iframe.style.boxShadow = '0 0 14px 4px rgba(0,0,0,0.1)';
+    }
+
     // stop moving when mouse button is released:
     document.onmouseup = null;
     document.onmousemove = null;
@@ -176,6 +184,10 @@ function dragElementFunc(dragEle: HTMLElement): void {
       dragEle.style.width = iframe.style.width;
       dragEle.style.right = iframe.style.right;
       dragEle.style.left = iframe.style.left;
+      dragEle.style.cursor = 'grabbing';
+      iframe.style.transform = 'translate3d(0px, -2px, 0px) scale(1.01)';
+      iframe.style.boxShadow = '0 8px 14px 5px rgba(0,0,0,0.12)'
+
     }
     // eslint-disable-next-line no-param-reassign
     e = e || window.event;
