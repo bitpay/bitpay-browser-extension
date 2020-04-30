@@ -32,7 +32,7 @@ function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string
     position: fixed!important;
     top: 10px;
     right: 10px;
-    box-shadow: 0 0 14px 4px rgba(0,0,0,0.1); 
+    box-shadow: 0 0 12px 4px rgba(0,0,0,0.1); 
     border-radius: 8px;
     z-index: ${FrameDimensions.zIndex} !important;
     transition: height 250ms ease 0s, box-shadow 250ms ease-in-out, transform 250ms cubic-bezier(.25,.8,.25,1);
