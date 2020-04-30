@@ -1,7 +1,7 @@
 import { CardConfig } from './gift-card.types';
 import { sortByDisplayName, fetchAvailableCards, addToSupportedGiftCards } from './gift-card';
 import { removeProtocolAndWww } from './utils';
-import { DirectIntegration, fetchDirectIntegrations } from './directory';
+import { DirectIntegration, fetchDirectIntegrations, fetchDirectory, Directory } from './directory';
 import { get, set } from './storage';
 import { currencySymbols } from './currency';
 import { BitpayUser } from './bitpay-id';
@@ -87,7 +87,7 @@ export function getMerchants(
     icon: cardConfig.icon,
     link: cardConfig.website,
     displayLink: cardConfig.website,
-    tags: [],
+    tags: cardConfig.tags || [],
     domains: [cardConfig.website].concat(cardConfig.supportedUrls || []),
     theme: cardConfig.brandColor || cardConfig.logoBackgroundColor,
     instructions: cardConfig.description,
@@ -106,13 +106,15 @@ export async function fetchCachedMerchants(): Promise<Merchant[]> {
 
 export async function fetchMerchants(): Promise<Merchant[]> {
   const user = await get<BitpayUser>('bitpayUser');
-  const [directIntegrations, availableGiftCards, supportedGiftCards = []] = await Promise.all([
+  const [directory, directIntegrations, availableGiftCards, supportedGiftCards = []] = await Promise.all([
+    fetchDirectory().catch(() => ({ curated: {}, categories: {} } as Directory)),
     fetchDirectIntegrations().catch(() => []),
     fetchAvailableCards({ user }).catch(() => []),
     get<CardConfig[]>('supportedGiftCards')
   ]);
   const newSupportedGiftCards = addToSupportedGiftCards(supportedGiftCards, availableGiftCards);
   await Promise.all([
+    set<Directory>('directory', directory),
     set<DirectIntegration[]>('directIntegrations', directIntegrations),
     set<CardConfig[]>('availableGiftCards', availableGiftCards),
     set<CardConfig[]>('supportedGiftCards', newSupportedGiftCards)
