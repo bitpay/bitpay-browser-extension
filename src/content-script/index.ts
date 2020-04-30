@@ -3,15 +3,17 @@ import { FrameDimensions } from '../services/frame';
 import { dispatchUrlChange } from '../services/browser';
 import { Merchant } from '../services/merchant';
 import { CheckoutPageCssSelectors } from '../services/gift-card.types';
+import { dragElementFunc } from './drag';
 
 let iframe: HTMLIFrameElement | undefined;
+const DragElementId = 'BitPayExtensionDrag';
 
 const getOrderTotal = (selector: string): number | undefined => {
   const element = document.querySelector(selector);
   return element ? parseFloat(element.innerHTML.trim().replace(/[^0-9.]/g, '')) : undefined;
 };
 
-function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string } {
+function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string; dragElementStyles: string } {
   const innerFrameStyles = `
     width: 100%;
     height: 100%; 
@@ -30,12 +32,22 @@ function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string
     position: fixed!important;
     top: 10px;
     right: 10px;
-    box-shadow: 0 0 14px 4px rgba(0,0,0,0.1); 
+    box-shadow: 0 0 12px 4px rgba(0,0,0,0.1); 
     border-radius: 8px;
-    z-index: 2147483647!important;
-    transition: height 250ms ease 0s;
+    z-index: ${FrameDimensions.zIndex} !important;
+    transition: height 250ms ease 0s, box-shadow 250ms ease-in-out, transform 250ms cubic-bezier(.25,.8,.25,1);
   `;
-  return { outerFrameStyles, innerFrameStyles };
+  const dragElementStyles = `
+    width: 160px; 
+    height: ${FrameDimensions.collapsedHeight}px; 
+    position: fixed;
+    top: 10px;
+    right: 75px;
+    display: block;
+    cursor: grab;
+    z-index: ${FrameDimensions.zIndex + 10};
+   `;
+  return { outerFrameStyles, innerFrameStyles, dragElementStyles };
 }
 
 function createIframe({ merchant }: { merchant?: Merchant }): HTMLIFrameElement {
@@ -67,8 +79,38 @@ function addIframe(frame: HTMLIFrameElement): void {
   document.body.appendChild(frame);
 }
 
+function getDragElement(): HTMLElement | null {
+  return document.getElementById(DragElementId);
+}
+
+function removeDragElement(): void {
+  const el = getDragElement();
+  if (el) {
+    document.body.removeChild(el);
+  }
+}
+
+function addDragElement(): void {
+  const dragElement = document.createElement('div');
+  const { dragElementStyles } = getIframeStyles();
+  dragElement.style.cssText = dragElementStyles;
+  dragElement.classList.add('drag-element');
+  dragElement.setAttribute('id', DragElementId);
+  document.body.appendChild(dragElement);
+
+  const dragEle = getDragElement();
+  if (dragEle) {
+    dragElementFunc(iframe, dragEle);
+  }
+}
+
 function resizeIframe(frame: HTMLIFrameElement, height: number = FrameDimensions.height): void {
   frame.style.height = `${height}px`;
+}
+
+function resetIframePosition(frame: HTMLIFrameElement, top: number, left: number): void {
+  frame.style.top = `${top}px`;
+  frame.style.left = `${left}px`;
 }
 
 function injectValueIntoInputsWithSelectors(selectors: string[], value: string): void {
@@ -82,7 +124,14 @@ browser.runtime.onMessage.addListener(async message => {
   const messageName = message && message.name;
   switch (messageName) {
     case 'EXTENSION_ICON_CLICKED':
-      return iframe ? removeIframe(iframe) : addIframe(createIframe({ merchant: message.merchant }));
+      if (iframe) {
+        removeDragElement();
+        return removeIframe(iframe);
+      }
+      addIframe(createIframe({ merchant: message.merchant }));
+      addDragElement();
+      return;
+
     case 'INJECT_CLAIM_INFO':
       // eslint-disable-next-line no-case-declarations
       const { cssSelectors, claimInfo } = message as {
@@ -93,9 +142,12 @@ browser.runtime.onMessage.addListener(async message => {
       if (claimInfo.pin) injectValueIntoInputsWithSelectors(cssSelectors.pinInput, claimInfo.pin);
       return;
     case 'POPUP_CLOSED':
+      removeDragElement();
       return iframe && removeIframe(iframe);
     case 'POPUP_RESIZED':
       return iframe && resizeIframe(iframe, message.height);
+    case 'RESET_FRAME_POSITION':
+      return iframe && resetIframePosition(iframe, message.top, message.left);
     default:
       console.log('Unsupported Event:', message);
   }
