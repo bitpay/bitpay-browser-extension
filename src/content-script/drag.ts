@@ -80,7 +80,7 @@ export function dragElementFunc(iframe: HTMLIFrameElement | undefined, dragEle: 
 
     if (iframe) {
       iframe.style.transform = 'translate3d(0px, 0px, 0px)';
-      iframe.style.boxShadow = '0 0 14px 4px rgba(0,0,0,0.1)';
+      iframe.style.boxShadow = '0 0 12px 4px rgba(0,0,0,0.1)';
     }
 
     // stop moving when mouse button is released:
@@ -97,7 +97,7 @@ export function dragElementFunc(iframe: HTMLIFrameElement | undefined, dragEle: 
       dragEle.style.left = iframe.style.left;
       dragEle.style.cursor = 'grabbing';
       iframe.style.transform = 'translate3d(0px, -2px, 0px) scale(1.01)';
-      iframe.style.boxShadow = '0 2px 14px 8px rgba(0,0,0,0.08)';
+      iframe.style.boxShadow = '0 2px 18px 8px rgba(0,0,0,0.08)';
     }
     // eslint-disable-next-line no-param-reassign
     e = e || window.event;
