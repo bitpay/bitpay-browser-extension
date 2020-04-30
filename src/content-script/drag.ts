@@ -53,7 +53,7 @@ export function dragElementFunc(iframe: HTMLIFrameElement | undefined, dragEle: 
         const left = rightBound ? dragEle.style.left : 10;
         browser.runtime.sendMessage({
           name: 'RESET_FRAME_POSITION',
-          top: `${top}px`,
+          top: top,
           left
         });
         dragEle.style.top = `${top}px`;
