@@ -103,8 +103,8 @@ const Amount: React.FC<RouteComponentProps & {
     return [integer, newDecimal].join('.');
   };
   const handleInput = (input: string): void => {
-    const stringValue = input;
-    const newAmount = parseFloat(Number(input).toFixed(precision));
+    const stringValue = input.replace(/[^\d.-]/g, '');
+    const newAmount = parseFloat(Number(stringValue).toFixed(precision));
     if (newAmount <= maxAmount) {
       const correctedValue = enforcePrecision(stringValue);
       if (correctedValue !== stringValue) shakeInput();
