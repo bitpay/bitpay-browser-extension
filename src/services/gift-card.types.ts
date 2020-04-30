@@ -52,6 +52,7 @@ export interface CommonCardConfig {
   supportedUrls?: string[];
   terms: string;
   website: string;
+  tags?: string[];
 }
 
 export interface CardConfig extends CommonCardConfig {
