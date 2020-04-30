@@ -35,7 +35,7 @@ function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string
     box-shadow: 0 0 14px 4px rgba(0,0,0,0.1); 
     border-radius: 8px;
     z-index: ${FrameDimensions.zIndex} !important;
-    transition: height 250ms ease 0s, boxShadow 250ms ease-in-out, transform 250ms cubic-bezier(.25,.8,.25,1);
+    transition: height 250ms ease 0s, box-shadow 250ms ease-in-out, transform 250ms cubic-bezier(.25,.8,.25,1);
   `;
   const dragElementStyles = `
     width: 160px; 

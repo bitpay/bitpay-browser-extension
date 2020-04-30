@@ -53,7 +53,7 @@ export function dragElementFunc(iframe: HTMLIFrameElement | undefined, dragEle: 
         const left = rightBound ? dragEle.style.left : 10;
         browser.runtime.sendMessage({
           name: 'RESET_FRAME_POSITION',
-          top: top,
+          top,
           left
         });
         dragEle.style.top = `${top}px`;
@@ -97,7 +97,7 @@ export function dragElementFunc(iframe: HTMLIFrameElement | undefined, dragEle: 
       dragEle.style.left = iframe.style.left;
       dragEle.style.cursor = 'grabbing';
       iframe.style.transform = 'translate3d(0px, -2px, 0px) scale(1.01)';
-      iframe.style.boxShadow = '0 5px 14px 5px rgba(0,0,0,0.12)';
+      iframe.style.boxShadow = '0 2px 14px 8px rgba(0,0,0,0.08)';
     }
     // eslint-disable-next-line no-param-reassign
     e = e || window.event;
