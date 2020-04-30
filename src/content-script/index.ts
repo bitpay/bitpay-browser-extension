@@ -33,7 +33,7 @@ function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string
     right: 10px;
     box-shadow: 0 0 14px 4px rgba(0,0,0,0.1); 
     border-radius: 8px;
-    z-index: ${FrameDimensions.zIndex};
+    z-index: ${FrameDimensions.zIndex} !important;
     transition: height 250ms ease 0s;
   `;
   const dragElementStyles = `
@@ -125,14 +125,27 @@ function dragElementFunc(dragEle: HTMLElement): void {
     const bottomBound = newTop + rect.height > viewport.bottom;
 
     if (leftBound || topBound || rightBound || bottomBound) {
-      if (bottomBound) {
+      if (bottomBound || topBound) {
         const left = leftBound || rightBound ? dragEle.style.left : newLeft;
+        const top =  bottomBound ? windowInnerHeight - rect.height - padding : 10;
         browser.runtime.sendMessage({
           name: 'RESET_FRAME_POSITION',
-          top: windowInnerHeight - rect.height - padding,
+          top,
           left
         });
-        dragEle.style.top = `calc(${windowInnerHeight} - ${rect.height} - ${padding})px`;
+        dragEle.style.top = `${top}px`;
+        dragEle.style.left = `${left}px`;
+      }
+
+      if(rightBound || leftBound) {
+        const top = topBound || bottomBound ?  dragEle.style.top: newTop;
+        const left = rightBound ? dragEle.style.left : 10;
+        browser.runtime.sendMessage({
+          name: 'RESET_FRAME_POSITION',
+          top: `${top}px`,
+          left: left
+        });
+        dragEle.style.top = `${top}px`;
         dragEle.style.left = `${left}px`;
       }
     } else {
