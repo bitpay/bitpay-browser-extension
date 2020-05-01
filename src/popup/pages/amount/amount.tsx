@@ -81,7 +81,10 @@ const Amount: React.FC<RouteComponentProps & {
   };
   const focusInput = (): void => {
     setTimeout(() => {
-      if (inputRef && inputRef.current) inputRef.current.focus();
+      if (inputRef && inputRef.current) {
+        inputRef.current.value = inputValue;
+        inputRef.current.focus();
+      }
     });
   };
   const changeAmount = (delta: number): void => {
@@ -141,7 +144,8 @@ const Amount: React.FC<RouteComponentProps & {
   };
   resizeFrame(360);
   return (
-    <div className="amount-page">
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events,  jsx-a11y/no-static-element-interactions
+    <div className="amount-page" onClick={focusInput}>
       <div className="amount-page__title">
         <div className="amount-page__merchant-name">{cardConfig.displayName}</div>
         {discount && (
@@ -156,7 +160,6 @@ const Amount: React.FC<RouteComponentProps & {
             ref={inputRef}
             value={inputValue}
             onChange={(e: React.FormEvent<HTMLInputElement>): void => handleInput(e.currentTarget.value)}
-            onBlur={focusInput}
             onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>): void => handleKeyDown(e.keyCode)}
             className="amount-page__input"
             placeholder="0"
