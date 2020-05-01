@@ -103,7 +103,8 @@ const Card: React.FC<RouteComponentProps & {
     resizeFrame();
   }, [ref]);
   useEffect(() => {
-    if (card.status === 'PENDING') redeem();
+    const createdLessThan24HoursAgo = Date.now() - new Date(card.date).getTime() < 1000 * 60 * 60 * 24;
+    if (card.status === 'PENDING' || (card.status === 'FAILURE' && createdLessThan24HoursAgo)) redeem();
     return (): void => {
       mountedRef.current = false;
     };
