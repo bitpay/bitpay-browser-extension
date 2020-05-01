@@ -130,7 +130,7 @@ browser.runtime.onMessage.addListener(async message => {
   const messageName = message && message.name;
   switch (messageName) {
     case 'EXTENSION_ICON_CLICKED':
-      toggleIframeVisibility();
+      toggleIframeVisibility(message.merchant);
       return;
     case 'INJECT_CLAIM_INFO':
       // eslint-disable-next-line no-case-declarations
