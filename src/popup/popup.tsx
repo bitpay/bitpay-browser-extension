@@ -70,10 +70,12 @@ const Popup: React.FC = () => {
 
   useEffect(() => {
     const attemptToRedeemGiftCards = (): void => {
+      const hasPaidInvoice = ({ invoice }: GiftCard): boolean =>
+        invoice && (invoice.nonPayProPaymentReceived || ['paid', 'invalid'].includes(invoice.status));
       const unredeemedGiftCards = purchasedGiftCards.filter(
         c =>
           c.status === 'UNREDEEMED' &&
-          (Date.now() - new Date(c.date).getTime() > 1000 || (c.invoice && c.invoice.status === 'paid')) &&
+          (Date.now() - new Date(c.date).getTime() > 1000 || hasPaidInvoice(c)) &&
           !realtimeInvoiceIds.includes(c.invoiceId)
       );
       if (!unredeemedGiftCards.length) return;
