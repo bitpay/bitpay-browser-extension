@@ -73,7 +73,7 @@ const Popup: React.FC = () => {
       const unredeemedGiftCards = purchasedGiftCards.filter(
         c =>
           c.status === 'UNREDEEMED' &&
-          Date.now() - new Date(c.date).getTime() > 1000 &&
+          (Date.now() - new Date(c.date).getTime() > 1000 || (c.invoice && c.invoice.status === 'paid')) &&
           !realtimeInvoiceIds.includes(c.invoiceId)
       );
       if (!unredeemedGiftCards.length) return;
