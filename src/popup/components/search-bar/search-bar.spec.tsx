@@ -11,6 +11,7 @@ describe('Search Bar', () => {
   it('should change icons based on input value', () => {
     const wrapper = shallow(<SearchBar />);
     wrapper.setProps({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       output: (val: any) => {
         wrapper.setProps({ value: val });
       }
@@ -28,6 +29,7 @@ describe('Search Bar', () => {
   it('should clear input value on clicking clearSearchButton ', () => {
     const wrapper = shallow(<SearchBar />);
     wrapper.setProps({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       output: (val: any) => {
         wrapper.setProps({ value: val });
       }

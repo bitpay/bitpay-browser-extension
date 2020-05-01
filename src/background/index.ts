@@ -60,6 +60,10 @@ async function sendMessageToTab(message: any, tab: Tabs.Tab): Promise<void> {
 }
 
 browser.browserAction.onClicked.addListener(async tab => {
+  if (!tab.url || (!tab.url.startsWith('https://') && !tab.url.startsWith('http://'))) {
+    browser.tabs.create({ url: `${process.env.API_ORIGIN}/directory?launchExtension=true` });
+    return;
+  }
   const merchant = tab.url && getBitPayMerchantFromUrl(tab.url, await getCachedMerchants());
   await browser.tabs.sendMessage(tab.id as number, {
     name: 'EXTENSION_ICON_CLICKED',
