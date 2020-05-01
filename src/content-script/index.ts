@@ -69,16 +69,6 @@ function createIframe({ merchant }: { merchant?: Merchant }): HTMLIFrameElement 
   return outerFrame;
 }
 
-function removeIframe(frame: HTMLIFrameElement): void {
-  document.body.removeChild(frame);
-  iframe = undefined;
-}
-
-function addIframe(frame: HTMLIFrameElement): void {
-  iframe = frame;
-  document.body.appendChild(frame);
-}
-
 function getDragElement(): HTMLElement | null {
   return document.getElementById(DragElementId);
 }
@@ -104,6 +94,18 @@ function addDragElement(): void {
   }
 }
 
+function removeIframe(frame: HTMLIFrameElement): void {
+  removeDragElement();
+  document.body.removeChild(frame);
+  iframe = undefined;
+}
+
+function addIframe(frame: HTMLIFrameElement): void {
+  iframe = frame;
+  document.body.appendChild(frame);
+  addDragElement();
+}
+
 function resizeIframe(frame: HTMLIFrameElement, height: number = FrameDimensions.height): void {
   frame.style.height = `${height}px`;
 }
@@ -120,18 +122,16 @@ function injectValueIntoInputsWithSelectors(selectors: string[], value: string):
   });
 }
 
+function toggleIframeVisibility(merchant?: Merchant): void {
+  iframe ? removeIframe(iframe) : addIframe(createIframe({ merchant }));
+}
+
 browser.runtime.onMessage.addListener(async message => {
   const messageName = message && message.name;
   switch (messageName) {
     case 'EXTENSION_ICON_CLICKED':
-      if (iframe) {
-        removeDragElement();
-        return removeIframe(iframe);
-      }
-      addIframe(createIframe({ merchant: message.merchant }));
-      addDragElement();
+      toggleIframeVisibility();
       return;
-
     case 'INJECT_CLAIM_INFO':
       // eslint-disable-next-line no-case-declarations
       const { cssSelectors, claimInfo } = message as {
@@ -192,6 +192,9 @@ if (window.location.origin === process.env.API_ORIGIN) {
         data: params
       });
     });
+  } else if (window.location.href.startsWith(`${process.env.API_ORIGIN}/directory`)) {
+    const launchExtension = new URLSearchParams(window.location.search).get('launchExtension');
+    if (launchExtension) toggleIframeVisibility();
   }
 }
 
