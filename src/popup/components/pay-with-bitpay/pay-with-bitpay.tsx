@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { browser } from 'webextension-polyfill-ts';
 import { GiftCard, CardConfig, GiftCardInvoiceParams } from '../../../services/gift-card.types';
 import { set } from '../../../services/storage';
-import { createBitPayInvoice, redeemGiftCard, getBitPayInvoice, isAmountValid } from '../../../services/gift-card';
+import { createBitPayInvoice, redeemGiftCard, isAmountValid } from '../../../services/gift-card';
 import Snack from '../snack/snack';
 import { waitForServerEvent, deleteCard } from '../../../services/gift-card-storage';
 import { wait } from '../../../services/utils';
@@ -92,11 +92,10 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
       setAwaitingPayment(false);
       return;
     }
-    const [invoice, giftCard] = await Promise.all([getBitPayInvoice(invoiceId), redeemGiftCard(unredeemedGiftCard)]);
+    const giftCard = await redeemGiftCard(unredeemedGiftCard);
     const finalGiftCard = {
       ...giftCard,
-      discounts: cardConfig.discounts,
-      invoice
+      discounts: cardConfig.discounts
     } as GiftCard;
     await saveGiftCard(finalGiftCard);
     showCard(finalGiftCard);

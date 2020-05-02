@@ -119,7 +119,7 @@ export async function redeemGiftCard(data: Partial<GiftCard>): Promise<GiftCard>
       const fullCard = {
         ...data,
         ...res,
-        invoice,
+        invoice: invoice || data.invoice,
         status
       };
       return fullCard;
