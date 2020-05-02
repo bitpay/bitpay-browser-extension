@@ -91,14 +91,18 @@ const Popup: React.FC = () => {
         });
       }
       justCreatedGiftCards.forEach(async card => {
+        const alreadyFinalized = (c: GiftCard): boolean => ['SUCCESS', 'FAILURE'].includes(c.status);
         const source = await createEventSourceObservable(card.invoiceId);
         const subscription = source.pipe(skip(1)).subscribe(async updatedInvoice => {
           const giftCard = purchasedGiftCards.find(c => c.invoiceId === card.invoiceId);
-          if (!giftCard) return;
+          if (!giftCard || alreadyFinalized(giftCard)) {
+            subscription.unsubscribe();
+            return;
+          }
           const newCards = await handlePaymentEvent(giftCard, updatedInvoice, purchasedGiftCards);
           const updatedCard = newCards.find(newCard => card.invoiceId === newCard.invoiceId);
           setPurchasedGiftCards(newCards);
-          if (updatedCard && ['SUCCESS', 'FAILURE'].includes(updatedCard.status)) {
+          if (updatedCard && alreadyFinalized(updatedCard)) {
             subscription.unsubscribe();
           }
         });
