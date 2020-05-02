@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MemoryRouter as Router, Route, Switch } from 'react-router-dom';
+import { skip } from 'rxjs/operators';
 import Category from './pages/category/category';
 import Brand from './pages/brand/brand';
 import Card from './pages/card/card';
@@ -21,7 +22,12 @@ import Payment from './pages/payment/payment';
 import { get } from '../services/storage';
 import { GiftCard, CardConfig } from '../services/gift-card.types';
 import { sortByDescendingDate } from '../services/gift-card';
-import { updateCard, listenForInvoiceChanges, handlePaymentEvent } from '../services/gift-card-storage';
+import {
+  updateCard,
+  listenForInvoiceChanges,
+  handlePaymentEvent,
+  createEventSourceObservable
+} from '../services/gift-card-storage';
 import Email from './pages/settings/email/email';
 import Archive from './pages/settings/archive/archive';
 import Legal from './pages/settings/legal/legal';
@@ -70,18 +76,28 @@ const Popup: React.FC = () => {
 
   useEffect(() => {
     const attemptToRedeemGiftCards = (): void => {
+      const justCreated = (card: GiftCard): boolean =>
+        card.status === 'UNREDEEMED' && Date.now() - new Date(card.date).getTime() < 1000;
       const unredeemedGiftCards = purchasedGiftCards.filter(
-        c =>
-          c.status === 'UNREDEEMED' &&
-          Date.now() - new Date(c.date).getTime() > 1000 &&
-          !realtimeInvoiceIds.includes(c.invoiceId)
+        c => c.status === 'UNREDEEMED' && !justCreated(c) && !realtimeInvoiceIds.includes(c.invoiceId)
       );
-      if (!unredeemedGiftCards.length) return;
-      setRealtimeInvoiceIds([...realtimeInvoiceIds, ...unredeemedGiftCards.map(c => c.invoiceId)]);
-      unredeemedGiftCards.forEach(async card => {
-        const updatedInvoice = await listenForInvoiceChanges(card);
-        const newCards = await handlePaymentEvent(card, updatedInvoice, purchasedGiftCards);
-        setPurchasedGiftCards(newCards);
+      const justCreatedGiftCards = purchasedGiftCards.filter(c => justCreated(c));
+      if (unredeemedGiftCards.length) {
+        setRealtimeInvoiceIds([...realtimeInvoiceIds, ...unredeemedGiftCards.map(c => c.invoiceId)]);
+        unredeemedGiftCards.forEach(async card => {
+          const updatedInvoice = await listenForInvoiceChanges(card);
+          const newCards = await handlePaymentEvent(card, updatedInvoice, purchasedGiftCards);
+          setPurchasedGiftCards(newCards);
+        });
+      }
+      justCreatedGiftCards.forEach(async card => {
+        const source = await createEventSourceObservable(card.invoiceId);
+        source.pipe(skip(1)).subscribe(async updatedInvoice => {
+          const giftCard = purchasedGiftCards.find(c => c.invoiceId === card.invoiceId);
+          if (!giftCard) return;
+          const newCards = await handlePaymentEvent(giftCard, updatedInvoice, purchasedGiftCards);
+          setPurchasedGiftCards(newCards);
+        });
       });
     };
     attemptToRedeemGiftCards();

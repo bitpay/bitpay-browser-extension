@@ -143,6 +143,7 @@ export interface Invoice {
   paymentDisplayTotals: { [currency: string]: string };
   amountPaid: number;
   displayAmountPaid: string;
+  nonPayProPaymentReceived?: boolean;
   transactionCurrency: string;
   status: 'new' | 'paid' | 'confirmed' | 'complete' | 'expired' | 'invalid';
 }
