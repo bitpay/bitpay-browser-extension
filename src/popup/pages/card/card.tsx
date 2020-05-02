@@ -84,6 +84,10 @@ const Card: React.FC<RouteComponentProps & {
         console.log('Unknown Menu Option Selected');
     }
   };
+  const handleErrorButtonClick = (): void => {
+    const hasValidPayment = card.invoice && ['paid', 'confirmed', 'complete'].includes(card.invoice.status);
+    hasValidPayment || !card.invoice ? handleMenuClick('Help') : launchNewTab(card.invoice.url);
+  };
   const redeem = async (): Promise<void> => {
     setFetchingClaimCode(true);
     const updatedGiftCard = await redeemGiftCard(card);
@@ -160,7 +164,7 @@ const Card: React.FC<RouteComponentProps & {
             arrow
           >
             <div className="action-button__footer">
-              <ActionButton onClick={(): void => handleMenuClick('Help')} flavor="danger">
+              <ActionButton onClick={handleErrorButtonClick} flavor="danger">
                 Something Went Wrong
               </ActionButton>
             </div>
