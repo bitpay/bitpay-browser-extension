@@ -92,7 +92,8 @@ const Popup: React.FC = () => {
       }
       justCreatedGiftCards.forEach(async card => {
         const alreadyFinalized = (c: GiftCard): boolean => ['SUCCESS', 'FAILURE'].includes(c.status);
-        const source = await createEventSourceObservable(card.invoiceId);
+        const source = await createEventSourceObservable(card.invoiceId).catch(() => undefined);
+        if (!source) return;
         const subscription = source.pipe(skip(1)).subscribe(async updatedInvoice => {
           const giftCard = purchasedGiftCards.find(c => c.invoiceId === card.invoiceId);
           if (!giftCard || alreadyFinalized(giftCard)) {
