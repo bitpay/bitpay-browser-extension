@@ -1,5 +1,4 @@
 import React, { useRef, useEffect, useState } from 'react';
-import './card.scss';
 import { RouteComponentProps } from 'react-router-dom';
 import { Tooltip, makeStyles, createStyles } from '@material-ui/core';
 import { GiftCard, CardConfig } from '../../../services/gift-card.types';
@@ -12,6 +11,7 @@ import CardHeader from '../../components/card-header/card-header';
 import CodeBox from '../../components/code-box/code-box';
 import CardMenu from '../../components/card-menu/card-menu';
 import ActionButton from '../../components/action-button/action-button';
+import './card.scss';
 
 const Card: React.FC<RouteComponentProps & {
   purchasedGiftCards: GiftCard[];
@@ -36,11 +36,8 @@ const Card: React.FC<RouteComponentProps & {
   const ref = useRef<HTMLDivElement>(null);
   const mountedRef = useRef(true);
 
-  const {
-    card: { invoiceId },
-    cardConfig
-  } = location.state as { card: GiftCard; cardConfig: CardConfig };
-  const giftCard = purchasedGiftCards.find(c => c.invoiceId === invoiceId) as GiftCard;
+  const { card: giftCard, cardConfig } = location.state as { card: GiftCard; cardConfig: CardConfig };
+  const { invoiceId } = giftCard;
   const [card, setCard] = useState(giftCard);
   const [fetchingClaimCode, setFetchingClaimCode] = useState(false);
   const initiallyArchived = giftCard.archived;
@@ -99,6 +96,11 @@ const Card: React.FC<RouteComponentProps & {
     await updateCard(fullCard);
     resizeFrame();
   };
+  useEffect(() => {
+    const updatedCard = purchasedGiftCards.find(c => c.invoiceId === invoiceId) as GiftCard;
+    setCard(updatedCard);
+    resizeFrame();
+  }, [purchasedGiftCards, invoiceId]);
   useEffect(() => {
     resizeFrame();
   }, [ref]);

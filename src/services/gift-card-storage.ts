@@ -1,3 +1,4 @@
+import { Observable, Observer } from 'rxjs';
 import { GiftCard, Invoice } from './gift-card.types';
 import { set } from './storage';
 import { redeemGiftCard, getBitPayInvoice } from './gift-card';
@@ -37,16 +38,40 @@ export const handlePaymentEvent = async (
   return purchasedGiftCards;
 };
 
+const getBusUrl = async (invoiceId: string): Promise<string> => {
+  const {
+    data: { url, token }
+  } = await fetch(`${process.env.API_ORIGIN}/invoices/${invoiceId}/events`).then(res => res.json());
+  return `${url}?token=${token}&action=subscribe&events[]=payment&events[]=confirmation&events[]=paymentRejected`;
+};
+
+export const createEventSourceObservable = async (invoiceId: string): Promise<Observable<Invoice>> => {
+  const busUrl = await getBusUrl(invoiceId);
+  return Observable.create((observer: Observer<Invoice>) => {
+    const source = new EventSource(busUrl);
+    source.addEventListener('statechange', (event: Event) => {
+      const { data } = event as CustomEvent;
+      const updatedInvoice = JSON.parse(data);
+      observer.next(updatedInvoice);
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    source.addEventListener('error', (event: any) => observer.error(event));
+    return (): void => {
+      source.close();
+    };
+  });
+};
+
 const createEventSource = (url: string): Promise<Invoice> =>
   new Promise((resolve, reject) => {
     const source = new EventSource(url);
-    source.addEventListener('statechange', async (event: Event) => {
+    source.addEventListener('statechange', (event: Event) => {
       const { data } = event as CustomEvent;
       const updatedInvoice = JSON.parse(data);
       source.close();
       resolve(updatedInvoice);
     });
-    source.addEventListener('paymentRejected', async () => {
+    source.addEventListener('paymentRejected', () => {
       reject(new Error('paymentRejected'));
     });
     source.addEventListener('error', (e: Event) => {
@@ -56,10 +81,7 @@ const createEventSource = (url: string): Promise<Invoice> =>
   });
 
 export const waitForServerEvent = async (unredeemedGiftCard: GiftCard): Promise<Invoice> => {
-  const {
-    data: { url, token }
-  } = await fetch(`${process.env.API_ORIGIN}/invoices/${unredeemedGiftCard.invoiceId}/events`).then(res => res.json());
-  const busUrl = `${url}?token=${token}&action=subscribe&events[]=payment&events[]=confirmation&events[]=paymentRejected`;
+  const busUrl = await getBusUrl(unredeemedGiftCard.invoiceId);
   return createEventSource(busUrl);
 };
 
