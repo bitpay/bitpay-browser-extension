@@ -174,7 +174,10 @@ const Popup: React.FC = () => {
               path="/category/:category"
               render={(props): JSX.Element => <Category merchants={merchants} {...props} />}
             />
-            <Route path="/brand/:brand" component={Brand} />
+            <Route
+              path="/brand/:brand"
+              render={(props): JSX.Element => <Brand directory={directory} merchants={merchants} {...props} />}
+            />
             <Route
               path="/cards/:brand"
               render={(props): JSX.Element => (

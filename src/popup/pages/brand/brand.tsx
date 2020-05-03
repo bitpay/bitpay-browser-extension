@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { RouteComponentProps, Link } from 'react-router-dom';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { Merchant, getDiscount } from '../../../services/merchant';
 import { resizeToFitPage, FrameDimensions } from '../../../services/frame';
@@ -8,8 +8,10 @@ import CardDenoms from '../../components/card-denoms/card-denoms';
 import ActionButton from '../../components/action-button/action-button';
 import DiscountText from '../../components/discount-text/discount-text';
 import './brand.scss';
+import MerchantCell from '../../components/merchant-cell/merchant-cell';
 
-const Brand: React.FC<RouteComponentProps> = ({ location }) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const Brand: React.FC<any> = ({ location, directory, merchants }) => {
   const ref = useRef<HTMLDivElement>(null);
   const { merchant } = location.state as { merchant: Merchant };
   const initiallyExpanded = merchant.hasDirectIntegration && merchant.instructions.length < 300;
@@ -31,6 +33,21 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
     scroll: { paddingBottom: pageHeight > FrameDimensions.maxFrameHeight - ctaHeight ? '96px' : 'auto' },
     divider: { marginTop: '2px' }
   };
+  const suggested = useMemo((): { category: string; suggestions: Merchant[] } => {
+    const category = Object.keys(directory.categories).sort(
+      (a, b) =>
+        directory.categories[b].tags.filter((tag: string) => merchant.tags.includes(tag)).length -
+        directory.categories[a].tags.filter((tag: string) => merchant.tags.includes(tag)).length
+    )[0];
+    const suggestions = merchants
+      .filter(
+        (m: Merchant) =>
+          m.displayName !== merchant.displayName &&
+          m.tags.filter((tag: string) => merchant.tags.includes(tag)).length > Math.round(merchant.tags.length / 3)
+      )
+      .sort(() => 0.5 - Math.random());
+    return { category, suggestions };
+  }, [directory, merchants, merchant]);
   return (
     <div className="brand-page">
       <div ref={ref}>
@@ -100,8 +117,35 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
               </div>
             </>
           )}
+          {suggested && (
+            <>
+              <div className="brand-page__body__divider" />
+              <div className="shop-page__section-header">
+                You Might Also Like
+                <Link
+                  className="shop-page__section-header--action"
+                  to={{
+                    pathname: `/category/${directory.categories[suggested.category].displayName}`,
+                    state: { category: directory.categories[suggested.category] }
+                  }}
+                >
+                  See All
+                </Link>
+              </div>
+              {suggested.suggestions.slice(0, 2).map(suggestion => (
+                <Link
+                  to={{
+                    pathname: `/brand/${suggestion.name}`,
+                    state: { merchant: suggestion }
+                  }}
+                  key={suggestion.name}
+                >
+                  <MerchantCell key={suggestion.name} merchant={suggestion} />
+                </Link>
+              ))}
+            </>
+          )}
         </div>
-
         {(merchant.cta || cardConfig) && (
           <div className="action-button__footer--fixed">
             {merchant.hasDirectIntegration && merchant.cta ? (
