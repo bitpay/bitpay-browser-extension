@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import classNames from 'classnames';
 import { browser } from 'webextension-polyfill-ts';
+import { motion, AnimatePresence } from 'framer-motion';
 import { GiftCard, CardConfig, GiftCardInvoiceParams } from '../../../services/gift-card.types';
 import { set } from '../../../services/storage';
 import { createBitPayInvoice, redeemGiftCard, isAmountValid } from '../../../services/gift-card';
@@ -12,6 +13,12 @@ import { BitpayUser } from '../../../services/bitpay-id';
 import { injectClaimInfo } from '../../../services/browser';
 import { PayWithBitpayImage } from '../svg/pay-with-bitpay-image';
 import { Merchant } from '../../../services/merchant';
+import {
+  buttonAnimation,
+  buttonTextAnimation,
+  buttonSpinnerAnimation,
+  spinAnimation
+} from '../../../services/animations';
 import './pay-with-bitpay.scss';
 
 const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
@@ -115,26 +122,49 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
     <>
       <div className="pay-with-bitpay">
         <Snack message={errorMessage} onClose={snackOnClose} />
-        {awaitingPayment ? (
-          <>
-            <div className="action-button action-button--pending">
-              <img className="action-button__spinner" src="../../assets/icons/spinner.svg" alt="spinner" /> Awaiting
-              Payment
-            </div>
-          </>
-        ) : (
-          <button
-            className={classNames({
-              disabled: !invoiceParams.email,
-              'pay-with-bitpay__pay-button': true
-            })}
-            type="button"
-            onClick={payButton}
-            disabled={!invoiceParams.email}
-          >
-            <PayWithBitpayImage />
-          </button>
-        )}
+        <AnimatePresence exitBeforeEnter>
+          {awaitingPayment ? (
+            <motion.div
+              className="action-button action-button--pending"
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={buttonAnimation}
+              key="awaiting-payment"
+            >
+              <motion.span variants={buttonSpinnerAnimation} key="awaiting-payment-wrapper">
+                <motion.img
+                  className="action-button__spinner"
+                  src="../../assets/icons/spinner.svg"
+                  variants={spinAnimation}
+                  alt="spinner"
+                  key="awaiting-payment-spinner"
+                />
+              </motion.span>
+              <motion.span variants={buttonTextAnimation} key="awaiting-payment-text">
+                Awaiting Payment
+              </motion.span>
+            </motion.div>
+          ) : (
+            <motion.button
+              className={classNames({
+                disabled: !invoiceParams.email,
+                'pay-with-bitpay__pay-button': true
+              })}
+              type="button"
+              onClick={payButton}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={buttonAnimation}
+              whileTap={{ scale: 0.98 }}
+              disabled={!invoiceParams.email}
+              key="pay-with-bitpay"
+            >
+              <PayWithBitpayImage />
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
     </>
   );
