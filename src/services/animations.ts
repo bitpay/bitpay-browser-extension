@@ -18,7 +18,7 @@ export const buttonAnimation = {
     opacity: 1,
     transition: {
       type: 'tween',
-      duration: 0.25,
+      duration: 0.2,
       when: 'beforeChildren',
       staggerChildren: 0.075
     }
