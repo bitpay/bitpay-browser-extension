@@ -38,6 +38,7 @@
       &::placeholder {
         color: $slate;
         font-weight: $regular;
+        user-select: none;
       }
     }
 

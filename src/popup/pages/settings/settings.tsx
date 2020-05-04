@@ -1,11 +1,12 @@
 import React from 'react';
 import classNames from 'classnames';
-import './settings.scss';
 import { Link } from 'react-router-dom';
 import { resizeFrame } from '../../../services/frame';
 import { BitpayUser } from '../../../services/bitpay-id';
 import { launchNewTab } from '../../../services/browser';
 import Gravatar from '../../components/gravatar/gravatar';
+import packageJson from '../../../../package.json';
+import './settings.scss';
 
 const Settings: React.FC<{ email: string; user: BitpayUser }> = ({ email, user }) => {
   resizeFrame(450);
@@ -63,7 +64,7 @@ const Settings: React.FC<{ email: string; user: BitpayUser }> = ({ email, user }
           onClick={(): void => launchNewTab('https://github.com/bitpay/bitpay-browser-extension')}
         >
           <div className="settings-group__item__label">Version</div>
-          <div className="settings-group__item__value">1.0.0</div>
+          <div className="settings-group__item__value">{packageJson.version}</div>
         </button>
       </div>
     </div>
