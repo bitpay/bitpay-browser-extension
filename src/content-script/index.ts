@@ -115,10 +115,10 @@ function resetIframePosition(frame: HTMLIFrameElement, top: number, left: number
   frame.style.left = `${left}px`;
 }
 
-function injectValueIntoInputsWithSelectors(selectors: string[], value: string): void {
+function injectValueIntoInputsWithSelectors(selectors: string[] = [], value = ''): void {
   selectors.forEach(selector => {
     const input = document.querySelector(selector) as HTMLInputElement | undefined;
-    if (input) input.value = value;
+    if (input && !input.value) input.value = value;
   });
 }
 

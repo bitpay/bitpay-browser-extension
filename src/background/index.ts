@@ -72,6 +72,10 @@ browser.browserAction.onClicked.addListener(async tab => {
 });
 
 browser.runtime.onInstalled.addListener(async () => {
+  const allTabs = await browser.tabs.query({});
+  allTabs.forEach(tab => {
+    browser.tabs.executeScript(tab.id, { file: 'js/contentScript.bundle.js' });
+  });
   await Promise.all([refreshCachedMerchantsIfNeeded(), createClientIdIfNotExists()]);
 });
 

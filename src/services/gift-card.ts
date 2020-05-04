@@ -100,6 +100,11 @@ export async function createBitPayInvoice({
     : post(`${process.env.API_ORIGIN}/gift-cards/pay`, params);
 }
 
+export async function getBitPayInvoice(id: string): Promise<Invoice> {
+  const { data } = await fetch(`${process.env.API_ORIGIN}/invoices/${id}`).then(res => res.json());
+  return data;
+}
+
 export async function redeemGiftCard(data: Partial<GiftCard>): Promise<GiftCard> {
   const url = `${process.env.API_ORIGIN}/gift-cards/redeem`;
   const params = {
@@ -107,12 +112,14 @@ export async function redeemGiftCard(data: Partial<GiftCard>): Promise<GiftCard>
     invoiceId: data.invoiceId,
     accessKey: data.accessKey
   };
+  const invoice = await getBitPayInvoice(data.invoiceId as string).catch(() => data.invoice);
   const giftCard = await post(url, params)
     .then((res: { claimCode?: string; claimLink?: string; pin?: string; barcodeImage?: string }) => {
       const status = res.claimCode || res.claimLink ? 'SUCCESS' : 'PENDING';
       const fullCard = {
         ...data,
         ...res,
+        invoice,
         status
       };
       return fullCard;
@@ -120,15 +127,12 @@ export async function redeemGiftCard(data: Partial<GiftCard>): Promise<GiftCard>
     .catch(err => {
       const errMessage = err.message || (err.error && err.error.message);
       const pendingMessages = ['Card creation delayed', 'Invoice is unpaid or payment has not confirmed'];
+      const invoiceStatus = invoice?.status as string;
+      const hasValidPayment = ['paid', 'confirmed', 'complete'].includes(invoiceStatus);
       const isDelayed = pendingMessages.includes(errMessage) || errMessage.indexOf('Please wait') !== -1;
-      return { ...data, status: isDelayed ? 'PENDING' : 'FAILURE' };
+      return { ...data, invoice, status: isDelayed && hasValidPayment ? 'PENDING' : 'FAILURE' };
     });
   return giftCard as GiftCard;
-}
-
-export async function getBitPayInvoice(id: string): Promise<Invoice> {
-  const { data } = await fetch(`${process.env.API_ORIGIN}/invoices/${id}`).then(res => res.json());
-  return data;
 }
 
 export function fetchAvailableCards(params: { user: BitpayUser }): Promise<CardConfig[]> {

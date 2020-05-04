@@ -14,7 +14,7 @@ const manifestInput = {
     '128': 'assets/icons/favicon-128.png'
   },
 
-  description: 'Spend crypto anywhere',
+  description: 'Spend crypto instantly',
   homepage_url: 'https://github.com/bitpay/bitpay-browser-extension',
   short_name: 'Pay with BitPay',
 

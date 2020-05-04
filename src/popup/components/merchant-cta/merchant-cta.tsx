@@ -44,7 +44,7 @@ const MerchantCta: React.FC<{ merchant?: Merchant; slimCTA: boolean }> = ({ merc
             <>
               <Link to={{ pathname: '/shop' }}>
                 <SuperToast
-                  title="Spend Crypto Anywhere"
+                  title="Spend Crypto Instantly"
                   caption="Purchase store credit at more than a 100+ major retailers"
                   shopMode
                 />
