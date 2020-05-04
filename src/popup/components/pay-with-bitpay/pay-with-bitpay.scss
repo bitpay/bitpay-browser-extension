@@ -13,13 +13,7 @@
   &__pay-button {
     height: 60px;
   }
-}
-
-@keyframes spin {
-  0% {
-    transform: rotateZ(0);
-  }
-  100% {
-    transform: rotateZ(360deg);
+  .action-button__spinner {
+    animation: unset;
   }
 }

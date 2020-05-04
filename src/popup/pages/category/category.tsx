@@ -122,8 +122,8 @@ const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location
             )}
           </>
         ) : (
-          <div className="spinner__wrapper">
-            <img className="spinner" src="../assets/icons/spinner-thick.svg" alt="spinner" />
+          <div className="loading-spinner__wrapper">
+            <img className="loading-spinner" src="../assets/icons/spinner-thick.svg" alt="spinner" />
           </div>
         )}
       </div>
