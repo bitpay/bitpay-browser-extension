@@ -17,6 +17,10 @@ const cacheValidityDuration = 1000 * 60;
 
 const windowIdResolveMap: { [windowId: number]: (message: GiftCardInvoiceMessage) => GiftCardInvoiceMessage } = {};
 
+function isNormalPage(tab: Tabs.Tab): boolean {
+  return !!tab.url && (tab.url.startsWith('https://') || tab.url.startsWith('http://'));
+}
+
 function getIconPath(bitpayAccepted: boolean): string {
   return `/assets/icons/favicon${bitpayAccepted ? '' : '-inactive'}-128.png`;
 }
@@ -60,7 +64,7 @@ async function sendMessageToTab(message: any, tab: Tabs.Tab): Promise<void> {
 }
 
 browser.browserAction.onClicked.addListener(async tab => {
-  if (!tab.url || (!tab.url.startsWith('https://') && !tab.url.startsWith('http://'))) {
+  if (!isNormalPage(tab)) {
     browser.tabs.create({ url: `${process.env.API_ORIGIN}/directory?launchExtension=true` });
     return;
   }
@@ -73,9 +77,13 @@ browser.browserAction.onClicked.addListener(async tab => {
 
 browser.runtime.onInstalled.addListener(async () => {
   const allTabs = await browser.tabs.query({});
-  allTabs.forEach(tab => {
-    browser.tabs.executeScript(tab.id, { file: 'js/contentScript.bundle.js' });
-  });
+  allTabs
+    .filter(tab => isNormalPage(tab))
+    .forEach(tab => {
+      browser.tabs.executeScript(tab.id, { file: 'js/contentScript.bundle.js' }).catch(err => {
+        console.log('Unable to initialize content script for tab', err);
+      });
+    });
   await Promise.all([refreshCachedMerchantsIfNeeded(), createClientIdIfNotExists()]);
 });
 
