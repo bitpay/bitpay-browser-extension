@@ -1,9 +1,16 @@
 import React, { useRef, useEffect, Dispatch, SetStateAction, useState } from 'react';
 import { browser } from 'webextension-polyfill-ts';
+import { motion, AnimatePresence } from 'framer-motion';
 import { BitpayUser } from '../../../../services/bitpay-id';
 import { resizeToFitPage } from '../../../../services/frame';
-import { IOSSwitch } from '../../../components/ios-switch/ios-switch';
 import { set, get, remove } from '../../../../services/storage';
+import {
+  buttonAnimation,
+  buttonTextAnimation,
+  buttonSpinnerAnimation,
+  spinAnimation
+} from '../../../../services/animations';
+import { IOSSwitch } from '../../../components/ios-switch/ios-switch';
 import CardMenu from '../../../components/card-menu/card-menu';
 import { SignInWithBitpayImage } from '../../../components/svg/sign-in-with-bitpay-image';
 import Gravatar from '../../../components/gravatar/gravatar';
@@ -85,16 +92,49 @@ const Account: React.FC<{
               Connect Account
             </button>
             <div className="account__body">Use your account to sync gift cards, track your purchases, and more.</div>
-            {awaitingAuthentication ? (
-              <div className="action-button action-button--pending">
-                <img className="action-button__spinner" src="../../assets/icons/spinner.svg" alt="spinner" /> Awaiting
-                Authentication
-              </div>
-            ) : (
-              <button type="button" onClick={connectBitpayId} className="account__zero-state__sign-in">
-                <SignInWithBitpayImage />
-              </button>
-            )}
+            <AnimatePresence exitBeforeEnter>
+              {awaitingAuthentication ? (
+                <motion.div
+                  className="action-button action-button--pending"
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={buttonAnimation}
+                  key="awaiting-authentication"
+                >
+                  <motion.span
+                    className="d-flex"
+                    variants={buttonSpinnerAnimation}
+                    key="awaiting-authentication-wrapper"
+                  >
+                    <motion.img
+                      className="action-button__spinner"
+                      src="../../assets/icons/spinner.svg"
+                      alt="spinner"
+                      variants={spinAnimation}
+                      key="awaiting-authentication-spinner"
+                    />
+                  </motion.span>
+                  <motion.span variants={buttonTextAnimation} key="awaiting-authentication-text">
+                    Awaiting Authentication
+                  </motion.span>
+                </motion.div>
+              ) : (
+                <motion.button
+                  type="button"
+                  onClick={connectBitpayId}
+                  className="account__zero-state__sign-in"
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={buttonAnimation}
+                  whileTap={{ scale: 0.98 }}
+                  key="sign-in-with-bitpay"
+                >
+                  <SignInWithBitpayImage />
+                </motion.button>
+              )}
+            </AnimatePresence>
           </div>
         )}
       </div>

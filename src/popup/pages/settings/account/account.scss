@@ -45,6 +45,10 @@
       display: block;
       height: 60px;
     }
+
+    .action-button__spinner {
+      animation: unset;
+    }
   }
   &__title {
     font-size: 20px;

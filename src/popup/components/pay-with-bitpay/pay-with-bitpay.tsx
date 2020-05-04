@@ -132,7 +132,7 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
               variants={buttonAnimation}
               key="awaiting-payment"
             >
-              <motion.span variants={buttonSpinnerAnimation} key="awaiting-payment-wrapper">
+              <motion.span className="d-flex" variants={buttonSpinnerAnimation} key="awaiting-payment-wrapper">
                 <motion.img
                   className="action-button__spinner"
                   src="../../assets/icons/spinner.svg"
