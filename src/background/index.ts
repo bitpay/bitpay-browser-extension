@@ -96,7 +96,15 @@ async function launchWindowAndListenForEvents({
   height: number;
   width: number;
 }): Promise<GiftCardInvoiceMessage> {
-  const { id } = await browser.windows.create({ url, type: 'popup', height, width });
+  const { id, height: winHeight, width: winWidth } = await browser.windows.create({
+    url,
+    type: 'popup',
+    height,
+    width
+  });
+  if ((winHeight as number) !== height || (winWidth as number) !== width) {
+    await browser.windows.update(id as number, { height, width });
+  }
   const promise = new Promise<GiftCardInvoiceMessage>(resolve => {
     windowIdResolveMap[id as number] = resolve as () => GiftCardInvoiceMessage;
   });
