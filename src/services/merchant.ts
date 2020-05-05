@@ -54,7 +54,7 @@ export function doesUrlMatch(url: string, supportedUrl: string): boolean {
     `(https?:\\/\\/(.+?\\.)?${urlWithoutProtocol}(\\/[A-Za-z0-9\\-\\._~:\\/\\?#\\[\\]@!$&'\\(\\)\\*\\+,;\\=]*)?)`,
     'g'
   );
-  return regExp.test(url);
+  return !!supportedUrl && regExp.test(url);
 }
 
 export function doAnyUrlsMatch(url: string, supportedUrls: string[]): boolean {

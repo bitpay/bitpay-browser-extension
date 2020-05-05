@@ -60,22 +60,20 @@ async function sendMessageToTab(message: any, tab: Tabs.Tab): Promise<void> {
 }
 
 browser.browserAction.onClicked.addListener(async tab => {
-  if (!tab.url || (!tab.url.startsWith('https://') && !tab.url.startsWith('http://'))) {
-    browser.tabs.create({ url: `${process.env.API_ORIGIN}/directory?launchExtension=true` });
-    return;
-  }
   const merchant = tab.url && getBitPayMerchantFromUrl(tab.url, await getCachedMerchants());
-  await browser.tabs.sendMessage(tab.id as number, {
-    name: 'EXTENSION_ICON_CLICKED',
-    merchant
-  });
+  await browser.tabs
+    .sendMessage(tab.id as number, {
+      name: 'EXTENSION_ICON_CLICKED',
+      merchant
+    })
+    .catch(() => browser.tabs.create({ url: `${process.env.API_ORIGIN}/directory?launchExtension=true` }));
 });
 
 browser.runtime.onInstalled.addListener(async () => {
   const allTabs = await browser.tabs.query({});
-  allTabs.forEach(tab => {
-    browser.tabs.executeScript(tab.id, { file: 'js/contentScript.bundle.js' });
-  });
+  allTabs.forEach(tab =>
+    browser.tabs.executeScript(tab.id, { file: 'js/contentScript.bundle.js' }).catch(() => undefined)
+  );
   await Promise.all([refreshCachedMerchantsIfNeeded(), createClientIdIfNotExists()]);
 });
 
@@ -88,7 +86,15 @@ async function launchWindowAndListenForEvents({
   height: number;
   width: number;
 }): Promise<GiftCardInvoiceMessage> {
-  const { id } = await browser.windows.create({ url, type: 'popup', height, width });
+  const { id, height: winHeight, width: winWidth } = await browser.windows.create({
+    url,
+    type: 'popup',
+    height,
+    width
+  });
+  if ((winHeight as number) !== height || (winWidth as number) !== width) {
+    await browser.windows.update(id as number, { height, width });
+  }
   const promise = new Promise<GiftCardInvoiceMessage>(resolve => {
     windowIdResolveMap[id as number] = resolve as () => GiftCardInvoiceMessage;
   });
