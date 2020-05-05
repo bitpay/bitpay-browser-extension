@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import classNames from 'classnames';
 import { browser } from 'webextension-polyfill-ts';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GiftCard, CardConfig, GiftCardInvoiceParams } from '../../../services/gift-card.types';
@@ -147,10 +146,7 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
             </motion.div>
           ) : (
             <motion.button
-              className={classNames({
-                disabled: !invoiceParams.email,
-                'pay-with-bitpay__pay-button': true
-              })}
+              className="pay-with-bitpay__pay-button"
               type="button"
               onClick={payButton}
               initial="hidden"

@@ -32,6 +32,7 @@ const Balance: React.FC<{
   // eslint-disable-next-line no-unused-expressions
   inputRef.current?.focus();
   const step = getPrecision(cardConfig.currency) === 2 ? '0.01' : '1';
+  const min = updateType === 'Remaining Balance' ? 0 : step;
   const onEmailChange = (): void => {
     setFormValid(inputRef.current?.validity.valid || false);
   };
@@ -71,7 +72,7 @@ const Balance: React.FC<{
                   type="number"
                   autoFocus
                   step={step}
-                  min="0"
+                  min={min}
                   max={updateType === 'Amount Spent' ? latestBalance : ''}
                   required
                   onChange={onEmailChange}
