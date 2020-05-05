@@ -4,7 +4,7 @@ import './gravatar.scss';
 
 const Gravatar: React.FC<{ email: string; size?: string | number }> = ({ email, size = 30 }) => {
   const emailHash = Md5.hashStr(email || '') as string;
-  const defaultImg = 'https://bitpay.com/img/wallet-logos/bitpay-wallet.png';
+  const defaultImg = `${process.env.API_ORIGIN}/img/wallet-logos/bitpay-wallet.png`;
   const url = `https://gravatar.com/avatar/${emailHash}.jpg?s=${+size * 4}&d=${defaultImg}`;
 
   return <img src={url} height={size} width={size} className="gravatar" alt="profile icon" />;

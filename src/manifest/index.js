@@ -19,7 +19,9 @@ const manifestInput = {
   short_name: 'Pay with BitPay',
 
   permissions: ['activeTab', 'storage', 'http://*/*', 'https://*/*'],
-  content_security_policy: "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  content_security_policy: `script-src 'self' ${
+    process.env.NODE_ENV === 'production' ? '' : "'unsafe-eval'"
+  }; object-src 'self'`,
 
   '__chrome|firefox__author': 'bitpay',
   __opera__developer: {
@@ -47,13 +49,13 @@ const manifestInput = {
     __firefox__browser_style: false
   },
 
-  '__chrome|opera__options_page': 'options.html',
+  // '__chrome|opera__options_page': 'options.html',
 
-  options_ui: {
-    page: 'options.html',
-    open_in_tab: true,
-    __chrome__chrome_style: false
-  },
+  // options_ui: {
+  //   page: 'options.html',
+  //   open_in_tab: true,
+  //   __chrome__chrome_style: false
+  // },
 
   background: {
     scripts: ['js/background.bundle.js'],

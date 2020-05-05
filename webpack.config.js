@@ -8,6 +8,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 const WriteWebpackPlugin = require('write-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ExtensionReloader = require('webpack-extension-reloader');
@@ -22,6 +23,11 @@ const destPath = path.join(__dirname, 'extension');
 const nodeEnv = process.env.NODE_ENV || 'development';
 const targetBrowser = process.env.TARGET_BROWSER;
 const manifest = wextManifest[targetBrowser](manifestInput);
+
+const dotEnv = new Dotenv({
+  path: process.env.NODE_ENV === 'production' ? '.env' : `.env.${process.env.NODE_ENV}`,
+  defaults: true
+});
 
 const extensionReloaderPlugin =
   nodeEnv === 'development'
@@ -116,10 +122,7 @@ module.exports = {
     new ForkTsCheckerWebpackPlugin(),
     // environmental variables
     new webpack.EnvironmentPlugin(['NODE_ENV', 'TARGET_BROWSER']),
-    new Dotenv({
-      path: process.env.NODE_ENV === 'production' ? '.env' : `.env.${process.env.NODE_ENV}`,
-      defaults: true
-    }),
+    dotEnv,
     // delete previous build files
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: [
@@ -141,6 +144,33 @@ module.exports = {
       chunks: ['options'],
       filename: 'options.html'
     }),
+    new CspHtmlWebpackPlugin(
+      {
+        'default-src': ["'self'", dotEnv.definitions['process.env.API_ORIGIN'].replace(/"/g, '')],
+        'base-uri': "'self'",
+        'img-src': [
+          'https://gravatar.com',
+          'https://*.wp.com',
+          dotEnv.definitions['process.env.API_ORIGIN'].replace(/"/g, '')
+        ],
+        'font-src': ['https://fonts.gstatic.com'],
+        'object-src': "'none'",
+        'script-src': process.env.NODE_ENV === 'production' ? ["'self'"] : ["'self'", "'unsafe-eval'"],
+        'style-src': ["'self'", 'https://fonts.googleapis.com/', "'unsafe-inline'"]
+      },
+      {
+        enabled: true,
+        hashingMethod: 'sha256',
+        hashEnabled: {
+          'script-src': process.env.NODE_ENV === 'production',
+          'style-src': false
+        },
+        nonceEnabled: {
+          'script-src': process.env.NODE_ENV === 'production',
+          'style-src': false
+        }
+      }
+    ),
     // write css file(s) to build folder
     new MiniCssExtractPlugin({
       filename: 'css/[name].css'
