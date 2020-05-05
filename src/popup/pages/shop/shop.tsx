@@ -19,7 +19,11 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
   const ref = useRef<HTMLDivElement>(null);
   const [searchVal, setSearchVal] = useState('' as string);
   const [isDirty, setDirty] = useState(false);
-  const categories = directory.categories ? Object.keys(directory.categories) : null;
+  const categories = directory.categories
+    ? Object.keys(directory.categories).sort((a, b) =>
+        directory.categories[a].displayName.localeCompare(directory.categories[b].displayName)
+      )
+    : null;
   const curation = directory.curated ? Object.keys(directory.curated) : null;
   const filteredMerchants = merchants.filter(
     merchant =>
