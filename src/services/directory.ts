@@ -1,4 +1,5 @@
 import { Merchant } from './merchant';
+import { set } from './storage';
 
 export interface DirectoryCurationApiObject {
   displayName: string;
@@ -75,7 +76,10 @@ export function fetchDirectIntegrations(): Promise<DirectIntegration[]> {
     .then((merchantMap: DirectIntegrationMap) => getDirectIntegrations(merchantMap));
 }
 
-export const saturateDirectory = (directoryApiObject: DirectoryApiObject, merchants: Merchant[]): Directory => {
+export const saturateDirectory = (
+  directoryApiObject: DirectoryApiObject = { curated: {}, categories: {} },
+  merchants: Merchant[] = []
+): Directory => {
   const directory = { ...directoryApiObject } as Directory;
   Object.keys(directory.curated).forEach(category => {
     const categoryObj = directory.curated[category];
@@ -102,5 +106,7 @@ export const saturateDirectory = (directoryApiObject: DirectoryApiObject, mercha
 };
 
 export async function fetchDirectory(): Promise<Directory> {
-  return fetch(`${process.env.API_ORIGIN}/merchant-directory/directory`).then(res => res.json());
+  const directory = await fetch(`${process.env.API_ORIGIN}/merchant-directory/directory`).then(res => res.json());
+  await set<Directory>('directory', directory);
+  return directory;
 }
