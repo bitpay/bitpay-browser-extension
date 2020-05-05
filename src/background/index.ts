@@ -17,10 +17,6 @@ const cacheValidityDuration = 1000 * 60;
 
 const windowIdResolveMap: { [windowId: number]: (message: GiftCardInvoiceMessage) => GiftCardInvoiceMessage } = {};
 
-function isNormalPage(tab: Tabs.Tab): boolean {
-  return !!tab.url && (tab.url.startsWith('https://') || tab.url.startsWith('http://'));
-}
-
 function getIconPath(bitpayAccepted: boolean): string {
   return `/assets/icons/favicon${bitpayAccepted ? '' : '-inactive'}-128.png`;
 }
@@ -64,26 +60,20 @@ async function sendMessageToTab(message: any, tab: Tabs.Tab): Promise<void> {
 }
 
 browser.browserAction.onClicked.addListener(async tab => {
-  if (!isNormalPage(tab)) {
-    browser.tabs.create({ url: `${process.env.API_ORIGIN}/directory?launchExtension=true` });
-    return;
-  }
   const merchant = tab.url && getBitPayMerchantFromUrl(tab.url, await getCachedMerchants());
-  await browser.tabs.sendMessage(tab.id as number, {
-    name: 'EXTENSION_ICON_CLICKED',
-    merchant
-  });
+  await browser.tabs
+    .sendMessage(tab.id as number, {
+      name: 'EXTENSION_ICON_CLICKED',
+      merchant
+    })
+    .catch(() => browser.tabs.create({ url: `${process.env.API_ORIGIN}/directory?launchExtension=true` }));
 });
 
 browser.runtime.onInstalled.addListener(async () => {
   const allTabs = await browser.tabs.query({});
-  allTabs
-    .filter(tab => isNormalPage(tab))
-    .forEach(tab => {
-      browser.tabs.executeScript(tab.id, { file: 'js/contentScript.bundle.js' }).catch(err => {
-        console.log('Unable to initialize content script for tab', err);
-      });
-    });
+  allTabs.forEach(tab =>
+    browser.tabs.executeScript(tab.id, { file: 'js/contentScript.bundle.js' }).catch(() => undefined)
+  );
   await Promise.all([refreshCachedMerchantsIfNeeded(), createClientIdIfNotExists()]);
 });
 
