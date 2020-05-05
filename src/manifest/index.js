@@ -49,13 +49,13 @@ const manifestInput = {
     __firefox__browser_style: false
   },
 
-  '__chrome|opera__options_page': 'options.html',
+  // '__chrome|opera__options_page': 'options.html',
 
-  options_ui: {
-    page: 'options.html',
-    open_in_tab: true,
-    __chrome__chrome_style: false
-  },
+  // options_ui: {
+  //   page: 'options.html',
+  //   open_in_tab: true,
+  //   __chrome__chrome_style: false
+  // },
 
   background: {
     scripts: ['js/background.bundle.js'],
