@@ -14,8 +14,8 @@ import {
   Merchant,
   getBitPayMerchantFromUrl,
   fetchCachedMerchants,
-  fetchMerchants,
-  getMerchantInitialEntries
+  getMerchantInitialEntries,
+  fetchDirectoryAndMerchants
 } from '../services/merchant';
 import Amount from './pages/amount/amount';
 import Payment from './pages/payment/payment';
@@ -35,7 +35,7 @@ import Balance from './pages/card/balance/balance';
 import { BitpayUser } from '../services/bitpay-id';
 import Account from './pages/settings/account/account';
 import { refreshMerchantCache } from '../services/browser';
-import { Directory, saturateDirectory, fetchDirectory } from '../services/directory';
+import { Directory, saturateDirectory } from '../services/directory';
 import './styles.scss';
 
 const Popup: React.FC = () => {
@@ -63,7 +63,7 @@ const Popup: React.FC = () => {
   useEffect(() => {
     if (Date.now() - popupLaunchTime.current < 1000) return;
     const updateMerchants = async (): Promise<void> => {
-      const [newDirectory, newMerchants] = await Promise.all([fetchDirectory(), fetchMerchants()]);
+      const [newDirectory, newMerchants] = await fetchDirectoryAndMerchants();
       setDirectory(saturateDirectory(newDirectory, newMerchants));
       setMerchants(newMerchants);
       setSupportedMerchant(getBitPayMerchantFromUrl(parentUrl.current, newMerchants));
@@ -71,7 +71,9 @@ const Popup: React.FC = () => {
       setSupportedGiftCards(newSupportedGiftCards);
       refreshMerchantCache();
     };
-    updateMerchants();
+    updateMerchants()
+      .then()
+      .catch(err => console.log('Error updating merchants after user change', err));
   }, [user]);
 
   useEffect(() => {
