@@ -116,7 +116,9 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
     case 'ID_CONNECTED': {
       const resolveFn = windowIdResolveMap[tab?.windowId as number];
       delete windowIdResolveMap[tab?.windowId as number];
-      browser.tabs.remove(tab?.id as number);
+      browser.tabs.remove(tab?.id as number).catch(() => {
+        browser.tabs.executeScript(tab?.id as number, { code: 'window.close()' });
+      });
       await pairBitpayId(message.data);
       return resolveFn && resolveFn({ data: { status: 'complete' } });
     }
