@@ -40,11 +40,13 @@ const Brand: React.FC<any> = ({ location, directory, merchants }) => {
         directory.categories[a].tags.filter((tag: string) => merchant.tags.includes(tag)).length
     )[0];
     const suggestions = merchants
-      .filter(
-        (m: Merchant) =>
-          m.displayName !== merchant.displayName &&
-          m.tags.filter((tag: string) => merchant.tags.includes(tag)).length > Math.round(merchant.tags.length / 3)
+      .filter((m: Merchant) => m.displayName !== merchant.displayName)
+      .sort(
+        (a: Merchant, b: Merchant) =>
+          b.tags.filter((tag: string) => merchant.tags.includes(tag)).length -
+          a.tags.filter((tag: string) => merchant.tags.includes(tag)).length
       )
+      .slice(0, 8)
       .sort(() => 0.5 - Math.random());
     return { category, suggestions };
   }, [directory, merchants, merchant]);
@@ -117,32 +119,38 @@ const Brand: React.FC<any> = ({ location, directory, merchants }) => {
               </div>
             </>
           )}
-          {suggested && (
+          {merchant.hasDirectIntegration && !merchant.cta && (
             <>
               <div className="brand-page__body__divider" />
               <div className="shop-page__section-header">
                 You Might Also Like
-                <Link
-                  className="shop-page__section-header--action"
-                  to={{
-                    pathname: `/category/${directory.categories[suggested.category].displayName}`,
-                    state: { category: directory.categories[suggested.category] }
-                  }}
-                >
-                  See All
-                </Link>
+                {suggested.category && (
+                  <Link
+                    className="shop-page__section-header--action"
+                    to={{
+                      pathname: `/category/${directory.categories[suggested.category].displayName}`,
+                      state: { category: directory.categories[suggested.category] }
+                    }}
+                  >
+                    See All
+                  </Link>
+                )}
               </div>
-              {suggested.suggestions.slice(0, 2).map(suggestion => (
-                <Link
-                  to={{
-                    pathname: `/brand/${suggestion.name}`,
-                    state: { merchant: suggestion }
-                  }}
-                  key={suggestion.name}
-                >
-                  <MerchantCell key={suggestion.name} merchant={suggestion} />
-                </Link>
-              ))}
+              {suggested.suggestions.length > 0 && (
+                <>
+                  {suggested.suggestions.slice(0, 2).map(suggestion => (
+                    <Link
+                      to={{
+                        pathname: `/brand/${suggestion.name}`,
+                        state: { merchant: suggestion }
+                      }}
+                      key={suggestion.name}
+                    >
+                      <MerchantCell key={suggestion.name} merchant={suggestion} />
+                    </Link>
+                  ))}
+                </>
+              )}
             </>
           )}
         </div>
