@@ -28,11 +28,6 @@
     padding: 18px;
   }
 
-  &[disabled] {
-    opacity: 0.6;
-    pointer-events: none;
-  }
-
   &__footer {
     margin: 10px 4px 0;
     &--fixed {
@@ -77,5 +72,12 @@
     height: 60px;
     width: 270px;
     margin-top: 0;
+  }
+}
+
+button {
+  &[disabled] {
+    opacity: 0.6 !important;
+    pointer-events: none;
   }
 }
