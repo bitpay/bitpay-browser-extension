@@ -10,15 +10,23 @@ export interface DirectoryCategoryApiObject {
   displayName: string;
   emoji: string;
   tags: string[];
+  name?: string;
 }
 
-export interface DirectoryApiObject {
+export interface DirectoryRawData {
   curated: {
     [category: string]: DirectoryCurationApiObject;
   };
   categories: {
     [category: string]: DirectoryCategoryApiObject;
   };
+}
+
+export interface DirectoryApiObject {
+  curated: {
+    [category: string]: DirectoryCurationApiObject;
+  };
+  categories: [DirectoryCategory?];
 }
 
 export interface DirectoryCuration extends DirectoryCurationApiObject {
@@ -33,9 +41,7 @@ export interface Directory {
   curated: {
     [category: string]: DirectoryCuration;
   };
-  categories: {
-    [category: string]: DirectoryCategory;
-  };
+  categories: [DirectoryCategory];
 }
 
 export interface DirectIntegrationApiObject {
@@ -76,8 +82,16 @@ export function fetchDirectIntegrations(): Promise<DirectIntegration[]> {
     .then((merchantMap: DirectIntegrationMap) => getDirectIntegrations(merchantMap));
 }
 
+export function getFormattedCategories(directory: DirectoryRawData): Directory {
+  const categories = Object.keys(directory.categories).map(key => ({ name: key, ...directory.categories[key] })) as [
+    DirectoryCategoryApiObject
+  ];
+  const newDirectory = { curated: { ...directory.curated }, categories } as Directory;
+  return newDirectory;
+}
+
 export const saturateDirectory = (
-  directoryApiObject: DirectoryApiObject = { curated: {}, categories: {} },
+  directoryApiObject: DirectoryApiObject = { curated: {}, categories: [] },
   merchants: Merchant[] = []
 ): Directory => {
   const directory = { ...directoryApiObject } as Directory;
@@ -95,18 +109,18 @@ export const saturateDirectory = (
       );
     if (categoryObj.availableMerchants.length === 0) delete directory.curated[category];
   });
-  Object.keys(directory.categories).forEach(category => {
-    const categoryObj = directory.categories[category];
+  directory.categories.forEach((categoryObj, index) => {
     categoryObj.availableMerchants = merchants.filter(merchant =>
       categoryObj.tags.some(tag => merchant.tags.includes(tag))
     );
-    if (categoryObj.availableMerchants.length === 0) delete directory.categories[category];
+    if (categoryObj.availableMerchants.length === 0) directory.categories.splice(index, 1);
   });
   return directory;
 };
 
 export async function fetchDirectory(): Promise<Directory> {
   const directory = await fetch(`${process.env.API_ORIGIN}/merchant-directory/directory`).then(res => res.json());
-  await set<Directory>('directory', directory);
-  return directory;
+  const newDirectory: Directory = getFormattedCategories(directory);
+  await set<Directory>('directory', newDirectory);
+  return newDirectory;
 }

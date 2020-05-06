@@ -19,11 +19,7 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
   const ref = useRef<HTMLDivElement>(null);
   const [searchVal, setSearchVal] = useState('' as string);
   const [isDirty, setDirty] = useState(false);
-  const categories = directory.categories
-    ? Object.keys(directory.categories).sort((a, b) =>
-        directory.categories[a].displayName.localeCompare(directory.categories[b].displayName)
-      )
-    : null;
+  const categories = directory.categories || null;
   const curation = directory.curated ? Object.keys(directory.curated) : null;
   const filteredMerchants = merchants.filter(
     merchant =>
@@ -149,15 +145,15 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
                     {categories.map(category => (
                       <Link
                         className="shop-page__categories__item"
-                        key={category}
+                        key={category.name}
                         to={{
-                          pathname: `/category/${directory.categories[category].emoji}`,
-                          state: { category: directory.categories[category] }
+                          pathname: `/category/${category.emoji}`,
+                          state: { category }
                         }}
                         onClick={handleClick}
                       >
-                        <div className="shop-page__categories__item__icon">{directory.categories[category].emoji}</div>
-                        {directory.categories[category].displayName}
+                        <div className="shop-page__categories__item__icon">{category.emoji}</div>
+                        {category.displayName}
                       </Link>
                     ))}
                   </div>
