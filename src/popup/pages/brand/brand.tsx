@@ -11,11 +11,7 @@ import ActionButton from '../../components/action-button/action-button';
 import DiscountText from '../../components/discount-text/discount-text';
 import MerchantCell from '../../components/merchant-cell/merchant-cell';
 
-const Brand: React.FC<RouteComponentProps & { directory: Directory; merchants: Merchant[] }> = ({
-  location,
-  directory,
-  merchants
-}) => {
+const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ location, directory }) => {
   const ref = useRef<HTMLDivElement>(null);
   const { merchant } = location.state as { merchant: Merchant };
   const cardConfig = merchant.giftCards[0];
@@ -35,17 +31,16 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory; merchants: M
         directory.categories[b].tags.filter((tag: string) => merchant.tags.includes(tag)).length -
         directory.categories[a].tags.filter((tag: string) => merchant.tags.includes(tag)).length
     )[0];
-    const suggestions = merchants
-      .filter((m: Merchant) => m.displayName !== merchant.displayName)
-      .sort(
-        (a: Merchant, b: Merchant) =>
-          b.tags.filter((tag: string) => merchant.tags.includes(tag)).length -
-          a.tags.filter((tag: string) => merchant.tags.includes(tag)).length
+    const suggestions = directory.categories[category].availableMerchants
+      .filter(
+        (m: Merchant) =>
+          m.displayName !== merchant.displayName &&
+          m.tags.filter((tag: string) => merchant.tags.includes(tag)).length >
+            Math.max(Math.round(merchant.tags.length / 3), 1)
       )
-      .slice(0, 8)
       .sort(() => 0.5 - Math.random());
     return { category, suggestions };
-  }, [directory, merchants, merchant]);
+  }, [directory, merchant]);
   useEffect((): void => {
     if (!ref.current) return;
     resizeToFitPage(ref, merchant.cta || merchant.giftCards[0] ? 125 : 50);
@@ -122,7 +117,7 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory; merchants: M
               </div>
             </>
           )}
-          {suggested?.suggestions?.length > 0 && (
+          {suggested?.suggestions?.length > 1 && (
             <>
               <div className="brand-page__body__divider" />
               <div className="shop-page__section-header">
