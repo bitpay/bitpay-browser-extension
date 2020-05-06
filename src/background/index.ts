@@ -3,10 +3,10 @@ import * as uuid from 'uuid';
 import { GiftCardInvoiceMessage } from '../services/gift-card.types';
 import {
   isBitPayAccepted,
-  fetchMerchants,
   Merchant,
   fetchCachedMerchants,
-  getBitPayMerchantFromUrl
+  getBitPayMerchantFromUrl,
+  fetchDirectoryAndMerchants
 } from '../services/merchant';
 import { get, set } from '../services/storage';
 import { generatePairingToken } from '../services/bitpay-id';
@@ -36,8 +36,9 @@ async function refreshCachedMerchants(): Promise<void> {
 
 async function refreshCachedMerchantsIfNeeded(): Promise<void> {
   if (Date.now() < cacheDate + cacheValidityDuration) return;
-  await fetchMerchants();
-  await refreshCachedMerchants();
+  return fetchDirectoryAndMerchants()
+    .then(() => refreshCachedMerchants())
+    .catch(err => console.log('Error refreshing merchants', err));
 }
 
 async function handleUrlChange(url: string): Promise<void> {

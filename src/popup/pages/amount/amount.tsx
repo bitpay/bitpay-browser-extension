@@ -11,6 +11,7 @@ import { resizeFrame } from '../../../services/frame';
 import ActionButton from '../../components/action-button/action-button';
 import { BitpayUser } from '../../../services/bitpay-id';
 import './amount.scss';
+import { formatCurrency } from '../../../services/currency';
 
 const shkAmp = 12;
 
@@ -41,7 +42,11 @@ const Amount: React.FC<RouteComponentProps & {
     (onMerchantWebsite && isAmountValid(initialAmount || 0, cardConfig) && initialAmount) ||
     (cardConfig.supportedAmounts && cardConfig.supportedAmounts[0] ? cardConfig.supportedAmounts[0] : 0);
   const [amount, setAmount] = useState(preloadedAmount);
-  const [inputValue, setInputValue] = useState(preloadedAmount ? `${preloadedAmount}` : '');
+  const [inputValue, setInputValue] = useState(
+    preloadedAmount
+      ? formatCurrency(preloadedAmount, cardConfig.currency, { customPrecision: 'minimal' }).replace(/[^\d.-]/g, '')
+      : ''
+  );
   const [inputError, setInputError] = useState(false);
   const [inputDirty, setInputDirty] = useState(false);
   const discount = (cardConfig.discounts || [])[0];
