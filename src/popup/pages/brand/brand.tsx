@@ -1,38 +1,29 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, RouteComponentProps } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
+import './brand.scss';
+import { Directory } from '../../../services/directory';
 import { Merchant, getDiscount } from '../../../services/merchant';
 import { resizeToFitPage, FrameDimensions } from '../../../services/frame';
 import { goToPage } from '../../../services/browser';
 import CardDenoms from '../../components/card-denoms/card-denoms';
 import ActionButton from '../../components/action-button/action-button';
 import DiscountText from '../../components/discount-text/discount-text';
-import './brand.scss';
 import MerchantCell from '../../components/merchant-cell/merchant-cell';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Brand: React.FC<any> = ({ location, directory, merchants }) => {
+const Brand: React.FC<RouteComponentProps & { directory: Directory; merchants: Merchant[] }> = ({
+  location,
+  directory,
+  merchants
+}) => {
   const ref = useRef<HTMLDivElement>(null);
   const { merchant } = location.state as { merchant: Merchant };
-  const initiallyExpanded = merchant.hasDirectIntegration && merchant.instructions.length < 300;
-  const [expandText, setExpandText] = useState(initiallyExpanded);
-  const [pageHeight, setPageHeight] = useState(0);
-  const ctaHeight = 125;
-  useEffect((): void => {
-    if (!ref.current) return;
-    resizeToFitPage(ref, merchant.cta || merchant.giftCards[0] ? ctaHeight : 50);
-    setPageHeight(ref.current.scrollHeight);
-  }, [ref, merchant, expandText]);
+  const [expandText, setExpandText] = useState(merchant.hasDirectIntegration && merchant.instructions.length < 300);
+  const [padding, setPadding] = useState({});
   const cardConfig = merchant.giftCards[0];
-  if (cardConfig && !cardConfig.description) {
-    cardConfig.description = cardConfig.terms;
-  }
+  if (cardConfig && !cardConfig.description) cardConfig.description = cardConfig.terms;
   const color = merchant.theme === '#ffffff' ? '#4f6ef7' : merchant.theme;
   const bubbleStyle = { color: { color, borderColor: color }, contents: { transform: 'translateY(-0.5px)' } };
-  const bodyStyle = {
-    scroll: { paddingBottom: pageHeight > FrameDimensions.maxFrameHeight - ctaHeight ? '96px' : 'auto' },
-    divider: { marginTop: '2px' }
-  };
   const suggested = useMemo((): { category: string; suggestions: Merchant[] } => {
     const category = Object.keys(directory.categories).sort(
       (a, b) =>
@@ -50,6 +41,13 @@ const Brand: React.FC<any> = ({ location, directory, merchants }) => {
       .sort(() => 0.5 - Math.random());
     return { category, suggestions };
   }, [directory, merchants, merchant]);
+  useEffect((): void => {
+    if (!ref.current) return;
+    resizeToFitPage(ref, merchant.cta || merchant.giftCards[0] ? 125 : 50);
+    setPadding({
+      paddingBottom: ref.current.scrollHeight > FrameDimensions.maxFrameHeight - 125 ? '96px' : 'auto'
+    });
+  }, [ref, merchant, expandText]);
   return (
     <div className="brand-page">
       <div ref={ref}>
@@ -79,8 +77,8 @@ const Brand: React.FC<any> = ({ location, directory, merchants }) => {
           </div>
         </div>
 
-        <div className="brand-page__body" style={bodyStyle.scroll}>
-          <div className="brand-page__body__divider" style={bodyStyle.divider} />
+        <div className="brand-page__body" style={padding}>
+          <div className="brand-page__body__divider" style={{ marginTop: '2px' }} />
           <div className="brand-page__body__content">
             <div className="brand-page__body__content__title">
               {merchant.hasDirectIntegration ? <>Payment Instructions</> : <>About</>}
