@@ -18,10 +18,15 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory; merchants: M
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const { merchant } = location.state as { merchant: Merchant };
-  const [expandText, setExpandText] = useState(merchant.hasDirectIntegration && merchant.instructions.length < 300);
-  const [padding, setPadding] = useState({});
   const cardConfig = merchant.giftCards[0];
   if (cardConfig && !cardConfig.description) cardConfig.description = cardConfig.terms;
+  const initiallyExpanded = (): boolean => {
+    if (merchant.hasDirectIntegration) return merchant.instructions.length < 300;
+    if (cardConfig?.description && !cardConfig.terms) return cardConfig.description.length < 300;
+    return false;
+  };
+  const [expandText, setExpandText] = useState(initiallyExpanded());
+  const [padding, setPadding] = useState({});
   const color = merchant.theme === '#ffffff' ? '#4f6ef7' : merchant.theme;
   const bubbleStyle = { color: { color, borderColor: color }, contents: { transform: 'translateY(-0.5px)' } };
   const suggested = useMemo((): { category: string; suggestions: Merchant[] } => {
@@ -106,7 +111,7 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory; merchants: M
               )}
             </div>
           </div>
-          {expandText && cardConfig && cardConfig.terms && (
+          {expandText && cardConfig?.terms && cardConfig.terms !== cardConfig.description && (
             <>
               <div className="brand-page__body__divider" />
               <div className="brand-page__body__content">
@@ -117,7 +122,7 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory; merchants: M
               </div>
             </>
           )}
-          {merchant.hasDirectIntegration && !merchant.cta && (
+          {suggested?.suggestions?.length > 0 && (
             <>
               <div className="brand-page__body__divider" />
               <div className="shop-page__section-header">
@@ -134,21 +139,17 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory; merchants: M
                   </Link>
                 )}
               </div>
-              {suggested.suggestions.length > 0 && (
-                <>
-                  {suggested.suggestions.slice(0, 2).map(suggestion => (
-                    <Link
-                      to={{
-                        pathname: `/brand/${suggestion.name}`,
-                        state: { merchant: suggestion }
-                      }}
-                      key={suggestion.name}
-                    >
-                      <MerchantCell key={suggestion.name} merchant={suggestion} />
-                    </Link>
-                  ))}
-                </>
-              )}
+              {suggested.suggestions.slice(0, 2).map(suggestion => (
+                <Link
+                  to={{
+                    pathname: `/brand/${suggestion.name}`,
+                    state: { merchant: suggestion }
+                  }}
+                  key={suggestion.name}
+                >
+                  <MerchantCell key={suggestion.name} merchant={suggestion} />
+                </Link>
+              ))}
             </>
           )}
         </div>
