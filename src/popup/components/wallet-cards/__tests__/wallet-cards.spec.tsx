@@ -2,7 +2,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { Link } from 'react-router-dom';
 import WalletCards from '../wallet-cards';
-import { CardConfigData, GiftCardsData } from './wallet-card-data';
+import { CardConfigData, GiftCardsData } from '../../../../testData';
 
 const GetBalanceReturnValue = 5;
 jest.mock('../../../../services/gift-card', () => ({
