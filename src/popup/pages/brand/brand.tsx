@@ -45,14 +45,14 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ locat
     if (!ref.current) return;
     const resizePadding = (): number => {
       if (merchant.cta || merchant.giftCards[0])
-        if (suggested.suggestions.length > 2) return -150;
+        if (suggested.suggestions.length > 1) return -150;
         else return 125;
       return 50;
     };
     const bodyPadding = (scrollHeight: number): string => {
       if (merchant.cta || merchant.giftCards[0])
         if (scrollHeight > FrameDimensions.maxFrameHeight - 125) return '96px';
-        else if (suggested.suggestions.length > 2) return '96px';
+        else if (suggested.suggestions.length > 1) return '96px';
       return 'auto';
     };
     resizeToFitPage(ref, resizePadding());
