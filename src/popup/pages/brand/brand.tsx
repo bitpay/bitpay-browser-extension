@@ -43,11 +43,21 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ locat
   }, [directory, merchant]);
   useEffect((): void => {
     if (!ref.current) return;
-    resizeToFitPage(ref, merchant.cta || merchant.giftCards[0] ? 125 : 50);
-    setPadding({
-      paddingBottom: ref.current.scrollHeight > FrameDimensions.maxFrameHeight - 125 ? '96px' : 'auto'
-    });
-  }, [ref, merchant, expandText]);
+    const resizePadding = (): number => {
+      if (merchant.cta || merchant.giftCards[0])
+        if (suggested.suggestions.length > 2) return -150;
+        else return 125;
+      return 50;
+    };
+    const bodyPadding = (scrollHeight: number): string => {
+      if (merchant.cta || merchant.giftCards[0])
+        if (scrollHeight > FrameDimensions.maxFrameHeight - 125) return '96px';
+        else if (suggested.suggestions.length > 2) return '96px';
+      return 'auto';
+    };
+    resizeToFitPage(ref, resizePadding());
+    setPadding({ paddingBottom: bodyPadding(ref.current.scrollHeight) });
+  }, [ref, merchant, expandText, suggested]);
   return (
     <div className="brand-page">
       <div ref={ref}>
