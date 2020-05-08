@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import './brand.scss';
-import { Directory } from '../../../services/directory';
+import { Directory, DirectoryCategory } from '../../../services/directory';
 import { Merchant, getDiscount } from '../../../services/merchant';
 import { resizeToFitPage, FrameDimensions } from '../../../services/frame';
 import { goToPage } from '../../../services/browser';
@@ -25,19 +25,23 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ locat
   const [padding, setPadding] = useState({});
   const color = merchant.theme === '#ffffff' ? '#4f6ef7' : merchant.theme;
   const bubbleStyle = { color: { color, borderColor: color }, contents: { transform: 'translateY(-0.5px)' } };
-  const suggested = useMemo((): { category: string; suggestions: Merchant[] } => {
-    const category = Object.keys(directory.categories).sort(
-      (a, b) =>
-        directory.categories[b].tags.filter((tag: string) => merchant.tags.includes(tag)).length -
-        directory.categories[a].tags.filter((tag: string) => merchant.tags.includes(tag)).length
-    )[0];
-    const suggestions = directory.categories[category].availableMerchants
-      .filter(
-        (m: Merchant) =>
-          m.displayName !== merchant.displayName &&
-          m.tags.filter((tag: string) => merchant.tags.includes(tag)).length >
-            Math.max(Math.round(merchant.tags.length / 3), 1)
+  const suggested = useMemo((): { category: DirectoryCategory; suggestions: Merchant[] } => {
+    const category =
+      directory.categories[
+        Object.keys(directory.categories).sort(
+          (a, b) =>
+            directory.categories[b].tags.filter((tag: string) => merchant.tags.includes(tag)).length -
+            directory.categories[a].tags.filter((tag: string) => merchant.tags.includes(tag)).length
+        )[0]
+      ];
+    const suggestions = category.availableMerchants
+      .filter((m: Merchant) => m.displayName !== merchant.displayName)
+      .sort(
+        (a: Merchant, b: Merchant) =>
+          b.tags.filter((tag: string) => merchant.tags.includes(tag)).length -
+          a.tags.filter((tag: string) => merchant.tags.includes(tag)).length
       )
+      .slice(0, 8)
       .sort(() => 0.5 - Math.random());
     return { category, suggestions };
   }, [directory, merchant]);
@@ -136,8 +140,8 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ locat
                   <Link
                     className="shop-page__section-header--action"
                     to={{
-                      pathname: `/category/${directory.categories[suggested.category].displayName}`,
-                      state: { category: directory.categories[suggested.category] }
+                      pathname: `/category/${suggested.category.displayName}`,
+                      state: { category: suggested.category }
                     }}
                   >
                     See All
