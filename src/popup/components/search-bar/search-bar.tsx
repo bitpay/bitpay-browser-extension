@@ -1,5 +1,6 @@
+import React, { useEffect, useState } from 'react';
+import { motion, transform } from 'framer-motion';
 import './search-bar.scss';
-import React, { useState, useEffect } from 'react';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { useTracking } from 'react-tracking';
@@ -21,8 +22,17 @@ const SearchBar: React.FC<any> = ({ output, value }) => {
     output('');
     tracking.trackEvent({ action: 'clearedSearchBox' });
   };
+  const [scrollY, setScrollY] = useState(window.scrollY);
+  const boxShadow = { boxShadow: `0 1px 5px 0 rgba(0, 0, 0, ${transform(scrollY, [0, 20], [0, 0.05])})` };
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleScroll = (e: any): void => setScrollY(e?.currentTarget?.scrollTop);
+    const parent = document.getElementById('search-bar')?.parentElement;
+    if (parent) parent.addEventListener('scroll', handleScroll);
+    return (): void => parent?.removeEventListener('scroll', handleScroll);
+  }, []);
   return (
-    <div className="search-bar--wrapper">
+    <motion.div id="search-bar" className="search-bar--wrapper" style={boxShadow}>
       <div className="search-bar">
         <div className="search-bar__box">
           <input
@@ -33,7 +43,7 @@ const SearchBar: React.FC<any> = ({ output, value }) => {
             type="text"
           />
           {value ? (
-            <button onClick={clearSearchBox} type="button">
+            <button onClick={clearSearchBox} className="d-flex" type="button">
               <img
                 id="searchClearIcon"
                 className="search-bar__box__icon"
@@ -46,7 +56,7 @@ const SearchBar: React.FC<any> = ({ output, value }) => {
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

@@ -1,24 +1,31 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { RouteComponentProps, Link } from 'react-router-dom';
+import './brand.scss';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { Link, RouteComponentProps } from 'react-router-dom';
 import { useTracking } from 'react-tracking';
 import ReactMarkdown from 'react-markdown';
+import { Directory, DirectoryCategory } from '../../../services/directory';
 import { Merchant, getDiscount } from '../../../services/merchant';
 import { resizeToFitPage, FrameDimensions } from '../../../services/frame';
 import { goToPage } from '../../../services/browser';
 import CardDenoms from '../../components/card-denoms/card-denoms';
 import ActionButton from '../../components/action-button/action-button';
 import DiscountText from '../../components/discount-text/discount-text';
+import MerchantCell from '../../components/merchant-cell/merchant-cell';
 import { trackComponent } from '../../../services/analytics';
-import './brand.scss';
 
-const Brand: React.FC<RouteComponentProps> = ({ location }) => {
+const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ location, directory }) => {
   const tracking = useTracking();
   const ref = useRef<HTMLDivElement>(null);
   const { merchant } = location.state as { merchant: Merchant };
-  const initiallyExpanded = merchant.hasDirectIntegration && merchant.instructions.length < 300;
-  const [textExpanded, setTextExpanded] = useState(initiallyExpanded);
-  const [pageHeight, setPageHeight] = useState(0);
-  const ctaHeight = 125;
+  const cardConfig = merchant.giftCards[0];
+  if (cardConfig && !cardConfig.description) cardConfig.description = cardConfig.terms;
+  const initiallyExpanded = (): boolean => {
+    if (merchant.hasDirectIntegration) return merchant.instructions.length < 300;
+    if (cardConfig?.description && !cardConfig.terms) return cardConfig.description.length < 300;
+    return false;
+  };
+  const [textExpanded, setTextExpanded] = useState(initiallyExpanded());
+  const [padding, setPadding] = useState({});
   const getEventParams = (action: string): { action: string; gaAction: string; merchant: string } => ({
     action,
     gaAction: `${action}:${merchant.name}`,
@@ -37,21 +44,45 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
     goToPage(merchant.cta.link);
     tracking.trackEvent(getEventParams('clickedMerchantCta'));
   };
-  useEffect((): void => {
-    if (!ref.current) return;
-    resizeToFitPage(ref, merchant.cta || merchant.giftCards[0] ? ctaHeight : 50);
-    setPageHeight(ref.current.scrollHeight);
-  }, [ref, merchant, textExpanded]);
-  const cardConfig = merchant.giftCards[0];
-  if (cardConfig && !cardConfig.description) {
-    cardConfig.description = cardConfig.terms;
-  }
   const color = merchant.theme === '#ffffff' ? '#4f6ef7' : merchant.theme;
   const bubbleStyle = { color: { color, borderColor: color }, contents: { transform: 'translateY(-0.5px)' } };
-  const bodyStyle = {
-    scroll: { paddingBottom: pageHeight > FrameDimensions.maxFrameHeight - ctaHeight ? '96px' : 'auto' },
-    divider: { marginTop: '2px' }
-  };
+  const suggested = useMemo((): { category: DirectoryCategory; suggestions: Merchant[] } => {
+    const category =
+      directory.categories[
+        Object.keys(directory.categories).sort(
+          (a, b) =>
+            directory.categories[b].tags.filter((tag: string) => merchant.tags.includes(tag)).length -
+            directory.categories[a].tags.filter((tag: string) => merchant.tags.includes(tag)).length
+        )[0]
+      ];
+    const suggestions = category.availableMerchants
+      .filter((m: Merchant) => m.displayName !== merchant.displayName)
+      .sort(
+        (a: Merchant, b: Merchant) =>
+          b.tags.filter((tag: string) => merchant.tags.includes(tag)).length -
+          a.tags.filter((tag: string) => merchant.tags.includes(tag)).length
+      )
+      .slice(0, 8)
+      .sort(() => 0.5 - Math.random());
+    return { category, suggestions };
+  }, [directory, merchant]);
+  useEffect((): void => {
+    if (!ref.current) return;
+    const resizePadding = (): number => {
+      if (merchant.cta || merchant.giftCards[0])
+        if (suggested.suggestions.length > 1) return -150;
+        else return 125;
+      return 50;
+    };
+    const bodyPadding = (scrollHeight: number): string => {
+      if (merchant.cta || merchant.giftCards[0])
+        if (scrollHeight > FrameDimensions.maxFrameHeight - 125) return '96px';
+        else if (suggested.suggestions.length > 1) return '96px';
+      return 'auto';
+    };
+    resizeToFitPage(ref, resizePadding());
+    setPadding({ paddingBottom: bodyPadding(ref.current.scrollHeight) });
+  }, [ref, merchant, textExpanded, suggested]);
   return (
     <div className="brand-page">
       <div ref={ref}>
@@ -77,8 +108,8 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
           </div>
         </div>
 
-        <div className="brand-page__body" style={bodyStyle.scroll}>
-          <div className="brand-page__body__divider" style={bodyStyle.divider} />
+        <div className="brand-page__body" style={padding}>
+          <div className="brand-page__body__divider" style={{ marginTop: '2px' }} />
           <div className="brand-page__body__content">
             <div className="brand-page__body__content__title">
               {merchant.hasDirectIntegration ? <>Payment Instructions</> : <>About</>}
@@ -102,7 +133,7 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
               )}
             </div>
           </div>
-          {textExpanded && cardConfig && cardConfig.terms && (
+          {expandText && cardConfig?.terms && cardConfig.terms !== cardConfig.description && (
             <>
               <div className="brand-page__body__divider" />
               <div className="brand-page__body__content">
@@ -113,8 +144,37 @@ const Brand: React.FC<RouteComponentProps> = ({ location }) => {
               </div>
             </>
           )}
+          {suggested?.suggestions?.length > 1 && (
+            <>
+              <div className="brand-page__body__divider" />
+              <div className="shop-page__section-header">
+                You Might Also Like
+                {suggested.category && (
+                  <Link
+                    className="shop-page__section-header--action"
+                    to={{
+                      pathname: `/category/${suggested.category.displayName}`,
+                      state: { category: suggested.category }
+                    }}
+                  >
+                    See All
+                  </Link>
+                )}
+              </div>
+              {suggested.suggestions.slice(0, 2).map(suggestion => (
+                <Link
+                  to={{
+                    pathname: `/brand/${suggestion.name}`,
+                    state: { merchant: suggestion }
+                  }}
+                  key={suggestion.name}
+                >
+                  <MerchantCell key={suggestion.name} merchant={suggestion} />
+                </Link>
+              ))}
+            </>
+          )}
         </div>
-
         {(merchant.cta || cardConfig) && (
           <div className="action-button__footer--fixed">
             {merchant.hasDirectIntegration && merchant.cta ? (

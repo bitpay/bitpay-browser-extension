@@ -102,13 +102,13 @@
         color: rgba(#565d6d, 0.8);
         line-height: 17px;
         margin-top: 4px;
-        height: 50px;
+        max-height: 50px;
         overflow: hidden;
         word-break: break-all;
 
         &--action {
           position: absolute;
-          bottom: 0;
+          bottom: -1px;
           right: 0;
           font-weight: $regular;
           font-size: 12px;
@@ -121,11 +121,14 @@
         }
 
         &--expand {
-          height: unset;
+          max-height: unset;
           overflow: visible;
           word-break: break-word;
         }
       }
+    }
+    .shop-page__section-header {
+      padding-top: 2px;
     }
   }
 }
