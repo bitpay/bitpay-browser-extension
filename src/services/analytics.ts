@@ -1,13 +1,8 @@
 import track, { Options } from 'react-tracking';
-import ReactGA from 'react-ga';
-import { dispatchAnalyticsEvent } from './browser';
 import packageJson from '../../package.json';
+import { get } from './storage';
 
-ReactGA.initialize(process.env.GA_UA as string, {
-  gaAddress: 'https://www.google-analytics.com/analytics.js',
-  titleCase: false
-});
-ReactGA.ga('set', 'checkProtocolTask', null);
+let cachedAnalyticsClientId: string | undefined;
 
 function getSafePathname(pathname: string): string {
   const parts = pathname.split('/');
@@ -33,13 +28,20 @@ export function trackComponent(
     eventProperties.page ? { ...options, dispatchOnMount: true } : { ...options }
   )(component);
 }
+export async function sendEventToGa(event: { [key: string]: string }): Promise<void> {
+  const clientId = cachedAnalyticsClientId || (await get<string>('analyticsClientId'));
+  cachedAnalyticsClientId = clientId;
+  const request = new XMLHttpRequest();
+  const eventTypeAndData =
+    event.action === 'viewedPage'
+      ? `&t=pageview&dp=${event.pathname}&dt=${event.page}`
+      : `&t=event&ea=${event.gaAction || event.action}`;
+  const message = `v=1&tid=${process.env.GA_UA}&cid=${clientId}&aip=1&ds=add-on&ec=${packageJson.version}${eventTypeAndData}`;
 
-export function dispatchEvent(event: { [key: string]: string }): void {
-  dispatchAnalyticsEvent(event);
+  request.open('POST', 'https://www.google-analytics.com/collect', true);
+  request.send(message);
 }
 
-export function sendEventToGa(event: { [key: string]: string }): void {
-  event.action === 'viewedPage'
-    ? ReactGA.pageview(event.pathname, undefined, event.page)
-    : ReactGA.event({ category: packageJson.version, action: event.gaAction || event.action });
+export function dispatchEvent(event: { [key: string]: string }): void {
+  sendEventToGa(event);
 }

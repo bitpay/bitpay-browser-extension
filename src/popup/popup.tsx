@@ -35,10 +35,9 @@ import Legal from './pages/settings/legal/legal';
 import Balance from './pages/card/balance/balance';
 import { BitpayUser } from '../services/bitpay-id';
 import Account from './pages/settings/account/account';
-import { refreshMerchantCache } from '../services/browser';
+import { refreshMerchantCache, dispatchAnalyticsEvent } from '../services/browser';
 import { Directory, saturateDirectory } from '../services/directory';
 import './styles.scss';
-import { dispatchEvent } from '../services/analytics';
 
 const Popup: React.FC = () => {
   const tracking = useTracking();
@@ -260,7 +259,7 @@ const Popup: React.FC = () => {
 export default track(
   {},
   {
-    dispatch: event => dispatchEvent(event),
+    dispatch: event => dispatchAnalyticsEvent(event),
     process: componentTrackingData => (componentTrackingData.page ? { action: 'viewedPage' } : null)
   }
 )(Popup);
