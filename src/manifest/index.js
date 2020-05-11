@@ -30,7 +30,7 @@ const manifestInput = {
 
   __firefox__applications: {
     gecko: {
-      id: '{754FB1AD-CC3B-4856-B6A0-7786F8CA9D17}'
+      id: '{854FB1AD-CC3B-4856-B6A0-7786F8CA9D17}'
     }
   },
 
