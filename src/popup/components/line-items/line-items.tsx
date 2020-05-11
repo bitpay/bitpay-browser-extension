@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTracking } from 'react-tracking';
 import { format } from 'date-fns';
 import { launchNewTab } from '../../../services/browser';
 import { formatDiscount } from '../../../services/merchant';
@@ -11,10 +12,12 @@ const LineItems: React.FC<{ cardConfig: CardConfig; card: Partial<GiftCard> & Un
   cardConfig,
   card
 }) => {
+  const tracking = useTracking();
   const activationFee = getActivationFee(card.amount, cardConfig);
   const totalDiscount = getTotalDiscount(card.amount, card.discounts || cardConfig.discounts);
   const openInvoice = (url: string) => (): void => {
     launchNewTab(`${url}&view=popup`);
+    tracking.trackEvent({ action: 'clickedAmountPaid' });
   };
   return (
     <div className="line-items">

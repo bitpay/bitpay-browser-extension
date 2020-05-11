@@ -1,5 +1,6 @@
-import React, { useRef, useState, Dispatch, SetStateAction } from 'react';
+import React, { useRef, useState, Dispatch, SetStateAction, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+import { useTracking } from 'react-tracking';
 import { motion } from 'framer-motion';
 import CardDenoms from '../../components/card-denoms/card-denoms';
 import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
@@ -10,8 +11,9 @@ import { Merchant } from '../../../services/merchant';
 import { resizeFrame } from '../../../services/frame';
 import ActionButton from '../../components/action-button/action-button';
 import { BitpayUser } from '../../../services/bitpay-id';
-import './amount.scss';
 import { formatCurrency } from '../../../services/currency';
+import { trackComponent } from '../../../services/analytics';
+import './amount.scss';
 
 const shkAmp = 12;
 
@@ -34,6 +36,7 @@ const Amount: React.FC<RouteComponentProps & {
   setPurchasedGiftCards,
   supportedMerchant
 }) => {
+  const tracking = useTracking();
   const inputRef = useRef<HTMLInputElement>(null);
   const { cardConfig, merchant } = location.state as { cardConfig: CardConfig; merchant: Merchant };
   const hasFixedDenoms = cardConfig.supportedAmounts && cardConfig.supportedAmounts[0];
@@ -47,6 +50,14 @@ const Amount: React.FC<RouteComponentProps & {
       ? formatCurrency(preloadedAmount, cardConfig.currency, { customPrecision: 'minimal' }).replace(/[^\d.-]/g, '')
       : ''
   );
+  useEffect(() => {
+    if (initialAmount)
+      tracking.trackEvent({
+        action: 'autofilledAmount',
+        brand: cardConfig.name,
+        gaAction: `autofilledAmount:${cardConfig.name}`
+      });
+  }, [tracking, initialAmount, cardConfig]);
   const [inputError, setInputError] = useState(false);
   const [inputDirty, setInputDirty] = useState(false);
   const discount = (cardConfig.discounts || [])[0];
@@ -96,6 +107,8 @@ const Amount: React.FC<RouteComponentProps & {
     hasFixedDenoms ? changeFixedAmount(delta) : changeVariableAmount(delta);
     setInputDirty(false);
     focusInput();
+    const method = delta > 0 ? 'increment' : 'decrement';
+    tracking.trackEvent({ action: 'changedAmount', method, gaAction: `changedAmount:${method}` });
   };
   const shakeInput = (): void => {
     setInputError(true);
@@ -114,6 +127,7 @@ const Amount: React.FC<RouteComponentProps & {
   const handleInput = (input: string): void => {
     const stringValue = input.replace(/[^\d.-]/g, '');
     const newAmount = parseFloat(Number(stringValue).toFixed(precision));
+    tracking.trackEvent({ action: 'changedAmount', method: 'type', gaAction: 'changedAmount:type' });
     if (newAmount <= maxAmount) {
       const correctedValue = enforcePrecision(stringValue);
       if (correctedValue !== stringValue) shakeInput();
@@ -219,4 +233,4 @@ const Amount: React.FC<RouteComponentProps & {
   );
 };
 
-export default Amount;
+export default trackComponent(Amount, { page: 'amount' });

@@ -13,16 +13,14 @@ describe('Gravatar', () => {
       {
         props: { email: 'sio_bibblebibblebibble@gmail.com' },
         expected: {
-          src:
-            'https://gravatar.com/avatar/435dc65470defec47a5117da43fccfb6.jpg?s=120&d=https://bitpay.com/img/wallet-logos/bitpay-wallet.png',
+          src: `https://gravatar.com/avatar/435dc65470defec47a5117da43fccfb6.jpg?s=120&d=${process.env.API_ORIGIN}/img/wallet-logos/bitpay-wallet.png`,
           size: 30
         }
       },
       {
         props: { email: 'anakin_skywalker@gamil.com', size: 35 },
         expected: {
-          src:
-            'https://gravatar.com/avatar/760358ccdb2c7f111e52eccbbfa9b5ef.jpg?s=140&d=https://bitpay.com/img/wallet-logos/bitpay-wallet.png',
+          src: `https://gravatar.com/avatar/760358ccdb2c7f111e52eccbbfa9b5ef.jpg?s=140&d=${process.env.API_ORIGIN}/img/wallet-logos/bitpay-wallet.png`,
           size: 35
         }
       }

@@ -1,8 +1,10 @@
 /* eslint-disable jsx-a11y/no-autofocus */
 import React, { useRef, useState } from 'react';
+import { useTracking } from 'react-tracking';
 import { resizeFrame } from '../../../../services/frame';
 import { set } from '../../../../services/storage';
 import ActionButton from '../../../components/action-button/action-button';
+import { trackComponent } from '../../../../services/analytics';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Email: React.FC<{ email: string; setEmail: (email: string) => void; history?: any }> = ({
@@ -10,6 +12,7 @@ const Email: React.FC<{ email: string; setEmail: (email: string) => void; histor
   setEmail,
   history
 }) => {
+  const tracking = useTracking();
   const [formValid, setFormValid] = useState(true);
   const emailRef = useRef<HTMLInputElement>(null);
   resizeFrame(293);
@@ -22,6 +25,7 @@ const Email: React.FC<{ email: string; setEmail: (email: string) => void; histor
     await set<string>('email', newEmail);
     setEmail(newEmail);
     history.goBack();
+    tracking.trackEvent({ action: 'changedEmail' });
   };
   return (
     <div className="settings">
@@ -53,4 +57,4 @@ const Email: React.FC<{ email: string; setEmail: (email: string) => void; histor
   );
 };
 
-export default Email;
+export default trackComponent(Email, { page: 'email' });

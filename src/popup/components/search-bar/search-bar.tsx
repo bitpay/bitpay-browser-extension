@@ -1,9 +1,25 @@
+import './search-bar.scss';
 import React, { useEffect, useState } from 'react';
 import { motion, transform } from 'framer-motion';
-import './search-bar.scss';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const SearchBar: React.FC<any> = ({ output, value }) => {
+const SearchBar: React.FC<any> = ({ output, value, tracking }) => {
+  const [analyticsSubject] = useState(new Subject());
+  useEffect(() => {
+    analyticsSubject.pipe(debounceTime(1000)).subscribe(query => {
+      tracking.trackEvent({ action: 'searched', query, gaAction: `searched:${query}` });
+    });
+  }, [analyticsSubject, tracking]);
+  const onChange = (e: React.FormEvent<HTMLInputElement>): void => {
+    output(e.currentTarget.value);
+    analyticsSubject.next(e.currentTarget.value);
+  };
+  const clearSearchBox = (): void => {
+    output('');
+    tracking.trackEvent({ action: 'clearedSearchBox' });
+  };
   const [scrollY, setScrollY] = useState(window.scrollY);
   const boxShadow = { boxShadow: `0 1px 5px 0 rgba(0, 0, 0, ${transform(scrollY, [0, 20], [0, 0.05])})` };
   useEffect(() => {
@@ -19,13 +35,13 @@ const SearchBar: React.FC<any> = ({ output, value }) => {
         <div className="search-bar__box">
           <input
             value={value || ''}
-            onChange={(e: React.FormEvent<HTMLInputElement>): void => output(e.currentTarget.value)}
+            onChange={onChange}
             className="search-bar__box__input"
             placeholder="Search Brand or Category"
             type="text"
           />
           {value ? (
-            <button onClick={(): void => output('')} className="d-flex" type="button">
+            <button onClick={clearSearchBox} className="d-flex" type="button">
               <img
                 id="searchClearIcon"
                 className="search-bar__box__icon"

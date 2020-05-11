@@ -24,6 +24,13 @@ export const dispatchUrlChange = (window: Window): void => {
   });
 };
 
+export const dispatchAnalyticsEvent = (event: { [key: string]: string }): void => {
+  browser.runtime.sendMessage(undefined, {
+    name: 'TRACK',
+    event
+  });
+};
+
 export const injectClaimInfo = (cardConfig: CardConfig, claimInfo: { claimCode: string; pin?: string }): void => {
   browser.runtime.sendMessage(undefined, {
     name: 'INJECT_CLAIM_INFO',

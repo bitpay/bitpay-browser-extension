@@ -29,6 +29,9 @@ const dotEnv = new Dotenv({
   defaults: true
 });
 
+const apiOrigin = dotEnv.definitions['process.env.API_ORIGIN'].replace(/"/g, '');
+const analyticsOrigins = ['https://www.google-analytics.com', 'https://ssl.google-analytics.com'];
+
 const extensionReloaderPlugin =
   nodeEnv === 'development'
     ? new ExtensionReloader({
@@ -146,16 +149,15 @@ module.exports = {
     }),
     new CspHtmlWebpackPlugin(
       {
-        'default-src': ["'self'", dotEnv.definitions['process.env.API_ORIGIN'].replace(/"/g, '')],
+        'default-src': ["'self'", apiOrigin, ...analyticsOrigins],
         'base-uri': "'self'",
-        'img-src': [
-          'https://gravatar.com',
-          'https://*.wp.com',
-          dotEnv.definitions['process.env.API_ORIGIN'].replace(/"/g, '')
-        ],
+        'img-src': ['https://gravatar.com', 'https://*.wp.com', apiOrigin],
         'font-src': ['https://fonts.gstatic.com'],
         'object-src': "'none'",
-        'script-src': process.env.NODE_ENV === 'production' ? ["'self'"] : ["'self'", "'unsafe-eval'"],
+        'script-src':
+          process.env.NODE_ENV === 'production'
+            ? ["'self'", ...analyticsOrigins]
+            : ["'self'", ...analyticsOrigins, "'unsafe-eval'"],
         'style-src': ["'self'", 'https://fonts.googleapis.com/', "'unsafe-inline'"]
       },
       {

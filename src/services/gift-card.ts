@@ -66,20 +66,12 @@ async function fetchAvailableCardMap({ user }: { user: BitpayUser }): Promise<Av
   return availableCardMap;
 }
 
-function removeDiscountsForNow(cardConfig: CardConfig): CardConfig {
-  return {
-    ...cardConfig
-    // discounts: undefined
-  };
-}
-
 function getCardConfigFromApiConfigMap(availableCardMap: AvailableCardMap): CardConfig[] {
   const cardNames = Object.keys(availableCardMap);
   const availableCards = cardNames
     .filter(cardName => availableCardMap[cardName] && availableCardMap[cardName].length)
     .map(cardName => getCardConfigFromApiBrandConfig(cardName, availableCardMap[cardName]))
     .filter(config => !config.hidden)
-    .map(cardConfig => removeDiscountsForNow(cardConfig))
     .map(cardConfig => ({
       ...cardConfig,
       displayName: cardConfig.displayName || cardConfig.name
@@ -180,3 +172,14 @@ export const getLatestBalanceEntry = (card: GiftCard): GiftCardBalanceEntry =>
   (card.balanceHistory || []).sort(sortByDescendingDate)[0] || { date: card.date, amount: card.amount };
 
 export const getLatestBalance = (card: GiftCard): number => getLatestBalanceEntry(card).amount;
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export function getGiftCardPromoEventParams(promotedCard: CardConfig) {
+  const discount = (promotedCard.discounts && promotedCard.discounts[0]) as GiftCardDiscount;
+  return {
+    brand: promotedCard.name,
+    promoName: discount.code,
+    promoType: discount.type,
+    discountAmount: discount.amount
+  };
+}

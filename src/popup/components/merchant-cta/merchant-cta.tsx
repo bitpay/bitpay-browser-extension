@@ -1,14 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './merchant-cta.scss';
 import { Link } from 'react-router-dom';
-import { Merchant, getDiscount } from '../../../services/merchant';
+import { useTracking } from 'react-tracking';
+import { Merchant, getDiscount, getGiftCardDiscount, getPromoEventParams } from '../../../services/merchant';
 import CardDenoms from '../card-denoms/card-denoms';
 import SuperToast from '../super-toast/super-toast';
 import DiscountText from '../discount-text/discount-text';
 
 const MerchantCta: React.FC<{ merchant?: Merchant; slimCTA: boolean }> = ({ merchant, slimCTA }) => {
+  const tracking = useTracking();
   const ctaPath = merchant && (merchant.hasDirectIntegration ? `/brand/${merchant.name}` : `/amount/${merchant.name}`);
   const hasDiscount = !!(merchant && getDiscount(merchant));
+  const hasGiftCardDiscount = !!(merchant && getGiftCardDiscount(merchant));
+  useEffect(() => {
+    if (!merchant || !hasGiftCardDiscount) return;
+    tracking.trackEvent({
+      action: 'presentedWithGiftCardPromo',
+      ...getPromoEventParams(merchant),
+      gaAction: `presentedWithGiftCardPromo:${merchant.name}`
+    });
+  }, [tracking, hasGiftCardDiscount, merchant]);
   return (
     <>
       {merchant ? (
@@ -34,7 +45,16 @@ const MerchantCta: React.FC<{ merchant?: Merchant; slimCTA: boolean }> = ({ merc
               )}
             </div>
           </div>
-          <Link to={{ pathname: ctaPath, state: { merchant, cardConfig: merchant.giftCards[0] } }}>
+          <Link
+            to={{ pathname: ctaPath, state: { merchant, cardConfig: merchant.giftCards[0] } }}
+            onClick={(): void =>
+              tracking.trackEvent({
+                action: 'clickedMerchantWalletCta',
+                merchant: merchant.name,
+                gaAction: `clickedMerchantWalletCta:${merchant.name}`
+              })
+            }
+          >
             {merchant.hasDirectIntegration ? <>Learn More</> : <>Buy Now</>}
           </Link>
         </div>
@@ -42,7 +62,10 @@ const MerchantCta: React.FC<{ merchant?: Merchant; slimCTA: boolean }> = ({ merc
         <>
           {slimCTA ? (
             <>
-              <Link to={{ pathname: '/shop' }}>
+              <Link
+                to={{ pathname: '/shop' }}
+                onClick={(): void => tracking.trackEvent({ action: 'clickedGeneralWalletCta' })}
+              >
                 <SuperToast
                   title="Spend Crypto Instantly"
                   caption="Purchase store credit at more than a 100+ major retailers"

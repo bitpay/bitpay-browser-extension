@@ -1,5 +1,6 @@
 import { browser, Tabs } from 'webextension-polyfill-ts';
 import * as uuid from 'uuid';
+import { sendEventToGa } from '../services/analytics';
 import { GiftCardInvoiceMessage } from '../services/gift-card.types';
 import {
   isBitPayAccepted,
@@ -44,8 +45,14 @@ async function refreshCachedMerchantsIfNeeded(): Promise<void> {
 async function handleUrlChange(url: string): Promise<void> {
   const merchants = await getCachedMerchants();
   const bitpayAccepted = !!(url && isBitPayAccepted(url, merchants));
+  const merchant = getBitPayMerchantFromUrl(url, merchants);
   await setIcon(bitpayAccepted);
   await refreshCachedMerchantsIfNeeded();
+  sendEventToGa({
+    action: `setExtensionIcon:${
+      merchant ? `active:${merchant.hasDirectIntegration ? 'direct' : 'giftCard'}` : `inactive`
+    }`
+  });
 }
 
 async function createClientIdIfNotExists(): Promise<void> {
@@ -76,6 +83,7 @@ browser.runtime.onInstalled.addListener(async () => {
     browser.tabs.executeScript(tab.id, { file: 'js/contentScript.bundle.js' }).catch(() => undefined)
   );
   await Promise.all([refreshCachedMerchantsIfNeeded(), createClientIdIfNotExists()]);
+  sendEventToGa({ action: 'installedExtension' });
 });
 
 async function launchWindowAndListenForEvents({
@@ -138,6 +146,8 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
       });
     case 'REFRESH_MERCHANT_CACHE':
       return refreshCachedMerchants();
+    case 'TRACK':
+      return sendEventToGa(message.event);
     case 'URL_CHANGED':
       return handleUrlChange(message.url);
     default:
