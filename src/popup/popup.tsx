@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MemoryRouter as Router, Route, Switch } from 'react-router-dom';
+import track, { useTracking } from 'react-tracking';
 import { skip } from 'rxjs/operators';
 import Category from './pages/category/category';
 import Brand from './pages/brand/brand';
@@ -37,8 +38,10 @@ import Account from './pages/settings/account/account';
 import { refreshMerchantCache } from '../services/browser';
 import { Directory, saturateDirectory } from '../services/directory';
 import './styles.scss';
+import { dispatchEvent } from '../services/analytics';
 
 const Popup: React.FC = () => {
+  const tracking = useTracking();
   const [amount, setAmount] = useState(0);
   const [initialEntries, setInitialEntries] = useState([{ pathname: '/shop', state: {} }]);
   const [initialIndex, setInitialIndex] = useState(0);
@@ -148,9 +151,10 @@ const Popup: React.FC = () => {
       setEmail(receiptEmail);
       setUser(bitpayUser);
       setLoaded(true);
+      tracking.trackEvent({ action: 'openedWidget' });
     };
     getStartPage();
-  }, []);
+  }, [tracking]);
   return (
     <>
       {loaded && (
@@ -250,4 +254,10 @@ const Popup: React.FC = () => {
   );
 };
 
-export default Popup;
+export default track(
+  {},
+  {
+    dispatch: event => dispatchEvent(event),
+    process: componentTrackingData => (componentTrackingData.page ? { action: 'viewedPage' } : null)
+  }
+)(Popup);

@@ -1,19 +1,23 @@
 import React, { useRef, useState, useEffect } from 'react';
-import './category.scss';
-import { Link } from 'react-router-dom';
+import { Link, RouteComponentProps } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTracking } from 'react-tracking';
+import Observer from '@researchgate/react-intersection-observer';
 import SearchBar from '../../components/search-bar/search-bar';
 import MerchantCell from '../../components/merchant-cell/merchant-cell';
 import { DirectoryCategory, DirectoryCuration } from '../../../services/directory';
-import { Merchant } from '../../../services/merchant';
+import { Merchant, getGiftCardDiscount, getPromoEventParams } from '../../../services/merchant';
 import { resizeToFitPage } from '../../../services/frame';
 import { wait } from '../../../services/utils';
 import { listAnimation } from '../../../services/animations';
+import { trackComponent } from '../../../services/analytics';
+import './category.scss';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location, merchants }) => {
+const Category: React.FC<RouteComponentProps & { merchants: Merchant[] }> = ({ location, merchants }) => {
+  const tracking = useTracking();
   const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const { searchVal: searchValue, scrollTop } = location.state as { searchVal: string; scrollTop: number };
   const { category, curation } = location.state as { category?: DirectoryCategory; curation?: DirectoryCuration };
   const [searchVal, setSearchVal] = useState('' as string);
   const [isDirty, setDirty] = useState(false);
@@ -29,13 +33,28 @@ const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location
         merchant.tags.find(tag => tag.includes(searchVal.toLowerCase()))
       : baseSet
   );
+  const handleIntersection = (merchant: Merchant) => (event: IntersectionObserverEntry): void => {
+    if (event.isIntersecting)
+      tracking.trackEvent({
+        action: 'presentedWithGiftCardPromo',
+        ...getPromoEventParams(merchant),
+        gaAction: `presentedWithGiftCardPromo:${merchant.name}`
+      });
+  };
   const resizeSwitch = (length: number): number => {
     if (length > 3) return 100;
     if (length > 2) return 50;
     return 0;
   };
-  const handleClick = (): void => {
+  const handleClick = (merchant: Merchant): void => {
     location.state = { scrollTop: scrollRef.current?.scrollTop as number, searchVal, category, curation };
+    if (getGiftCardDiscount(merchant)) {
+      tracking.trackEvent({
+        action: 'clickedGiftCardPromo',
+        ...getPromoEventParams(merchant),
+        gaAction: `clickedGiftCardPromo:${merchant.name}`
+      });
+    }
   };
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
@@ -57,9 +76,9 @@ const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location
   useEffect(() => {
     const setScrollPositionAndSearchVal = async (): Promise<void> => {
       if (location.state) {
-        if (location.state.searchVal) setSearchVal(location.state.searchVal);
+        if (searchValue) setSearchVal(searchValue);
         await wait(renderList.length > 24 ? 400 : 0);
-        if (scrollRef.current) scrollRef.current.scrollTop = location.state.scrollTop || 0;
+        if (scrollRef.current) scrollRef.current.scrollTop = scrollTop || 0;
       }
     };
     resizeToFitPage(contentRef);
@@ -69,6 +88,18 @@ const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location
   useEffect(() => {
     resizeToFitPage(contentRef, resizeSwitch(renderList.length));
   }, [searchVal, renderList]);
+  const ListItem: React.FC<{ merchant: Merchant }> = ({ merchant }) => (
+    <Link
+      to={{
+        pathname: `/brand/${merchant.name}`,
+        state: { merchant, category, curation }
+      }}
+      key={merchant.name}
+      onClick={(): void => handleClick(merchant)}
+    >
+      <MerchantCell key={merchant.name} merchant={merchant} />
+    </Link>
+  );
   return (
     <div className="category-page" ref={scrollRef}>
       <SearchBar output={setSearchVal} value={searchVal} />
@@ -96,21 +127,20 @@ const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location
                 {renderList.map((merchant, index) => (
                   <motion.div
                     custom={index}
-                    initial={index > 7 || location.state.scrollTop > 0 || isDirty ? 'base' : 'delta'}
+                    initial={index > 7 || scrollTop > 0 || isDirty ? 'base' : 'delta'}
                     animate="base"
                     variants={listAnimation}
                     key={merchant.name}
                   >
-                    <Link
-                      to={{
-                        pathname: `/brand/${merchant.name}`,
-                        state: { merchant, category, curation }
-                      }}
-                      key={merchant.name}
-                      onClick={handleClick}
-                    >
-                      <MerchantCell key={merchant.name} merchant={merchant} />
-                    </Link>
+                    {getGiftCardDiscount(merchant) ? (
+                      <Observer onChange={handleIntersection(merchant)}>
+                        <div>
+                          <ListItem merchant={merchant} />
+                        </div>
+                      </Observer>
+                    ) : (
+                      <ListItem merchant={merchant} />
+                    )}
                   </motion.div>
                 ))}
               </>
@@ -131,4 +161,4 @@ const Category: React.FC<{ location: any; merchants: Merchant[] }> = ({ location
   );
 };
 
-export default Category;
+export default trackComponent(Category, { page: 'category' });

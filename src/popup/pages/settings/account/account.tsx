@@ -1,4 +1,7 @@
+import './account.scss';
 import React, { useRef, useEffect, Dispatch, SetStateAction, useState } from 'react';
+import { RouteComponentProps } from 'react-router-dom';
+import { useTracking } from 'react-tracking';
 import { browser } from 'webextension-polyfill-ts';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BitpayUser } from '../../../../services/bitpay-id';
@@ -14,17 +17,17 @@ import { IOSSwitch } from '../../../components/ios-switch/ios-switch';
 import CardMenu from '../../../components/card-menu/card-menu';
 import { SignInWithBitpayImage } from '../../../components/svg/sign-in-with-bitpay-image';
 import Gravatar from '../../../components/gravatar/gravatar';
-import './account.scss';
+import { trackComponent } from '../../../../services/analytics';
 
-const Account: React.FC<{
+const Account: React.FC<RouteComponentProps & {
   user?: BitpayUser;
   setUser: Dispatch<SetStateAction<BitpayUser | undefined>>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  history: any;
 }> = ({ user, setUser, history }) => {
+  const tracking = useTracking();
   const ref = useRef<HTMLDivElement>(null);
   const [awaitingAuthentication, setAwaitingAuthentication] = useState(false);
   const connectBitpayId = async (): Promise<void> => {
+    tracking.trackEvent({ action: 'clickedSignInButton' });
     setAwaitingAuthentication(true);
     await browser.runtime.sendMessage({
       name: 'LAUNCH_WINDOW',
@@ -35,20 +38,24 @@ const Account: React.FC<{
     const newUser = await get<BitpayUser>('bitpayUser');
     if (!newUser) {
       setAwaitingAuthentication(false);
+      tracking.trackEvent({ action: 'closedSignInPage' });
       return;
     }
     setUser(newUser);
     resizeToFitPage(ref, 49);
+    tracking.trackEvent({ action: 'connectedAccount' });
   };
   const disconnect = async (): Promise<void> => {
     await remove('bitpayUser');
     setUser(undefined);
     history.goBack();
+    tracking.trackEvent({ action: 'disconnectedAccount' });
   };
   const handleChange = async (): Promise<void> => {
     const updatedUser = { ...(user as BitpayUser), syncGiftCards: !user?.syncGiftCards };
     await set<BitpayUser>('bitpayUser', updatedUser);
     setUser(updatedUser);
+    tracking.trackEvent({ action: updatedUser.syncGiftCards ? 'enabledSyncGiftCards' : 'disabledSyncGiftCards' });
   };
   useEffect(() => {
     resizeToFitPage(ref, 49);
@@ -142,4 +149,4 @@ const Account: React.FC<{
   );
 };
 
-export default Account;
+export default trackComponent(Account, { page: 'account' });

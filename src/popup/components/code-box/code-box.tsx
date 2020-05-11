@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { useTracking } from 'react-tracking';
 import { motion } from 'framer-motion';
 import copyUtil from '../../../services/copy-util';
 import { wait } from '../../../services/utils';
@@ -16,6 +17,7 @@ const animateLabels = {
 };
 
 const CodeBox: React.FC<{ code: string; label: string }> = ({ code, label }) => {
+  const tracking = useTracking();
   const mountedRef = useRef(true);
   const [hovering, setHovering] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -23,9 +25,10 @@ const CodeBox: React.FC<{ code: string; label: string }> = ({ code, label }) => 
     copyUtil(code);
     if (copied) return;
     setCopied(true);
+    tracking.trackEvent({ action: 'copiedValue', label, gaAction: `copiedValue:${label}` });
     await wait(1500);
     if (mountedRef.current) setCopied(false);
-  }, [copied, code]);
+  }, [copied, code, label, tracking]);
   const changeHovering = useCallback(
     (val: boolean) => (): void => {
       setHovering(val);

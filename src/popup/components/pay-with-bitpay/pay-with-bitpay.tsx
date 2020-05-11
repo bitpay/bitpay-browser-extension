@@ -2,9 +2,15 @@ import React, { useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { browser } from 'webextension-polyfill-ts';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTracking } from 'react-tracking';
 import { GiftCard, CardConfig, GiftCardInvoiceParams } from '../../../services/gift-card.types';
 import { set } from '../../../services/storage';
-import { createBitPayInvoice, redeemGiftCard, isAmountValid } from '../../../services/gift-card';
+import {
+  createBitPayInvoice,
+  redeemGiftCard,
+  isAmountValid,
+  getGiftCardPromoEventParams
+} from '../../../services/gift-card';
 import Snack from '../snack/snack';
 import { waitForServerEvent, deleteCard } from '../../../services/gift-card-storage';
 import { wait } from '../../../services/utils';
@@ -40,6 +46,7 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
   supportedMerchant,
   onInvalidParams = (): void => undefined
 }) => {
+  const tracking = useTracking();
   const [errorMessage, setErrorMessage] = useState('');
   const [awaitingPayment, setAwaitingPayment] = useState(false);
   const { amount, currency } = invoiceParams;
@@ -94,11 +101,20 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
       })
     ]);
     if (res.data && res.data.status === 'closed') {
+      tracking.trackEvent({ action: 'closedInvoice', brand: cardConfig.name });
       await deleteGiftCard(unredeemedGiftCard);
       setAwaitingPayment(false);
       return;
     }
     const giftCard = await redeemGiftCard(unredeemedGiftCard);
+    const transactionCurrency = giftCard.invoice?.transactionCurrency;
+    tracking.trackEvent({
+      action: 'purchasedGiftCard',
+      gaAction: `purchasedGiftCard:${cardConfig.name}:${transactionCurrency}`,
+      brand: cardConfig.name,
+      transactionCurrency,
+      ...(cardConfig.discounts && cardConfig.discounts[0] && { ...getGiftCardPromoEventParams(cardConfig) })
+    });
     const finalGiftCard = {
       ...giftCard,
       discounts: cardConfig.discounts
@@ -107,16 +123,23 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
     showCard(finalGiftCard);
     if (finalGiftCard.status === 'SUCCESS' && cardConfig.cssSelectors && onMerchantWebsite) {
       injectClaimInfo(cardConfig, { claimCode: finalGiftCard.claimCode, pin: finalGiftCard.pin });
+      tracking.trackEvent({
+        action: 'autofilledClaimInfo',
+        brand: cardConfig.name,
+        gaAction: `autofilledClaimInfo:${cardConfig.name}`
+      });
     }
   };
   const snackOnClose = (): void => {
     setErrorMessage('');
   };
-  const payButton = (): Promise<void> =>
-    launchInvoice().catch(err => {
+  const payButton = (): Promise<void> => {
+    tracking.trackEvent({ action: 'clickedPayButton', brand: cardConfig.name });
+    return launchInvoice().catch(err => {
       setErrorMessage(err.message || 'An unexpected error occurred');
       setAwaitingPayment(false);
     });
+  };
   return (
     <>
       <div className="pay-with-bitpay">

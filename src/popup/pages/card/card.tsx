@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { Tooltip, makeStyles, createStyles } from '@material-ui/core';
+import { useTracking } from 'react-tracking';
 import { GiftCard, CardConfig } from '../../../services/gift-card.types';
 import { wait } from '../../../services/utils';
 import { resizeToFitPage } from '../../../services/frame';
@@ -11,12 +12,14 @@ import CardHeader from '../../components/card-header/card-header';
 import CodeBox from '../../components/code-box/code-box';
 import CardMenu from '../../components/card-menu/card-menu';
 import ActionButton from '../../components/action-button/action-button';
+import { trackComponent } from '../../../services/analytics';
 import './card.scss';
 
 const Card: React.FC<RouteComponentProps & {
   purchasedGiftCards: GiftCard[];
   updateGiftCard: (card: GiftCard) => void;
 }> = ({ location, history, purchasedGiftCards, updateGiftCard }) => {
+  const tracking = useTracking();
   const useStyles = makeStyles(() =>
     createStyles({
       tooltipStyles: {
@@ -45,6 +48,11 @@ const Card: React.FC<RouteComponentProps & {
   const launchClaimLink = (): void => {
     const url = cardConfig.defaultClaimCodeType === 'link' ? (card.claimLink as string) : redeemUrl;
     launchNewTab(url);
+    tracking.trackEvent({
+      action: 'clickedRedeemButton',
+      gaAction: `clickedRedeemButton:${cardConfig.name}`,
+      brand: cardConfig.name
+    });
   };
   const shouldShowRedeemButton = (): boolean => !!(cardConfig.redeemUrl || cardConfig.defaultClaimCodeType === 'link');
   const updateCard = async (cardToUpdate: GiftCard): Promise<void> => {
@@ -57,11 +65,13 @@ const Card: React.FC<RouteComponentProps & {
   const archive = async (): Promise<void> => {
     await updateCard({ ...card, archived: true });
     initiallyArchived ? resizeFrame() : history.goBack();
+    tracking.trackEvent({ action: 'archivedGiftCard' });
   };
   const unarchive = async (): Promise<void> => {
     updateGiftCard(card);
     resizeFrame();
     updateCard({ ...card, archived: false });
+    tracking.trackEvent({ action: 'unarchivedGiftCard' });
   };
 
   const handleMenuClick = (item: string): void => {
@@ -79,6 +89,7 @@ const Card: React.FC<RouteComponentProps & {
         unarchive();
         break;
       case 'Help':
+        tracking.trackEvent({ action: 'clickedHelp' });
         return launchNewTab('https://bitpay.com/request-help');
       default:
         console.log('Unknown Menu Option Selected');
@@ -175,4 +186,4 @@ const Card: React.FC<RouteComponentProps & {
   );
 };
 
-export default Card;
+export default trackComponent(Card, { page: 'card' });

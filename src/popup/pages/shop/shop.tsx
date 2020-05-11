@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './shop.scss';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTracking } from 'react-tracking';
+import Observer from '@researchgate/react-intersection-observer';
 import SearchBar from '../../components/search-bar/search-bar';
 import MerchantCell from '../../components/merchant-cell/merchant-cell';
-import { Merchant } from '../../../services/merchant';
+import { Merchant, getGiftCardDiscount, getPromoEventParams } from '../../../services/merchant';
 import { Directory } from '../../../services/directory';
 import { resizeToFitPage } from '../../../services/frame';
 import { wait } from '../../../services/utils';
 import { listAnimation } from '../../../services/animations';
+import { trackComponent } from '../../../services/analytics';
+import './shop.scss';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: any }> = ({
@@ -16,6 +19,7 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
   merchants,
   location
 }) => {
+  const tracking = useTracking();
   const ref = useRef<HTMLDivElement>(null);
   const [searchVal, setSearchVal] = useState('' as string);
   const [isDirty, setDirty] = useState(false);
@@ -31,9 +35,49 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
       (merchant.name.toLowerCase().includes(searchVal.toLowerCase()) ||
         merchant.tags.find(category => category.includes(searchVal.toLowerCase())))
   );
-  const handleClick = (): void => {
+  const handleClick = (merchant?: Merchant): void => {
     location.state = { scrollTop: ref.current?.scrollTop as number, searchVal };
+    if (merchant && getGiftCardDiscount(merchant)) {
+      tracking.trackEvent({
+        action: 'clickedGiftCardPromo',
+        ...getPromoEventParams(merchant),
+        gaAction: `clickedGiftCardPromo:${merchant.name}`
+      });
+    }
   };
+  const MerchantItem: React.FC<{ merchant: Merchant }> = ({ merchant }) => (
+    <Link
+      to={{
+        pathname: `/brand/${merchant.name}`,
+        state: { merchant }
+      }}
+      key={merchant.name}
+      onClick={(): void => handleClick(merchant)}
+    >
+      <MerchantCell key={merchant.name} merchant={merchant} />
+    </Link>
+  );
+  const handleIntersection = (merchant: Merchant) => (event: IntersectionObserverEntry): void => {
+    if (event.isIntersecting)
+      tracking.trackEvent({
+        action: 'presentedWithGiftCardPromo',
+        ...getPromoEventParams(merchant),
+        gaAction: `presentedWithGiftCardPromo:${merchant.name}`
+      });
+  };
+  const ObservedItem: React.FC<{ merchant: Merchant }> = ({ merchant }) => (
+    <>
+      {getGiftCardDiscount(merchant) ? (
+        <Observer onChange={handleIntersection(merchant)}>
+          <div>
+            <MerchantItem merchant={merchant} />
+          </div>
+        </Observer>
+      ) : (
+        <MerchantItem merchant={merchant} />
+      )}
+    </>
+  );
   useEffect(() => {
     if (searchVal) setDirty(true);
   }, [searchVal]);
@@ -61,16 +105,7 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
               <>
                 <div className="shop-page__section-header">Search Results</div>
                 {filteredMerchants.map(merchant => (
-                  <Link
-                    to={{
-                      pathname: `/brand/${merchant.name}`,
-                      state: { merchant }
-                    }}
-                    key={merchant.name}
-                    onClick={handleClick}
-                  >
-                    <MerchantCell key={merchant.name} merchant={merchant} />
-                  </Link>
+                  <ObservedItem merchant={merchant} key={merchant.name} />
                 ))}
                 <div className="shop-page__divider" />
               </>
@@ -97,7 +132,7 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
                               pathname: `/category/${directory.curated[category].displayName}`,
                               state: { curation: directory.curated[category] }
                             }}
-                            onClick={handleClick}
+                            onClick={(): void => handleClick()}
                           >
                             See All
                           </Link>
@@ -112,16 +147,7 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
                                 variants={listAnimation}
                                 key={merchant.name}
                               >
-                                <Link
-                                  to={{
-                                    pathname: `/brand/${merchant.name}`,
-                                    state: { merchant }
-                                  }}
-                                  key={merchant.name}
-                                  onClick={handleClick}
-                                >
-                                  <MerchantCell key={merchant.name} merchant={merchant} />
-                                </Link>
+                                <ObservedItem merchant={merchant} key={merchant.name} />
                               </motion.div>
                             )}
                           </React.Fragment>
@@ -139,7 +165,7 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
                       pathname: '/category/all',
                       state: { curation: null, category: null }
                     }}
-                    onClick={handleClick}
+                    onClick={(): void => handleClick()}
                   >
                     See All Brands
                   </Link>
@@ -151,10 +177,10 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
                         className="shop-page__categories__item"
                         key={category}
                         to={{
-                          pathname: `/category/${directory.categories[category].emoji}`,
+                          pathname: `/category/${directory.categories[category].displayName}`,
                           state: { category: directory.categories[category] }
                         }}
-                        onClick={handleClick}
+                        onClick={(): void => handleClick()}
                       >
                         <div className="shop-page__categories__item__icon">{directory.categories[category].emoji}</div>
                         {directory.categories[category].displayName}
@@ -171,4 +197,4 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
   );
 };
 
-export default Shop;
+export default trackComponent(Shop, { page: 'shop' });

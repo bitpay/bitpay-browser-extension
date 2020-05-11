@@ -5,8 +5,9 @@ import { resizeFrame } from '../../../../services/frame';
 import { GiftCard, CardConfig } from '../../../../services/gift-card.types';
 import { formatCurrency } from '../../../../services/currency';
 import { sortByDescendingDate } from '../../../../services/gift-card';
-import './archive.scss';
 import { wait } from '../../../../services/utils';
+import { trackComponent } from '../../../../services/analytics';
+import './archive.scss';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Archive: React.FC<{ purchasedGiftCards: GiftCard[]; supportedGiftCards: CardConfig[]; location: any }> = ({
@@ -71,4 +72,4 @@ const Archive: React.FC<{ purchasedGiftCards: GiftCard[]; supportedGiftCards: Ca
   );
 };
 
-export default Archive;
+export default trackComponent(Archive, { page: 'archive' });
