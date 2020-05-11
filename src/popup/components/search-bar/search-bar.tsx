@@ -1,13 +1,11 @@
+import './search-bar.scss';
 import React, { useEffect, useState } from 'react';
 import { motion, transform } from 'framer-motion';
-import './search-bar.scss';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { useTracking } from 'react-tracking';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const SearchBar: React.FC<any> = ({ output, value }) => {
-  const tracking = useTracking();
+const SearchBar: React.FC<any> = ({ output, value, tracking }) => {
   const [analyticsSubject] = useState(new Subject());
   useEffect(() => {
     analyticsSubject.pipe(debounceTime(1000)).subscribe(query => {

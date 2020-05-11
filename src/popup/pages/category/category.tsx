@@ -102,7 +102,7 @@ const Category: React.FC<RouteComponentProps & { merchants: Merchant[] }> = ({ l
   );
   return (
     <div className="category-page" ref={scrollRef}>
-      <SearchBar output={setSearchVal} value={searchVal} />
+      <SearchBar output={setSearchVal} value={searchVal} tracking={tracking} />
       <div className="shop-page__content" ref={contentRef}>
         {loaded ? (
           <>

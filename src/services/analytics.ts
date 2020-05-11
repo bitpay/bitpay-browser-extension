@@ -35,7 +35,7 @@ export function trackComponent(
 }
 
 export function dispatchEvent(event: { [key: string]: string }): void {
-  dispatchAnalyticsEvent({ ...event, category: 'widget' });
+  dispatchAnalyticsEvent(event);
 }
 
 export function sendEventToGa(event: { [key: string]: string }): void {

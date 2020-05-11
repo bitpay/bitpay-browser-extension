@@ -97,7 +97,7 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
   }, [searchVal, directory]);
   return (
     <div className="shop-page" ref={ref}>
-      <SearchBar output={setSearchVal} value={searchVal} />
+      <SearchBar output={setSearchVal} value={searchVal} tracking={tracking} />
       <div className="shop-page__content">
         {searchVal ? (
           <>
