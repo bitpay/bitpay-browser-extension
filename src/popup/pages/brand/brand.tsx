@@ -2,6 +2,7 @@ import './brand.scss';
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { useTracking } from 'react-tracking';
+import Observer from '@researchgate/react-intersection-observer';
 import ReactMarkdown from 'react-markdown';
 import { Directory, DirectoryCategory } from '../../../services/directory';
 import { Merchant, getDiscount } from '../../../services/merchant';
@@ -24,6 +25,7 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ locat
     if (cardConfig?.description && !cardConfig.terms) return cardConfig.description.length < 300;
     return false;
   };
+  const [pageEntering, setPageEntering] = useState(true);
   const [textExpanded, setTextExpanded] = useState(initiallyExpanded());
   const [padding, setPadding] = useState({});
   const getEventParams = (action: string): { action: string; gaAction: string; merchant: string } => ({
@@ -83,6 +85,19 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ locat
     resizeToFitPage(ref, resizePadding());
     setPadding({ paddingBottom: bodyPadding(ref.current.scrollHeight) });
   }, [ref, merchant, textExpanded, suggested]);
+  useEffect(() => {
+    setTimeout(() => {
+      setPageEntering(false);
+    }, 400);
+  }, []);
+  const handleIntersection = (event: IntersectionObserverEntry): void => {
+    if (event.isIntersecting)
+      tracking.trackEvent({
+        action: 'scrolledToSuggestedMerchants',
+        merchant: merchant.name,
+        gaAction: `scrolledToSuggestedMerchants:${merchant.name}`
+      });
+  };
   return (
     <div className="brand-page">
       <div ref={ref}>
@@ -133,7 +148,7 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ locat
               )}
             </div>
           </div>
-          {expandText && cardConfig?.terms && cardConfig.terms !== cardConfig.description && (
+          {textExpanded && cardConfig?.terms && cardConfig.terms !== cardConfig.description && (
             <>
               <div className="brand-page__body__divider" />
               <div className="brand-page__body__content">
@@ -156,22 +171,42 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ locat
                       pathname: `/category/${suggested.category.displayName}`,
                       state: { category: suggested.category }
                     }}
+                    onClick={(): void => {
+                      tracking.trackEvent({
+                        action: 'viewedAllSuggestedMerchants',
+                        merchant: merchant.name,
+                        gaAction: `viewedAllSuggestedMerchants:${merchant.name}`
+                      });
+                    }}
                   >
                     See All
                   </Link>
                 )}
               </div>
-              {suggested.suggestions.slice(0, 2).map(suggestion => (
-                <Link
-                  to={{
-                    pathname: `/brand/${suggestion.name}`,
-                    state: { merchant: suggestion }
-                  }}
-                  key={suggestion.name}
-                >
-                  <MerchantCell key={suggestion.name} merchant={suggestion} />
-                </Link>
-              ))}
+
+              <Observer onChange={handleIntersection} threshold={0.8} disabled={pageEntering}>
+                <div>
+                  {suggested.suggestions.slice(0, 2).map(suggestion => (
+                    <Link
+                      to={{
+                        pathname: `/brand/${suggestion.name}`,
+                        state: { merchant: suggestion }
+                      }}
+                      key={suggestion.name}
+                      onClick={(): void => {
+                        tracking.trackEvent({
+                          action: 'clickedSuggestedMerchant',
+                          merchant: merchant.name,
+                          suggestedMerchant: suggestion.name,
+                          gaAction: `clickedSuggestedMerchant:${merchant.name}:${suggestion.name}`
+                        });
+                      }}
+                    >
+                      <MerchantCell key={suggestion.name} merchant={suggestion} />
+                    </Link>
+                  ))}
+                </div>
+              </Observer>
             </>
           )}
         </div>
