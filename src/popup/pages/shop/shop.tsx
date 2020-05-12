@@ -166,7 +166,7 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
                     See All Brands
                   </Link>
                 </div>
-                {categories && categories.length > 0 && (
+                {categories && categories.length && (
                   <div className="shop-page__categories">
                     {categories.map(category => (
                       <Link
