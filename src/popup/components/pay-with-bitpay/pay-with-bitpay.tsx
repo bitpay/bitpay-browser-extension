@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { browser } from 'webextension-polyfill-ts';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -67,79 +67,83 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
     history.push(`/wallet`);
     history.push({ pathname: `/card/${card.invoiceId}`, state: { card, cardConfig } });
   };
-  const launchInvoice = async (): Promise<void> => {
-    if (!isAmountValid(amount, cardConfig)) {
-      return onInvalidParams();
-    }
-    setAwaitingPayment(true);
-    const { invoiceId, accessKey, totalDiscount } = await createBitPayInvoice({ params: invoiceParams, user });
-    if (setEmail) {
-      await set<string>('email', invoiceParams.email as string);
-      setEmail(invoiceParams.email as string);
-    }
-    const unredeemedGiftCard = {
-      currency,
-      date: new Date().toISOString(),
-      amount,
-      clientId: invoiceParams.clientId,
-      accessKey,
-      invoiceId,
-      name: invoiceParams.brand,
-      totalDiscount,
-      status: 'UNREDEEMED'
-    } as GiftCard;
-    await saveGiftCard(unredeemedGiftCard);
-    const launchPromise = browser.runtime.sendMessage({
-      name: 'LAUNCH_WINDOW',
-      url: `${process.env.API_ORIGIN}/invoice?id=${invoiceId}&view=popup`
-    });
-    const res = await Promise.race([
-      launchPromise,
-      waitForServerEvent(unredeemedGiftCard).catch(async () => {
-        await wait(1000 * 60 * 15);
-        Promise.resolve({ data: { status: 'closed' } });
-      })
-    ]);
-    if (res.data && res.data.status === 'closed') {
-      tracking.trackEvent({ action: 'closedInvoice', brand: cardConfig.name });
-      await deleteGiftCard(unredeemedGiftCard);
-      setAwaitingPayment(false);
-      return;
-    }
-    const giftCard = await redeemGiftCard(unredeemedGiftCard);
-    const transactionCurrency = giftCard.invoice?.transactionCurrency;
-    tracking.trackEvent({
-      action: 'purchasedGiftCard',
-      gaAction: `purchasedGiftCard:${cardConfig.name}:${transactionCurrency}`,
-      brand: cardConfig.name,
-      transactionCurrency,
-      ...(cardConfig.discounts && cardConfig.discounts[0] && { ...getGiftCardPromoEventParams(cardConfig) })
-    });
-    const finalGiftCard = {
-      ...giftCard,
-      discounts: cardConfig.discounts
-    } as GiftCard;
-    await saveGiftCard(finalGiftCard);
-    showCard(finalGiftCard);
-    if (finalGiftCard.status === 'SUCCESS' && cardConfig.cssSelectors && onMerchantWebsite) {
-      injectClaimInfo(cardConfig, { claimCode: finalGiftCard.claimCode, pin: finalGiftCard.pin });
-      tracking.trackEvent({
-        action: 'autofilledClaimInfo',
-        brand: cardConfig.name,
-        gaAction: `autofilledClaimInfo:${cardConfig.name}`
-      });
-    }
-  };
   const snackOnClose = (): void => {
     setErrorMessage('');
   };
-  const payButton = (): Promise<void> => {
-    tracking.trackEvent({ action: 'clickedPayButton', brand: cardConfig.name });
-    return launchInvoice().catch(err => {
+  const payButton = (): void => {
+    setAwaitingPayment(true);
+    return tracking?.trackEvent({ action: 'clickedPayButton', brand: cardConfig.name });
+  };
+  useEffect(() => {
+    if (!awaitingPayment) return;
+    const launchInvoice = async (): Promise<void> => {
+      if (!isAmountValid(amount, cardConfig)) {
+        return onInvalidParams();
+      }
+      const { invoiceId, accessKey, totalDiscount } = await createBitPayInvoice({ params: invoiceParams, user });
+      if (setEmail) {
+        await set<string>('email', invoiceParams.email as string);
+        setEmail(invoiceParams.email as string);
+      }
+      const unredeemedGiftCard = {
+        currency,
+        date: new Date().toISOString(),
+        amount,
+        clientId: invoiceParams.clientId,
+        accessKey,
+        invoiceId,
+        name: invoiceParams.brand,
+        totalDiscount,
+        status: 'UNREDEEMED'
+      } as GiftCard;
+      await saveGiftCard(unredeemedGiftCard);
+      const launchPromise = browser.runtime.sendMessage({
+        name: 'LAUNCH_WINDOW',
+        url: `${process.env.API_ORIGIN}/invoice?id=${invoiceId}&view=popup`
+      });
+      const res = await Promise.race([
+        launchPromise,
+        waitForServerEvent(unredeemedGiftCard).catch(async () => {
+          await wait(1000 * 60 * 15);
+          Promise.resolve({ data: { status: 'closed' } });
+        })
+      ]);
+      if (res.data && res.data.status === 'closed') {
+        tracking.trackEvent({ action: 'closedInvoice', brand: cardConfig.name });
+        await deleteGiftCard(unredeemedGiftCard);
+        setAwaitingPayment(false);
+        return;
+      }
+      const giftCard = await redeemGiftCard(unredeemedGiftCard);
+      const transactionCurrency = giftCard.invoice?.transactionCurrency;
+      tracking.trackEvent({
+        action: 'purchasedGiftCard',
+        gaAction: `purchasedGiftCard:${cardConfig.name}:${transactionCurrency}`,
+        brand: cardConfig.name,
+        transactionCurrency,
+        ...(cardConfig.discounts && cardConfig.discounts[0] && { ...getGiftCardPromoEventParams(cardConfig) })
+      });
+      const finalGiftCard = {
+        ...giftCard,
+        discounts: cardConfig.discounts
+      } as GiftCard;
+      await saveGiftCard(finalGiftCard);
+      showCard(finalGiftCard);
+      if (finalGiftCard.status === 'SUCCESS' && cardConfig.cssSelectors && onMerchantWebsite) {
+        injectClaimInfo(cardConfig, { claimCode: finalGiftCard.claimCode, pin: finalGiftCard.pin });
+        tracking.trackEvent({
+          action: 'autofilledClaimInfo',
+          brand: cardConfig.name,
+          gaAction: `autofilledClaimInfo:${cardConfig.name}`
+        });
+      }
+    };
+    launchInvoice().catch(err => {
       setErrorMessage(err.message || 'An unexpected error occurred');
       setAwaitingPayment(false);
     });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [awaitingPayment]);
   return (
     <>
       <div className="pay-with-bitpay">
