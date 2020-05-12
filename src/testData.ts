@@ -1,4 +1,5 @@
-import { CardConfig, ClaimCodeType, GiftCard } from '../../../../services/gift-card.types';
+import { CardConfig, ClaimCodeType, GiftCard } from './services/gift-card.types';
+import { Merchant } from './services/merchant';
 
 export const GiftCardsData: GiftCard[] = [
   {
@@ -65,4 +66,22 @@ export const CardConfigData: CardConfig = {
     orderTotal: ['.grand-total-price'],
     pinInput: []
   }
+};
+
+export const MerchantData: Merchant = {
+  caption:
+    'Only redeemable on www.amazon.com (USA website)↵↵Amazon.com Gift Cards never expire and can be redeemed towards millions of items at www.amazon.com.',
+  displayLink: 'amazon.com',
+  displayName: 'Amazon',
+  domains: ['amazon.com'],
+  featured: true,
+  giftCards: [],
+  hasDirectIntegration: false,
+  icon: 'https://bitpay.com/gift-cards/assets/amazoncom/icon2.svg',
+  instructions:
+    'Only redeemable on www.amazon.com (USA website)↵↵Amazon.com Gift Cards never expire and can be redeemed towards millions of items at www.amazon.com.',
+  link: 'amazon.com',
+  name: 'Amazon.com',
+  tags: ['online', 'games'],
+  theme: '#FF9902'
 };

@@ -15,6 +15,14 @@ const ExtensionReloader = require('webpack-extension-reloader');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
+const dotEnv = new Dotenv({
+  path: process.env.NODE_ENV === 'production' ? '.env' : `.env.${process.env.NODE_ENV}`,
+  defaults: true
+});
+
+const apiOrigin = dotEnv.definitions['process.env.API_ORIGIN'].replace(/"/g, '');
+process.env.API_ORIGIN = apiOrigin;
+
 const manifestInput = require('./src/manifest');
 
 const viewsPath = path.join(__dirname, 'views');
@@ -23,11 +31,6 @@ const destPath = path.join(__dirname, 'extension');
 const nodeEnv = process.env.NODE_ENV || 'development';
 const targetBrowser = process.env.TARGET_BROWSER;
 const manifest = wextManifest[targetBrowser](manifestInput);
-
-const dotEnv = new Dotenv({
-  path: process.env.NODE_ENV === 'production' ? '.env' : `.env.${process.env.NODE_ENV}`,
-  defaults: true
-});
 
 const extensionReloaderPlugin =
   nodeEnv === 'development'
@@ -146,13 +149,9 @@ module.exports = {
     }),
     new CspHtmlWebpackPlugin(
       {
-        'default-src': ["'self'", dotEnv.definitions['process.env.API_ORIGIN'].replace(/"/g, '')],
+        'default-src': ["'self'", apiOrigin],
         'base-uri': "'self'",
-        'img-src': [
-          'https://gravatar.com',
-          'https://*.wp.com',
-          dotEnv.definitions['process.env.API_ORIGIN'].replace(/"/g, '')
-        ],
+        'img-src': ['https://gravatar.com', 'https://*.wp.com', apiOrigin],
         'font-src': ['https://fonts.gstatic.com'],
         'object-src': "'none'",
         'script-src': process.env.NODE_ENV === 'production' ? ["'self'"] : ["'self'", "'unsafe-eval'"],

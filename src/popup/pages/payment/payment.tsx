@@ -9,6 +9,7 @@ import { resizeToFitPage } from '../../../services/frame';
 import { BitpayUser } from '../../../services/bitpay-id';
 import { Merchant } from '../../../services/merchant';
 import './payment.scss';
+import { trackComponent } from '../../../services/analytics';
 
 const Payment: React.FC<RouteComponentProps & {
   user?: BitpayUser;
@@ -72,4 +73,4 @@ const Payment: React.FC<RouteComponentProps & {
   );
 };
 
-export default Payment;
+export default trackComponent(Payment, { page: 'payment' });

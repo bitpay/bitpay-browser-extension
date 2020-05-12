@@ -1,6 +1,8 @@
 import React from 'react';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
+import { useTracking } from 'react-tracking';
+import { trackComponent } from '../../../services/analytics';
 import { resizeFrame } from '../../../services/frame';
 import { BitpayUser } from '../../../services/bitpay-id';
 import { launchNewTab } from '../../../services/browser';
@@ -9,7 +11,12 @@ import packageJson from '../../../../package.json';
 import './settings.scss';
 
 const Settings: React.FC<{ email: string; user: BitpayUser }> = ({ email, user }) => {
+  const tracking = useTracking();
   resizeFrame(450);
+  const launchRepo = (): void => {
+    launchNewTab('https://github.com/bitpay/bitpay-browser-extension');
+    tracking.trackEvent({ action: 'clickedVersion' });
+  };
   return (
     <div className="settings">
       <div className="settings-group">
@@ -58,11 +65,7 @@ const Settings: React.FC<{ email: string; user: BitpayUser }> = ({ email, user }
         <Link type="button" className="settings-group__item" to="/settings/legal">
           Legal
         </Link>
-        <button
-          type="button"
-          className="settings-group__item"
-          onClick={(): void => launchNewTab('https://github.com/bitpay/bitpay-browser-extension')}
-        >
+        <button type="button" className="settings-group__item" onClick={launchRepo}>
           <div className="settings-group__item__label">Version</div>
           <div className="settings-group__item__value">{packageJson.version}</div>
         </button>
@@ -71,4 +74,4 @@ const Settings: React.FC<{ email: string; user: BitpayUser }> = ({ email, user }
   );
 };
 
-export default Settings;
+export default trackComponent(Settings, { page: 'settings' });

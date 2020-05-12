@@ -1,8 +1,16 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { shallow, ShallowWrapper } from 'enzyme';
 import SearchBar from './search-bar';
 
 describe('Search Bar', () => {
+  const setWrapperProps = (wrapper: ShallowWrapper): void => {
+    wrapper.setProps({
+      output: (val: string) => wrapper.setProps({ value: val }),
+      tracking: {
+        trackEvent: (): void => undefined
+      }
+    });
+  };
   it('should create the component', () => {
     const wrapper = shallow(<SearchBar />);
     expect(wrapper.exists()).toBeTruthy();
@@ -10,12 +18,7 @@ describe('Search Bar', () => {
 
   it('should change icons based on input value', () => {
     const wrapper = shallow(<SearchBar />);
-    wrapper.setProps({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      output: (val: any) => {
-        wrapper.setProps({ value: val });
-      }
-    });
+    setWrapperProps(wrapper);
     expect(wrapper.find('#searchClearIcon').exists()).toBeFalsy();
     expect(wrapper.find('#searchIcon').exists()).toBeTruthy();
     wrapper.find('input').simulate('change', { currentTarget: { value: 'amazon' } });
@@ -28,12 +31,7 @@ describe('Search Bar', () => {
 
   it('should clear input value on clicking clearSearchButton ', () => {
     const wrapper = shallow(<SearchBar />);
-    wrapper.setProps({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      output: (val: any) => {
-        wrapper.setProps({ value: val });
-      }
-    });
+    setWrapperProps(wrapper);
     wrapper.find('input').simulate('change', { currentTarget: { value: 'amazon' } });
     expect(wrapper.find('input').prop('value')).toBe('amazon');
     wrapper.find('button').simulate('click');

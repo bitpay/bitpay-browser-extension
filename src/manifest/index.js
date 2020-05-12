@@ -21,7 +21,9 @@ const manifestInput = {
   permissions: ['activeTab', 'storage', 'http://*/*', 'https://*/*'],
   content_security_policy: `script-src 'self' ${
     process.env.NODE_ENV === 'production' ? '' : "'unsafe-eval'"
-  }; object-src 'self'`,
+  }; object-src 'self'; connect-src ${process.env.API_ORIGIN} https://www.google-analytics.com ${
+    process.env.NODE_ENV === 'production' ? '' : 'ws:'
+  }`,
 
   '__chrome|firefox__author': 'bitpay',
   __opera__developer: {
@@ -30,7 +32,7 @@ const manifestInput = {
 
   __firefox__applications: {
     gecko: {
-      id: '{754FB1AD-CC3B-4856-B6A0-7786F8CA9D17}'
+      id: '{854FB1AD-CC3B-4856-B6A0-7786F8CA9D17}'
     }
   },
 

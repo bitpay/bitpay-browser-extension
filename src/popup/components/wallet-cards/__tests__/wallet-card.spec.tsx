@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import WalletCard from '../wallet-card';
-import { GiftCardsData, CardConfigData } from './wallet-card-data';
+import { CardConfigData, GiftCardsData } from '../../../../testData';
 
 const GetBalanceReturnValue = 5;
 

@@ -1,5 +1,7 @@
 /* eslint-disable jsx-a11y/no-autofocus */
 import React, { useRef, useState, useEffect } from 'react';
+import { useTracking } from 'react-tracking';
+import { RouteComponentProps } from 'react-router-dom';
 import { resizeToFitPage } from '../../../../services/frame';
 import { GiftCard, CardConfig } from '../../../../services/gift-card.types';
 import CardHeader from '../../../components/card-header/card-header';
@@ -9,14 +11,12 @@ import { getLatestBalanceEntry } from '../../../../services/gift-card';
 import { wait } from '../../../../services/utils';
 import CardMenu from '../../../components/card-menu/card-menu';
 import ActionButton from '../../../components/action-button/action-button';
+import { trackComponent } from '../../../../services/analytics';
 
-const Balance: React.FC<{
+const Balance: React.FC<RouteComponentProps & {
   updateGiftCard: (cards: GiftCard) => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  history: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  location: any;
 }> = ({ location, history, updateGiftCard }) => {
+  const tracking = useTracking();
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     resizeToFitPage(ref, 80);
@@ -45,14 +45,17 @@ const Balance: React.FC<{
       balanceHistory: [...(card.balanceHistory || []), { date: new Date().toISOString(), amount }]
     };
     await updateGiftCard(updatedCard);
+    tracking.trackEvent({ action: 'changedBalance', type: updateType, gaAction: `changedBalance:${updateType}` });
     history.goBack();
   };
   const handleMenuClick = async (option: string): Promise<void> => {
     await wait(100);
+    const type = option.replace('Enter ', '');
+    tracking.trackEvent({ action: 'changedBalanceUpdateType', type });
     history.goBack();
     history.push({
       pathname: `/card/${card.invoiceId}/balance`,
-      state: { card, cardConfig, updateType: option.replace('Enter ', '') }
+      state: { card, cardConfig, updateType: type }
     });
   };
   return (
@@ -95,4 +98,4 @@ const Balance: React.FC<{
   );
 };
 
-export default Balance;
+export default trackComponent(Balance, { page: 'balance' });
