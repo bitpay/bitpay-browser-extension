@@ -89,7 +89,8 @@ const Popup: React.FC = () => {
       if (unredeemedGiftCards.length) {
         setRealtimeInvoiceIds([...realtimeInvoiceIds, ...unredeemedGiftCards.map(c => c.invoiceId)]);
         unredeemedGiftCards.forEach(async card => {
-          const updatedInvoice = await listenForInvoiceChanges(card);
+          const updatedInvoice = await listenForInvoiceChanges(card).catch(() => undefined);
+          if (!updatedInvoice) return;
           const newCards = await handlePaymentEvent(card, updatedInvoice, purchasedGiftCards);
           setPurchasedGiftCards(newCards);
         });

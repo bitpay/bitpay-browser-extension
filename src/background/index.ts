@@ -42,12 +42,17 @@ async function refreshCachedMerchantsIfNeeded(): Promise<void> {
     .catch(err => console.log('Error refreshing merchants', err));
 }
 
+function isGiftCardInvoice(url: string): boolean {
+  return url.startsWith(process.env.API_ORIGIN as string) && url.includes('/invoice?id=') && url.includes('view=popup');
+}
+
 async function handleUrlChange(url: string): Promise<void> {
   const merchants = await getCachedMerchants();
-  const bitpayAccepted = !!(url && isBitPayAccepted(url, merchants));
+  const bitpayAccepted = isBitPayAccepted(url, merchants);
   const merchant = getBitPayMerchantFromUrl(url, merchants);
-  await setIcon(bitpayAccepted);
+  await setIcon(bitpayAccepted || isGiftCardInvoice(url));
   await refreshCachedMerchantsIfNeeded();
+  if (isGiftCardInvoice(url)) return;
   dispatchEvent({
     action: `setExtensionIcon:${
       merchant ? `active:${merchant.hasDirectIntegration ? 'direct' : 'giftCard'}` : `inactive`
@@ -153,7 +158,7 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
     case 'TRACK':
       return dispatchEvent(message.event);
     case 'URL_CHANGED':
-      return handleUrlChange(message.url);
+      return message.url && handleUrlChange(message.url);
     default:
       return tab && sendMessageToTab(message, tab);
   }
