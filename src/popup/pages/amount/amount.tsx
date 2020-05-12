@@ -1,6 +1,6 @@
 import React, { useRef, useState, Dispatch, SetStateAction, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import { useTracking } from 'react-tracking';
+import { TrackingProp } from 'react-tracking';
 import { motion } from 'framer-motion';
 import CardDenoms from '../../components/card-denoms/card-denoms';
 import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
@@ -25,6 +25,7 @@ const Amount: React.FC<RouteComponentProps & {
   purchasedGiftCards: GiftCard[];
   setPurchasedGiftCards: Dispatch<SetStateAction<GiftCard[]>>;
   supportedMerchant?: Merchant;
+  tracking?: TrackingProp;
 }> = ({
   location,
   clientId,
@@ -34,9 +35,9 @@ const Amount: React.FC<RouteComponentProps & {
   history,
   purchasedGiftCards,
   setPurchasedGiftCards,
-  supportedMerchant
+  supportedMerchant,
+  tracking
 }) => {
-  const tracking = useTracking();
   const inputRef = useRef<HTMLInputElement>(null);
   const { cardConfig, merchant } = location.state as { cardConfig: CardConfig; merchant: Merchant };
   const hasFixedDenoms = cardConfig.supportedAmounts && cardConfig.supportedAmounts[0];
@@ -52,7 +53,7 @@ const Amount: React.FC<RouteComponentProps & {
   );
   useEffect(() => {
     if (initialAmount)
-      tracking.trackEvent({
+      return tracking?.trackEvent({
         action: 'autofilledAmount',
         brand: cardConfig.name,
         gaAction: `autofilledAmount:${cardConfig.name}`
@@ -108,7 +109,7 @@ const Amount: React.FC<RouteComponentProps & {
     setInputDirty(false);
     focusInput();
     const method = delta > 0 ? 'increment' : 'decrement';
-    tracking.trackEvent({ action: 'changedAmount', method, gaAction: `changedAmount:${method}` });
+    return tracking?.trackEvent({ action: 'changedAmount', method, gaAction: `changedAmount:${method}` });
   };
   const shakeInput = (): void => {
     setInputError(true);
@@ -127,7 +128,6 @@ const Amount: React.FC<RouteComponentProps & {
   const handleInput = (input: string): void => {
     const stringValue = input.replace(/[^\d.-]/g, '');
     const newAmount = parseFloat(Number(stringValue).toFixed(precision));
-    tracking.trackEvent({ action: 'changedAmount', method: 'type', gaAction: 'changedAmount:type' });
     if (newAmount <= maxAmount) {
       const correctedValue = enforcePrecision(stringValue);
       if (correctedValue !== stringValue) shakeInput();
@@ -139,6 +139,7 @@ const Amount: React.FC<RouteComponentProps & {
     } else {
       shakeInput();
     }
+    return tracking?.trackEvent({ action: 'changedAmount', method: 'type', gaAction: 'changedAmount:type' });
   };
   const goToPaymentPage = (): void => {
     isAmountValid(amount, cardConfig)

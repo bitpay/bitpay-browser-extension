@@ -36,6 +36,11 @@ jest.mock('../../components/pay-with-bitpay/pay-with-bitpay', () => {
   return PayWithBitpay;
 });
 
+jest.mock('../../../services/analytics', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  trackComponent: (component: any): any => component
+}));
+
 jest.mock('../../../services/frame', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   resizeFrame: (): any => jest.fn()
