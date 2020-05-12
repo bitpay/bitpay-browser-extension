@@ -26,25 +26,30 @@ const Account: React.FC<RouteComponentProps & {
   const tracking = useTracking();
   const ref = useRef<HTMLDivElement>(null);
   const [awaitingAuthentication, setAwaitingAuthentication] = useState(false);
-  const connectBitpayId = async (): Promise<void> => {
-    tracking.trackEvent({ action: 'clickedSignInButton' });
-    setAwaitingAuthentication(true);
-    await browser.runtime.sendMessage({
-      name: 'LAUNCH_WINDOW',
-      url: `${process.env.API_ORIGIN}/wallet-card/login?context=bpa`,
-      width: 350,
-      height: 600
-    });
-    const newUser = await get<BitpayUser>('bitpayUser');
-    if (!newUser) {
-      setAwaitingAuthentication(false);
-      tracking.trackEvent({ action: 'closedSignInPage' });
-      return;
-    }
-    setUser(newUser);
-    resizeToFitPage(ref, 49);
-    tracking.trackEvent({ action: 'connectedAccount' });
-  };
+  useEffect(() => {
+    if (!awaitingAuthentication) return;
+    const connectBitpayId = async (): Promise<void> => {
+      tracking.trackEvent({ action: 'clickedSignInButton' });
+      setAwaitingAuthentication(true);
+      await browser.runtime.sendMessage({
+        name: 'LAUNCH_WINDOW',
+        url: `${process.env.API_ORIGIN}/wallet-card/login?context=bpa`,
+        width: 350,
+        height: 600
+      });
+      const newUser = await get<BitpayUser>('bitpayUser');
+      if (!newUser) {
+        setAwaitingAuthentication(false);
+        tracking.trackEvent({ action: 'closedSignInPage' });
+        return;
+      }
+      setUser(newUser);
+      resizeToFitPage(ref, 49);
+      tracking.trackEvent({ action: 'connectedAccount' });
+    };
+    connectBitpayId();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [awaitingAuthentication]);
   const disconnect = async (): Promise<void> => {
     await remove('bitpayUser');
     setUser(undefined);
@@ -95,7 +100,7 @@ const Account: React.FC<RouteComponentProps & {
           </div>
         ) : (
           <div className="account__zero-state">
-            <button type="button" className="account__title" onClick={connectBitpayId}>
+            <button type="button" className="account__title">
               Connect Account
             </button>
             <div className="account__body">Use your account to sync gift cards, track your purchases, and more.</div>
@@ -129,7 +134,6 @@ const Account: React.FC<RouteComponentProps & {
               ) : (
                 <motion.button
                   type="button"
-                  onClick={connectBitpayId}
                   className="account__zero-state__sign-in"
                   initial="hidden"
                   animate="visible"
@@ -137,6 +141,7 @@ const Account: React.FC<RouteComponentProps & {
                   variants={buttonAnimation}
                   whileTap={{ scale: 0.98 }}
                   key="sign-in-with-bitpay"
+                  onClick={(): void => setAwaitingAuthentication(true)}
                 >
                   <SignInWithBitpayImage />
                 </motion.button>
