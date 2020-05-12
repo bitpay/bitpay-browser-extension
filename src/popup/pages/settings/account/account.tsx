@@ -30,7 +30,6 @@ const Account: React.FC<RouteComponentProps & {
     if (!awaitingAuthentication) return;
     const connectBitpayId = async (): Promise<void> => {
       tracking.trackEvent({ action: 'clickedSignInButton' });
-      setAwaitingAuthentication(true);
       await browser.runtime.sendMessage({
         name: 'LAUNCH_WINDOW',
         url: `${process.env.API_ORIGIN}/wallet-card/login?context=bpa`,
@@ -100,9 +99,7 @@ const Account: React.FC<RouteComponentProps & {
           </div>
         ) : (
           <div className="account__zero-state">
-            <button type="button" className="account__title">
-              Connect Account
-            </button>
+            <div className="account__title">Connect Account</div>
             <div className="account__body">Use your account to sync gift cards, track your purchases, and more.</div>
             <AnimatePresence exitBeforeEnter>
               {awaitingAuthentication ? (
