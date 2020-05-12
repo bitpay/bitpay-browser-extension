@@ -43,5 +43,6 @@ export async function sendEventToGa(event: { [key: string]: string }): Promise<v
 }
 
 export function dispatchEvent(event: { [key: string]: string }): void {
+  if (process.env.TARGET_BROWSER === 'firefox') return;
   sendEventToGa(event);
 }

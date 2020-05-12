@@ -19,9 +19,11 @@ const manifestInput = {
   short_name: 'Pay with BitPay',
 
   permissions: ['activeTab', 'storage', 'http://*/*', 'https://*/*'],
-  content_security_policy: `script-src 'self' https://www.google-analytics.com ${
+  content_security_policy: `script-src 'self' ${
     process.env.NODE_ENV === 'production' ? '' : "'unsafe-eval'"
-  }; object-src 'self'`,
+  }; object-src 'self'; connect-src ${process.env.API_ORIGIN} https://www.google-analytics.com ${
+    process.env.NODE_ENV === 'production' ? '' : 'ws:'
+  }`,
 
   '__chrome|firefox__author': 'bitpay',
   __opera__developer: {
