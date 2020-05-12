@@ -47,7 +47,7 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ locat
     tracking.trackEvent(getEventParams('clickedMerchantCta'));
   };
   const color = merchant.theme === '#ffffff' ? '#4f6ef7' : merchant.theme;
-  const bubbleStyle = { color: { color, borderColor: color } };
+  const bubbleColor = { color, borderColor: color };
   const suggested = useMemo((): { category: DirectoryCategory; suggestions: Merchant[] } => {
     const category =
       directory.categories[
@@ -114,7 +114,7 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ locat
               {merchant.hasDirectIntegration ? <>{merchant.caption}</> : <CardDenoms cardConfig={cardConfig} />}
             </div>
             {getDiscount(merchant) && (
-              <div className="brand-page__header__block__discount" style={bubbleStyle.color}>
+              <div className="brand-page__header__block__discount" style={bubbleColor}>
                 <DiscountText merchant={merchant} />
               </div>
             )}
