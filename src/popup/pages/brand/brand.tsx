@@ -47,7 +47,7 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ locat
     tracking.trackEvent(getEventParams('clickedMerchantCta'));
   };
   const color = merchant.theme === '#ffffff' ? '#4f6ef7' : merchant.theme;
-  const bubbleStyle = { color: { color, borderColor: color }, contents: { transform: 'translateY(-0.5px)' } };
+  const bubbleStyle = { color: { color, borderColor: color } };
   const suggested = useMemo((): { category: DirectoryCategory; suggestions: Merchant[] } => {
     const category =
       directory.categories[
@@ -115,9 +115,7 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ locat
             </div>
             {getDiscount(merchant) && (
               <div className="brand-page__header__block__discount" style={bubbleStyle.color}>
-                <div style={bubbleStyle.contents}>
-                  <DiscountText merchant={merchant} />
-                </div>
+                <DiscountText merchant={merchant} />
               </div>
             )}
           </div>
