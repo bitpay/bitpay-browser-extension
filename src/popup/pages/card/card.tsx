@@ -2,6 +2,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { Tooltip, makeStyles, createStyles } from '@material-ui/core';
 import { useTracking } from 'react-tracking';
+import { motion } from 'framer-motion';
+import { upperCut } from '../../../services/animations';
 import { GiftCard, CardConfig } from '../../../services/gift-card.types';
 import { wait } from '../../../services/utils';
 import { resizeToFitPage } from '../../../services/frame';
@@ -36,9 +38,9 @@ const Card: React.FC<RouteComponentProps & {
     })
   );
   const classes = useStyles();
+  const tooltipStyles = { tooltip: classes.tooltipStyles };
   const ref = useRef<HTMLDivElement>(null);
   const mountedRef = useRef(true);
-
   const { card: giftCard, cardConfig } = location.state as { card: GiftCard; cardConfig: CardConfig };
   const { invoiceId } = giftCard;
   const [card, setCard] = useState(giftCard);
@@ -59,7 +61,7 @@ const Card: React.FC<RouteComponentProps & {
     updateGiftCard(cardToUpdate);
     setCard(cardToUpdate);
   };
-  const resizeFrame = (paddingBottom = 80): void => {
+  const resizeFrame = (paddingBottom = 60): void => {
     if (mountedRef.current) resizeToFitPage(ref, paddingBottom);
   };
   const archive = async (): Promise<void> => {
@@ -73,7 +75,7 @@ const Card: React.FC<RouteComponentProps & {
     updateCard({ ...card, archived: false });
     tracking.trackEvent({ action: 'unarchivedGiftCard' });
   };
-
+  const menuItems = ['Edit Balance', card.archived ? 'Unarchive' : 'Archive', 'Help'];
   const handleMenuClick = (item: string): void => {
     switch (item) {
       case 'Edit Balance':
@@ -130,30 +132,51 @@ const Card: React.FC<RouteComponentProps & {
   return (
     <div className="card-details">
       <div className="card-details__content" ref={ref}>
-        <CardMenu items={['Edit Balance', card.archived ? 'Unarchive' : 'Archive', 'Help']} onClick={handleMenuClick} />
+        <CardMenu items={menuItems} onClick={handleMenuClick} />
+
         <CardHeader amount={getLatestBalance(card)} cardConfig={cardConfig} card={card} />
+
         <LineItems cardConfig={cardConfig} card={card} />
+
         {card.status === 'SUCCESS' && cardConfig.defaultClaimCodeType !== 'link' && (
-          <div className="card-details__content__code-box">
+          <motion.div
+            variants={upperCut}
+            custom={0.2}
+            animate="visible"
+            initial="hidden"
+            className="card-details__content__code-box"
+          >
             <CodeBox label="Claim Code" code={card.claimCode} />
             {card.pin && <CodeBox label="Pin" code={card.pin} />}
-          </div>
+          </motion.div>
         )}
 
         {card.status === 'SUCCESS' && !card.archived && shouldShowRedeemButton() && (
-          <div className="action-button__footer">
+          <motion.div
+            variants={upperCut}
+            custom={0.3}
+            animate="visible"
+            initial="hidden"
+            className="action-button__footer"
+          >
             <ActionButton onClick={launchClaimLink}>Redeem Now</ActionButton>
-          </div>
+          </motion.div>
         )}
 
         {card.status === 'PENDING' && (
           <Tooltip
             title="We’ll update your claim code here when your payment confirms"
             placement="top"
-            classes={{ tooltip: classes.tooltipStyles }}
+            classes={tooltipStyles}
             arrow
           >
-            <div className="action-button__footer">
+            <motion.div
+              variants={upperCut}
+              custom={0.3}
+              animate="visible"
+              initial="hidden"
+              className="action-button__footer"
+            >
               <ActionButton onClick={redeem} flavor="warn">
                 {fetchingClaimCode ? (
                   <>
@@ -164,21 +187,28 @@ const Card: React.FC<RouteComponentProps & {
                   <>Pending Confirmation</>
                 )}
               </ActionButton>
-            </div>
+            </motion.div>
           </Tooltip>
         )}
+
         {card.status === 'FAILURE' && (
           <Tooltip
             title="Could not get claim code. Please contact BitPay Support."
             placement="top"
-            classes={{ tooltip: classes.tooltipStyles }}
+            classes={tooltipStyles}
             arrow
           >
-            <div className="action-button__footer">
+            <motion.div
+              variants={upperCut}
+              custom={0.3}
+              animate="visible"
+              initial="hidden"
+              className="action-button__footer"
+            >
               <ActionButton onClick={handleErrorButtonClick} flavor="danger">
                 Something Went Wrong
               </ActionButton>
-            </div>
+            </motion.div>
           </Tooltip>
         )}
       </div>

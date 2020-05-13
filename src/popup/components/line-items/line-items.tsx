@@ -1,6 +1,8 @@
 import React from 'react';
 import { useTracking } from 'react-tracking';
 import { format } from 'date-fns';
+import { motion } from 'framer-motion';
+import { upperCut } from '../../../services/animations';
 import { launchNewTab } from '../../../services/browser';
 import { formatDiscount } from '../../../services/merchant';
 import { CardConfig, GiftCard, UnsoldGiftCard } from '../../../services/gift-card.types';
@@ -20,7 +22,7 @@ const LineItems: React.FC<{ cardConfig: CardConfig; card: Partial<GiftCard> & Un
     tracking.trackEvent({ action: 'clickedAmountPaid' });
   };
   return (
-    <div className="line-items">
+    <motion.div className="line-items" variants={upperCut} animate="visible" initial="hidden">
       {card.date && (
         <div className="line-items__item">
           <div className="line-items__item__label">Purchased</div>
@@ -75,7 +77,7 @@ const LineItems: React.FC<{ cardConfig: CardConfig; card: Partial<GiftCard> & Un
           </button>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 
