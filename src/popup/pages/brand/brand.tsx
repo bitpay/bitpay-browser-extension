@@ -49,14 +49,11 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ locat
   const color = merchant.theme === '#ffffff' ? '#4f6ef7' : merchant.theme;
   const bubbleColor = { color, borderColor: color };
   const suggested = useMemo((): { category: DirectoryCategory; suggestions: Merchant[] } => {
-    const category =
-      directory.categories[
-        Object.keys(directory.categories).sort(
-          (a, b) =>
-            directory.categories[b].tags.filter((tag: string) => merchant.tags.includes(tag)).length -
-            directory.categories[a].tags.filter((tag: string) => merchant.tags.includes(tag)).length
-        )[0]
-      ];
+    const category = directory.categories.sort(
+      (a, b) =>
+        b.tags.filter((tag: string) => merchant.tags.includes(tag)).length -
+        a.tags.filter((tag: string) => merchant.tags.includes(tag)).length
+    )[0];
     const suggestions = category.availableMerchants
       .filter((m: Merchant) => m.displayName !== merchant.displayName)
       .sort(

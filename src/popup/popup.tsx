@@ -36,7 +36,7 @@ import Balance from './pages/card/balance/balance';
 import { BitpayUser } from '../services/bitpay-id';
 import Account from './pages/settings/account/account';
 import { refreshMerchantCache, dispatchAnalyticsEvent } from '../services/browser';
-import { Directory, saturateDirectory } from '../services/directory';
+import { Directory, saturateDirectory, getCachedDirectory } from '../services/directory';
 import './styles.scss';
 
 const Popup: React.FC = () => {
@@ -128,7 +128,7 @@ const Popup: React.FC = () => {
         bitpayUser,
         extensionClientId
       ] = await Promise.all([
-        get<Directory>('directory'),
+        getCachedDirectory(),
         fetchCachedMerchants(),
         get<CardConfig[]>('supportedGiftCards'),
         get<GiftCard[]>('purchasedGiftCards'),
