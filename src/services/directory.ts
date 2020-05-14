@@ -1,5 +1,5 @@
 import { Merchant } from './merchant';
-import { set } from './storage';
+import { set, get } from './storage';
 
 export interface DirectoryCurationApiObject {
   displayName: string;
@@ -12,30 +12,32 @@ export interface DirectoryCategoryApiObject {
   tags: string[];
 }
 
-export interface DirectoryApiObject {
-  curated: {
-    [category: string]: DirectoryCurationApiObject;
-  };
-  categories: {
-    [category: string]: DirectoryCategoryApiObject;
-  };
+export interface CurationsObject {
+  [curation: string]: DirectoryCurationApiObject;
+}
+
+export interface CategoriesObject {
+  [category: string]: DirectoryCategoryApiObject;
+}
+
+export interface DirectoryRawData {
+  curated: CurationsObject;
+  categories: CategoriesObject;
 }
 
 export interface DirectoryCuration extends DirectoryCurationApiObject {
   availableMerchants: Merchant[];
+  name: string;
 }
 
 export interface DirectoryCategory extends DirectoryCategoryApiObject {
   availableMerchants: Merchant[];
+  name: string;
 }
 
 export interface Directory {
-  curated: {
-    [category: string]: DirectoryCuration;
-  };
-  categories: {
-    [category: string]: DirectoryCategory;
-  };
+  curated: DirectoryCuration[];
+  categories: DirectoryCategory[];
 }
 
 export interface DirectIntegrationApiObject {
@@ -76,37 +78,60 @@ export function fetchDirectIntegrations(): Promise<DirectIntegration[]> {
     .then((merchantMap: DirectIntegrationMap) => getDirectIntegrations(merchantMap));
 }
 
+export function convertToArray<T>(object: { [key: string]: T }): T[] {
+  return Object.keys(object).map(key => ({ name: key, ...object[key] }));
+}
+
+export function convertObjectsToArrays(directory: DirectoryRawData): Directory {
+  const categories = convertToArray(directory.categories);
+  const curated = convertToArray(directory.curated);
+  const newDirectory = { curated, categories } as Directory;
+  return newDirectory;
+}
+
 export const saturateDirectory = (
-  directoryApiObject: DirectoryApiObject = { curated: {}, categories: {} },
+  unsaturatedDirectory: Directory = { curated: [], categories: [] },
   merchants: Merchant[] = []
 ): Directory => {
-  const directory = { ...directoryApiObject } as Directory;
-  Object.keys(directory.curated).forEach(category => {
-    const categoryObj = directory.curated[category];
-    categoryObj.availableMerchants = merchants
-      .filter(
-        merchant =>
-          categoryObj.merchants.includes(merchant.displayName) ||
-          (categoryObj.displayName === 'Popular Brands' && merchant.featured)
-      )
-      .sort(
-        (a: Merchant, b: Merchant) =>
-          categoryObj.merchants.indexOf(a.displayName) - categoryObj.merchants.indexOf(b.displayName)
-      );
-    if (categoryObj.availableMerchants.length === 0) delete directory.curated[category];
-  });
-  Object.keys(directory.categories).forEach(category => {
-    const categoryObj = directory.categories[category];
-    categoryObj.availableMerchants = merchants.filter(merchant =>
-      categoryObj.tags.some(tag => merchant.tags.includes(tag))
-    );
-    if (categoryObj.availableMerchants.length === 0) delete directory.categories[category];
-  });
+  const directory = { ...unsaturatedDirectory } as Directory;
+  directory.curated = unsaturatedDirectory.curated
+    .map(curation => ({
+      ...curation,
+      availableMerchants: merchants
+        .filter(
+          merchant =>
+            curation.merchants.includes(merchant.displayName) ||
+            (curation.displayName === 'Popular Brands' && merchant.featured)
+        )
+        .sort(
+          (a: Merchant, b: Merchant) =>
+            curation.merchants.indexOf(a.displayName) - curation.merchants.indexOf(b.displayName)
+        )
+    }))
+    .filter(curation => curation.availableMerchants.length);
+  directory.categories = unsaturatedDirectory.categories
+    .map(category => ({
+      ...category,
+      availableMerchants: merchants.filter(merchant => category.tags.some(tag => merchant.tags.includes(tag)))
+    }))
+    .filter(category => category.availableMerchants.length);
   return directory;
 };
 
 export async function fetchDirectory(): Promise<Directory> {
   const directory = await fetch(`${process.env.API_ORIGIN}/merchant-directory/directory`).then(res => res.json());
-  await set<Directory>('directory', directory);
-  return directory;
+  const newDirectory: Directory = convertObjectsToArrays(directory);
+  await set<Directory>('directory', newDirectory);
+  return newDirectory;
+}
+
+export async function getCachedDirectory(): Promise<Directory> {
+  // TODO: Remove this method in a few months (after we're sure everyone has the updated directory schema saved)
+  const savedDirectory = (await get<Directory | DirectoryRawData | undefined>('directory')) || {
+    curated: [],
+    categories: []
+  };
+  return savedDirectory && Array.isArray(savedDirectory.categories) && Array.isArray(savedDirectory.curated)
+    ? (savedDirectory as Directory)
+    : convertObjectsToArrays(savedDirectory as DirectoryRawData);
 }
