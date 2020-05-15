@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/no-autofocus */
 import React, { useRef, useEffect, useState, Dispatch, SetStateAction } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
 import { GiftCardInvoiceParams, CardConfig, UnsoldGiftCard, GiftCard } from '../../../services/gift-card.types';
 import LineItems from '../../components/line-items/line-items';
@@ -8,8 +9,8 @@ import CardHeader from '../../components/card-header/card-header';
 import { resizeToFitPage } from '../../../services/frame';
 import { BitpayUser } from '../../../services/bitpay-id';
 import { Merchant } from '../../../services/merchant';
-import './payment.scss';
 import { trackComponent } from '../../../services/analytics';
+import './payment.scss';
 
 const Payment: React.FC<RouteComponentProps & {
   user?: BitpayUser;
@@ -42,13 +43,15 @@ const Payment: React.FC<RouteComponentProps & {
     emailRef.current?.validity.valid ? setReceiptEmail(event.target.value) : setReceiptEmail('');
   };
   useEffect(() => {
-    resizeToFitPage(ref, 77, 100);
+    resizeToFitPage(ref, 71, 100);
   }, [ref]);
   return (
     <div className="payment">
       <div ref={ref}>
-        <CardHeader cardConfig={cardConfig} card={card} />
-        {shouldShowLineItems && <LineItems cardConfig={cardConfig} card={card} />}
+        <AnimatePresence initial={false}>
+          <CardHeader cardConfig={cardConfig} card={card} />
+          {shouldShowLineItems && <LineItems cardConfig={cardConfig} card={card} />}
+        </AnimatePresence>
         {!invoiceParams.email && !user && (
           <div className="settings-group">
             <div className="settings-group__label">Email</div>

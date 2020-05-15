@@ -1,6 +1,5 @@
 export const listAnimation = {
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  base: (i: number) => ({
+  base: (i: number): Record<string, unknown> => ({
     opacity: 1,
     y: 0,
     transition: {
@@ -70,5 +69,41 @@ export const spinAnimation = {
       ease: 'linear',
       duration: 1
     }
+  }
+};
+
+export const upperCut = {
+  visible: (i: number): Record<string, unknown> => ({
+    opacity: 1,
+    rotateX: 0,
+    y: 0,
+    transition: {
+      type: 'spring',
+      damping: 25,
+      delay: i * 0.15
+    }
+  }),
+  hidden: {
+    y: 20,
+    rotateX: 10,
+    opacity: 0
+  }
+};
+
+export const counterPunch = {
+  visible: (i: number): Record<string, unknown> => ({
+    opacity: 1,
+    rotateX: 0,
+    y: 0,
+    transition: {
+      type: 'spring',
+      damping: 25,
+      delay: i * 0.15
+    }
+  }),
+  hidden: {
+    y: -20,
+    rotateX: -8,
+    opacity: 0
   }
 };

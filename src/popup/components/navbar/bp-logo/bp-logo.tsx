@@ -28,8 +28,7 @@ const animateLogo = {
       mass: 0.75
     }
   },
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  hidden: (i: number) => ({
+  hidden: (i: number): Record<string, unknown> => ({
     opacity: 0,
     transition: {
       type: 'spring',
@@ -39,8 +38,7 @@ const animateLogo = {
       delay: i * 0.025
     }
   }),
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  show: (i: number) => ({
+  show: (i: number): Record<string, unknown> => ({
     opacity: 1,
     transition: {
       type: 'spring',
