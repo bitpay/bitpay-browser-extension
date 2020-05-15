@@ -2,6 +2,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useTracking } from 'react-tracking';
 import { RouteComponentProps } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { resizeToFitPage } from '../../../../services/frame';
 import { GiftCard, CardConfig } from '../../../../services/gift-card.types';
 import CardHeader from '../../../components/card-header/card-header';
@@ -65,7 +66,9 @@ const Balance: React.FC<RouteComponentProps & {
           items={[updateType === 'Amount Spent' ? 'Enter Remaining Balance' : 'Enter Amount Spent']}
           onClick={handleMenuClick}
         />
-        <CardHeader amount={latestBalance} cardConfig={cardConfig} card={card} />
+        <AnimatePresence initial={false}>
+          <CardHeader amount={latestBalance} cardConfig={cardConfig} card={card} />
+        </AnimatePresence>
         <form onSubmit={saveValue}>
           <div>
             <div className="settings-group">

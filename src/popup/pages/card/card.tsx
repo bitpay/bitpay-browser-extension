@@ -66,7 +66,7 @@ const Card: React.FC<RouteComponentProps & {
   };
   const archive = async (): Promise<void> => {
     await updateCard({ ...card, archived: true });
-    initiallyArchived ? resizeFrame() : history.goBack();
+    initiallyArchived ? resizeToFitPage(ref, 75, 100) : history.goBack();
     tracking.trackEvent({ action: 'archivedGiftCard' });
   };
   const unarchive = async (): Promise<void> => {
@@ -141,7 +141,7 @@ const Card: React.FC<RouteComponentProps & {
         {card.status === 'SUCCESS' && cardConfig.defaultClaimCodeType !== 'link' && (
           <motion.div
             variants={upperCut}
-            custom={0.2}
+            custom={1}
             animate="visible"
             initial="hidden"
             className="card-details__content__code-box"
@@ -154,7 +154,7 @@ const Card: React.FC<RouteComponentProps & {
         {card.status === 'SUCCESS' && !card.archived && shouldShowRedeemButton() && (
           <motion.div
             variants={upperCut}
-            custom={0.3}
+            custom={2}
             animate="visible"
             initial="hidden"
             className="action-button__footer"
@@ -172,7 +172,7 @@ const Card: React.FC<RouteComponentProps & {
           >
             <motion.div
               variants={upperCut}
-              custom={0.3}
+              custom={2}
               animate="visible"
               initial="hidden"
               className="action-button__footer"
@@ -200,7 +200,7 @@ const Card: React.FC<RouteComponentProps & {
           >
             <motion.div
               variants={upperCut}
-              custom={0.3}
+              custom={2}
               animate="visible"
               initial="hidden"
               className="action-button__footer"

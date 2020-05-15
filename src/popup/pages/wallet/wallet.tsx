@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import './wallet.scss';
 import { GiftCard, CardConfig } from '../../../services/gift-card.types';
 import { Merchant } from '../../../services/merchant';
@@ -21,7 +22,7 @@ const Wallet: React.FC<{
     .filter(card => !card.archived && card.status !== 'UNREDEEMED')
     .sort(sortByDescendingDate);
   return (
-    <div className="wallet">
+    <motion.div className="wallet" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <div ref={ref}>
         <MerchantCta merchant={supportedMerchant} slimCTA />
         <div className="wallet-codes">
@@ -35,7 +36,7 @@ const Wallet: React.FC<{
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

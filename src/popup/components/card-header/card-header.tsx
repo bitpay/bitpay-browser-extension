@@ -10,7 +10,7 @@ const CardHeader: React.FC<{ amount?: number; card: Partial<GiftCard> & UnsoldGi
   card,
   cardConfig
 }) => (
-  <motion.div className="card-header" variants={counterPunch} custom={0.175} animate="visible" initial="hidden">
+  <motion.div className="card-header" variants={counterPunch} custom={1} animate="visible" initial="hidden">
     <div className="card-header__title">{cardConfig.displayName}</div>
     <div className="card-header__balance">
       <img src={cardConfig.icon} alt={`${cardConfig.displayName} logo`} />

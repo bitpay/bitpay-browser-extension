@@ -22,7 +22,7 @@ const LineItems: React.FC<{ cardConfig: CardConfig; card: Partial<GiftCard> & Un
     tracking.trackEvent({ action: 'clickedAmountPaid' });
   };
   return (
-    <motion.div className="line-items" variants={upperCut} animate="visible" initial="hidden">
+    <motion.div className="line-items" variants={upperCut} custom={0} animate="visible" initial="hidden">
       {card.date && (
         <div className="line-items__item">
           <div className="line-items__item__label">Purchased</div>

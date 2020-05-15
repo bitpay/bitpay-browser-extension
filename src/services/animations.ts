@@ -73,37 +73,37 @@ export const spinAnimation = {
 };
 
 export const upperCut = {
-  visible: (delay: number): Record<string, unknown> => ({
+  visible: (i: number): Record<string, unknown> => ({
     opacity: 1,
     rotateX: 0,
     y: 0,
     transition: {
       type: 'spring',
-      damping: 50,
-      delay
+      damping: 25,
+      delay: i * 0.15
     }
   }),
   hidden: {
     y: 20,
-    rotateX: 20,
+    rotateX: 10,
     opacity: 0
   }
 };
 
 export const counterPunch = {
-  visible: (delay: number): Record<string, unknown> => ({
+  visible: (i: number): Record<string, unknown> => ({
     opacity: 1,
     rotateX: 0,
     y: 0,
     transition: {
       type: 'spring',
-      damping: 40,
-      delay
+      damping: 25,
+      delay: i * 0.15
     }
   }),
   hidden: {
-    y: -10,
-    rotateX: -25,
+    y: -20,
+    rotateX: -8,
     opacity: 0
   }
 };
