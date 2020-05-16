@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/camelcase */
 const pkg = require('../../package.json');
+const csp = require('../../csp');
 
 const manifestInput = {
   manifest_version: 2,
@@ -19,11 +20,7 @@ const manifestInput = {
   short_name: 'Pay with BitPay',
 
   permissions: ['activeTab', 'storage', 'http://*/*', 'https://*/*'],
-  content_security_policy: `script-src 'self' ${
-    process.env.NODE_ENV === 'production' ? '' : "'unsafe-eval'"
-  }; object-src 'self'; connect-src ${process.env.API_ORIGIN} https://www.google-analytics.com ${
-    process.env.NODE_ENV === 'production' ? '' : 'ws:'
-  }`,
+  content_security_policy: csp.cspString,
 
   '__chrome|firefox__author': 'bitpay',
   __opera__developer: {

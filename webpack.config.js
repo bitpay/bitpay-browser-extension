@@ -23,6 +23,7 @@ const dotEnv = new Dotenv({
 const apiOrigin = dotEnv.definitions['process.env.API_ORIGIN'].replace(/"/g, '');
 process.env.API_ORIGIN = apiOrigin;
 
+const csp = require('./csp');
 const manifestInput = require('./src/manifest');
 
 const viewsPath = path.join(__dirname, 'views');
@@ -147,29 +148,18 @@ module.exports = {
       chunks: ['options'],
       filename: 'options.html'
     }),
-    new CspHtmlWebpackPlugin(
-      {
-        'default-src': ["'self'", apiOrigin],
-        'base-uri': "'self'",
-        'img-src': ['https://gravatar.com', 'https://*.wp.com', apiOrigin],
-        'font-src': ['https://fonts.gstatic.com'],
-        'object-src': "'none'",
-        'script-src': process.env.NODE_ENV === 'production' ? ["'self'"] : ["'self'", "'unsafe-eval'"],
-        'style-src': ["'self'", 'https://fonts.googleapis.com/', "'unsafe-inline'"]
+    new CspHtmlWebpackPlugin(csp.cspObject, {
+      enabled: true,
+      hashingMethod: 'sha256',
+      hashEnabled: {
+        'script-src': process.env.NODE_ENV === 'production',
+        'style-src': false
       },
-      {
-        enabled: true,
-        hashingMethod: 'sha256',
-        hashEnabled: {
-          'script-src': process.env.NODE_ENV === 'production',
-          'style-src': false
-        },
-        nonceEnabled: {
-          'script-src': process.env.NODE_ENV === 'production',
-          'style-src': false
-        }
+      nonceEnabled: {
+        'script-src': process.env.NODE_ENV === 'production',
+        'style-src': false
       }
-    ),
+    }),
     // write css file(s) to build folder
     new MiniCssExtractPlugin({
       filename: 'css/[name].css'
