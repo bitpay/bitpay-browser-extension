@@ -2,6 +2,10 @@
   padding: 10px 15px;
   position: relative;
 
+  .action-button--warn {
+    margin-bottom: 15px;
+  }
+
   &__content {
     display: flex;
     flex-direction: column;
