@@ -127,7 +127,11 @@ function resetIframePosition(frame: HTMLIFrameElement, top: number, left: number
 function injectValueIntoInputsWithSelectors(selectors: string[] = [], value = ''): void {
   selectors.forEach(selector => {
     const input = document.querySelector(selector) as HTMLInputElement | undefined;
-    if (input && !input.value) input.value = value;
+    if (input && !input.value) {
+      input.setAttribute('value', value);
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      input.dispatchEvent(new Event('blur', { bubbles: true }));
+    }
   });
 }
 
