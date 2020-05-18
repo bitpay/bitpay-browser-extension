@@ -208,7 +208,7 @@ if (window.location.origin === process.env.API_ORIGIN) {
         data: params
       });
     });
-  } else if (window.location.href.startsWith(`${process.env.API_ORIGIN}/directory`)) {
+  } else if (window.location.href.startsWith(`${process.env.API_ORIGIN}/extension`)) {
     const launchExtension = new URLSearchParams(window.location.search).get('launchExtension');
     if (launchExtension && !document.querySelector('iframe[srcdoc]')) toggleIframeVisibility();
   }

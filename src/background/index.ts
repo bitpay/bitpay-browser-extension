@@ -83,7 +83,7 @@ browser.browserAction.onClicked.addListener(async tab => {
       name: 'EXTENSION_ICON_CLICKED',
       merchant
     })
-    .catch(() => browser.tabs.create({ url: `${process.env.API_ORIGIN}/directory?launchExtension=true` }));
+    .catch(() => browser.tabs.create({ url: `${process.env.API_ORIGIN}/extension?launchExtension=true` }));
 });
 
 browser.runtime.onInstalled.addListener(async () => {
