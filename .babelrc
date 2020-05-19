@@ -6,6 +6,7 @@
         {
           "corejs": "3.1.3",
           "useBuiltIns": "usage",
+		  
           // Do not transform modules to CJS
           "modules": false,
           "targets": {
