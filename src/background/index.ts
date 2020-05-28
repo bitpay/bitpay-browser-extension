@@ -69,6 +69,7 @@ async function createClientIdIfNotExists(): Promise<void> {
   if (!analyticsClientId) {
     await set<string>('analyticsClientId', uuid.v4());
   }
+  clientId ? dispatchEvent({ action: 'updatedExtension' }) : dispatchEvent({ action: 'installedExtension' });
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -92,7 +93,6 @@ browser.runtime.onInstalled.addListener(async () => {
     browser.tabs.executeScript(tab.id, { file: 'js/contentScript.bundle.js' }).catch(() => undefined)
   );
   await Promise.all([refreshCachedMerchantsIfNeeded(), createClientIdIfNotExists()]);
-  dispatchEvent({ action: 'installedExtension' });
 });
 
 async function launchWindowAndListenForEvents({
