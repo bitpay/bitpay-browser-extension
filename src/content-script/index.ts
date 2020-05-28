@@ -4,6 +4,7 @@ import { dispatchUrlChange } from '../services/browser';
 import { Merchant } from '../services/merchant';
 import { CheckoutPageCssSelectors } from '../services/gift-card.types';
 import { dragElementFunc } from './drag';
+import { safelyParseJSON } from '../services/utils';
 
 let iframe: HTMLIFrameElement | undefined;
 const DragElementId = 'BitPayExtensionDrag';
@@ -198,10 +199,10 @@ if (window.location.origin === process.env.API_ORIGIN) {
       });
     });
   } else if (window.location.href.includes('/wallet-card')) {
-    window.postMessage({ message: 'pairingOnly' }, process.env.API_ORIGIN);
+    setTimeout(() => window.postMessage({ message: 'pairingOnly' }, process.env.API_ORIGIN as string), 300);
     window.addEventListener('message', ({ data }) => {
-      const dataObj = typeof data === 'string' ? JSON.parse(data) : data;
-      const { message, params } = dataObj;
+      const dataObj = typeof data === 'string' ? safelyParseJSON(data) : data;
+      const { message, params } = dataObj || {};
       if (message !== 'pairing') return;
       browser.runtime.sendMessage(undefined, {
         name: 'ID_CONNECTED',

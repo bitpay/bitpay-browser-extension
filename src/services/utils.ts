@@ -63,3 +63,13 @@ export function useKeyPress(targetKey: string): any {
 
   return keyPressed;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function safelyParseJSON(json: any): object | undefined {
+  let parsed;
+  try {
+    parsed = JSON.parse(json);
+    // eslint-disable-next-line no-empty
+  } catch (e) {}
+  return parsed;
+}
