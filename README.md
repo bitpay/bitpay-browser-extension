@@ -5,7 +5,7 @@
   Discover new ways to use crypto
 </h1>
 <p align="center">
-  Be alerted whenever a website to see how you can use crypto.
+  Be alerted whenever a website you visit offers crypto as a payment option.
   Pay directly at checkout, or purchase and manage store credit through the app.<br/><br/>
 </p>
 <p align="center">
