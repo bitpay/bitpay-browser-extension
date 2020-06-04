@@ -6,10 +6,12 @@
 </h1>
 <p align="center">
   Be alerted whenever a website you visit offers crypto as a payment option.
-  Pay directly at checkout, or purchase and manage store credit through the app.<br/><br/>
+  <br/>
+  Pay directly at checkout, or purchase and manage store credit through the app.
+  <br/><br/>
 </p>
 <p align="center">
-  <img width="375" src="https://bitpay.com/img/demos/extension-demo-short.gif" />
+  <img width="375" src="https://bitpay.com/img/demos/extension-demo.gif" />
 </p>
 
 <hr />
