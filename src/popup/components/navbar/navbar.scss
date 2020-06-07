@@ -19,21 +19,4 @@
   height: 48px;
   padding: 0 12px;
   border-bottom: 1px solid rgba(black, 0.05);
-
-  &__controls {
-    position: absolute;
-    right: 13px;
-    transform: translateY(1px);
-    user-select: none;
-
-    &__toggle {
-      position: absolute;
-      right: 0;
-      &--wrapper {
-        position: relative;
-        right: 7px;
-        display: flex;
-      }
-    }
-  }
 }
