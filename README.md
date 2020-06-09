@@ -88,6 +88,6 @@ See the original [README](https://github.com/abhijithvijayan/wext-manifest) of w
 
 Give a ⭐️ if this project helped you!
 
-## Licence
+## License
 
 Code released under the [MIT License](LICENSE).
