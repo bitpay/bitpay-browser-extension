@@ -4,10 +4,11 @@
   position: absolute;
   left: 16px;
 
-  &.blue {
-    fill: $bitpayBlue;
-  }
-  &.white {
-    fill: white;
+  &__helper {
+    font-weight: $regular;
+    font-size: 11px;
+    color: #97aaff;
+    pointer-events: none;
+    user-select: none;
   }
 }

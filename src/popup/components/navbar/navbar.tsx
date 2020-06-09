@@ -16,6 +16,7 @@ const Navbar: React.FC<RouteComponentProps> = ({ history, location }) => {
   const tracking = useTracking();
   const [preCollapseHeight, setPreCollapseHeight] = useState(0);
   const [collapsed, setCollapsed] = useState(false);
+  const [payMode, setPayMode] = useState(false);
   const goBack = (): void => {
     if (collapsed) {
       setCollapsed(false);
@@ -45,11 +46,20 @@ const Navbar: React.FC<RouteComponentProps> = ({ history, location }) => {
       .pipe(debounceTime(1000))
       .subscribe(() => tracking.trackEvent({ action: 'draggedWidget' }));
   }, [tracking]);
+  useEffect(() => {
+    const payReady = (mode: boolean) => (): void => setPayMode(mode);
+    window.addEventListener('PAY_VISIBLE', payReady(true));
+    window.addEventListener('PAY_HIDDEN', payReady(false));
+    return (): void => {
+      window.removeEventListener('PAY_VISIBLE', payReady(true));
+      window.removeEventListener('PAY_HIDDEN', payReady(false));
+    };
+  }, []);
   return (
-    <div className="header-bar fixed">
-      <BackButton show={showBackButton} onClick={goBack} />
-      <BitpayLogo solo={showBackButton} />
-      <Toggle collapsed={collapsed} expand={expand} collapse={collapse} close={close} />
+    <div className={`header-bar fixed ${collapsed && payMode ? 'fixed--dark' : ''}`}>
+      <BackButton show={!collapsed && showBackButton} onClick={goBack} />
+      <BitpayLogo solo={!collapsed && showBackButton} payMode={collapsed && payMode} />
+      <Toggle collapsed={collapsed} expand={expand} collapse={collapse} close={close} payMode={collapsed && payMode} />
     </div>
   );
 };
