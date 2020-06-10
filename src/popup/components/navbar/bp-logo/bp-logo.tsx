@@ -79,15 +79,17 @@ const animateLogo = {
 
 const BitpayLogo: React.FC<{ solo?: boolean; payMode?: boolean }> = ({ solo, payMode = false }) => (
   <>
-    <motion.div
-      className="bp-logo__helper"
-      initial="hidden"
-      animate={payMode ? 'payModeHelper' : 'hidden'}
-      variants={animateLogo}
-      custom={0}
-    >
-      Pay with
-    </motion.div>
+    {payMode && (
+      <motion.div
+        className="bp-logo__helper"
+        initial="hidden"
+        animate="payModeHelper"
+        variants={animateLogo}
+        custom={0}
+      >
+        Pay with
+      </motion.div>
+    )}
     <motion.svg
       className="bp-logo"
       initial="base"
