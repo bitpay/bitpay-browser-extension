@@ -29,6 +29,10 @@
       margin-right: 4px;
       font-size: 15px;
       color: black;
+      @-moz-document url-prefix() {
+        transform: translateY(0);
+        margin-right: 8px;
+      }
     }
 
     &--large {
@@ -109,6 +113,9 @@
         font-size: 18px;
         margin-right: 10px;
         transform: translateY(-1px);
+        @-moz-document url-prefix() {
+          transform: translateY(0);
+        }
       }
     }
   }

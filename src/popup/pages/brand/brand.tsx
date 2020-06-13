@@ -4,6 +4,7 @@ import { Link, RouteComponentProps } from 'react-router-dom';
 import { useTracking } from 'react-tracking';
 import Observer from '@researchgate/react-intersection-observer';
 import ReactMarkdown from 'react-markdown';
+import { motion } from 'framer-motion';
 import { Directory, DirectoryCategory } from '../../../services/directory';
 import { Merchant, getDiscount } from '../../../services/merchant';
 import { resizeToFitPage, FrameDimensions } from '../../../services/frame';
@@ -96,7 +97,7 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ locat
       });
   };
   return (
-    <div className="brand-page">
+    <motion.div className="brand-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <div ref={ref}>
         <div className="brand-page__header">
           <div className="brand-page__header__icon--wrapper">
@@ -181,7 +182,7 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ locat
 
               <Observer onChange={handleIntersection} threshold={0.8} disabled={pageEntering}>
                 <div>
-                  {suggested.suggestions.slice(0, 2).map(suggestion => (
+                  {suggested.suggestions.slice(0, 2).map((suggestion) => (
                     <Link
                       to={{
                         pathname: `/brand/${suggestion.name}`,
@@ -217,7 +218,7 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ locat
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 
