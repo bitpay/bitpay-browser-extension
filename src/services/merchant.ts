@@ -6,7 +6,7 @@ import {
   getGiftCardPromoEventParams
 } from './gift-card';
 import { removeProtocolAndWww } from './utils';
-import { DirectIntegration, fetchDirectIntegrations, Directory, fetchDirectory } from './directory';
+import { DirectIntegration, fetchDirectIntegrations, Directory, fetchDirectory, DirectoryDiscount } from './directory';
 import { get, set } from './storage';
 import { currencySymbols } from './currency';
 import { BitpayUser } from './bitpay-id';
@@ -38,19 +38,19 @@ export function spreadAmounts(values: Array<number>, currency: string): string {
   return caption;
 }
 
-export function formatDiscount(
-  discount: { type: string; amount: number; currency?: string },
-  currency?: string
-): string {
-  if (discount.type === 'percentage') {
-    return `${discount.amount.toString()}%`;
+export function formatDiscount(discount: DirectoryDiscount, currency?: string): string {
+  if (discount.type === 'custom' && discount.value) {
+    return `${discount.value.toString()}`;
   }
-  if (discount.type === 'flatrate' && currency) {
+  if (discount.type === 'percentage' && discount.amount) {
+    return `${discount.amount.toString()}% Off Every Purchase`;
+  }
+  if (discount.type === 'flatrate' && discount.amount && currency) {
     return currencySymbols[currency]
-      ? `${currencySymbols[currency]}${discount.amount.toString()}`
-      : `${discount.amount.toString()} ${currency}`;
+      ? `${currencySymbols[currency]}${discount.amount.toString()} Off Every Purchase`
+      : `${discount.amount.toString()} ${currency} Off Every Purchase`;
   }
-  return discount.amount.toString();
+  return discount.type;
 }
 
 export function doesUrlMatch(url: string, supportedUrl: string): boolean {
