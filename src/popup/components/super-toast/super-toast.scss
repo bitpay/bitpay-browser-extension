@@ -8,6 +8,7 @@
   box-shadow: 0 0 14px 4px rgba(black, 0.05);
   border-radius: 9px;
   cursor: pointer;
+  user-select: none;
 
   &__content {
     display: flex;

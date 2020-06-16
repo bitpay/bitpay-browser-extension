@@ -1,0 +1,20 @@
+@import "../../../../styles/variables";
+
+.header-bar {
+  &__controls {
+    position: absolute;
+    right: 13px;
+    transform: translateY(3px);
+    user-select: none;
+
+    &__toggle {
+      position: absolute;
+      right: 0;
+      &--wrapper {
+        position: relative;
+        right: 7px;
+        display: flex;
+      }
+    }
+  }
+}

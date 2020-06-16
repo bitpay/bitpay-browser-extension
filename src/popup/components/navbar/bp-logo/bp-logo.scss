@@ -4,10 +4,31 @@
   position: absolute;
   left: 16px;
 
-  &.blue {
-    fill: $bitpayBlue;
+  &__helper {
+    font-weight: $regular;
+    font-size: 11px;
+    pointer-events: none;
+    user-select: none;
+    background: linear-gradient(
+      to right,
+      #97aaff 0%,
+      #97aaff 30%,
+      lighten(#97aaff, 40%) 40%,
+      #97aaff 50%,
+      #97aaff 100%
+    );
+    background-size: 82px;
+    background-clip: text;
+    color: transparent;
+    animation: rollingGradient 8.2s linear infinite;
   }
-  &.white {
-    fill: white;
+}
+
+@keyframes rollingGradient {
+  0% {
+    background-position: -82px 0;
+  }
+  100% {
+    background-position: 82px 0;
   }
 }

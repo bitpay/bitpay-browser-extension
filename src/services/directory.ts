@@ -40,6 +40,13 @@ export interface Directory {
   categories: DirectoryCategory[];
 }
 
+export interface DirectoryDiscount {
+  type: 'flatrate' | 'percentage' | 'custom';
+  amount?: number;
+  currency?: string;
+  value?: string;
+}
+
 export interface DirectIntegrationApiObject {
   displayName: string;
   caption: string;
@@ -52,11 +59,7 @@ export interface DirectIntegrationApiObject {
   displayLink: string;
   tags: string[];
   domains: string[];
-  discount?: {
-    type: string;
-    amount: number;
-    currency?: string;
-  };
+  discount?: DirectoryDiscount;
   theme: string;
   instructions: string;
 }

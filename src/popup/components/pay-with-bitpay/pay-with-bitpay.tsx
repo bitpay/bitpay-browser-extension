@@ -26,16 +26,18 @@ import {
 } from '../../../services/animations';
 import './pay-with-bitpay.scss';
 
-const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
-  cardConfig: CardConfig;
-  invoiceParams: GiftCardInvoiceParams;
-  setEmail?: (email: string) => void;
-  user?: BitpayUser;
-  purchasedGiftCards: GiftCard[];
-  setPurchasedGiftCards: (cards: GiftCard[]) => void;
-  supportedMerchant?: Merchant;
-  onInvalidParams?: () => void;
-}> = ({
+const PayWithBitpay: React.FC<
+  Partial<RouteComponentProps> & {
+    cardConfig: CardConfig;
+    invoiceParams: GiftCardInvoiceParams;
+    setEmail?: (email: string) => void;
+    user?: BitpayUser;
+    purchasedGiftCards: GiftCard[];
+    setPurchasedGiftCards: (cards: GiftCard[]) => void;
+    supportedMerchant?: Merchant;
+    onInvalidParams?: () => void;
+  }
+> = ({
   cardConfig,
   invoiceParams,
   history,
@@ -78,6 +80,7 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
     if (!awaitingPayment) return;
     const launchInvoice = async (): Promise<void> => {
       if (!isAmountValid(amount, cardConfig)) {
+        setAwaitingPayment(false);
         return onInvalidParams();
       }
       const { invoiceId, accessKey, totalDiscount } = await createBitPayInvoice({ params: invoiceParams, user });
@@ -138,7 +141,7 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
         });
       }
     };
-    launchInvoice().catch(err => {
+    launchInvoice().catch((err) => {
       setErrorMessage(err.message || 'An unexpected error occurred');
       setAwaitingPayment(false);
     });

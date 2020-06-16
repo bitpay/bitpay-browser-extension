@@ -6,7 +6,7 @@ import {
   getGiftCardPromoEventParams
 } from './gift-card';
 import { removeProtocolAndWww } from './utils';
-import { DirectIntegration, fetchDirectIntegrations, Directory, fetchDirectory } from './directory';
+import { DirectIntegration, fetchDirectIntegrations, Directory, fetchDirectory, DirectoryDiscount } from './directory';
 import { get, set } from './storage';
 import { currencySymbols } from './currency';
 import { BitpayUser } from './bitpay-id';
@@ -38,19 +38,17 @@ export function spreadAmounts(values: Array<number>, currency: string): string {
   return caption;
 }
 
-export function formatDiscount(
-  discount: { type: string; amount: number; currency?: string },
-  currency?: string
-): string {
-  if (discount.type === 'percentage') {
-    return `${discount.amount.toString()}%`;
+export function formatDiscount(discount: DirectoryDiscount, currency?: string): string {
+  if (discount.type === 'custom') return discount.value || 'Discount Available';
+  if (discount.type === 'percentage' && discount.amount) {
+    return `${discount.amount.toString()}% Off Every Purchase`;
   }
-  if (discount.type === 'flatrate' && currency) {
+  if (discount.type === 'flatrate' && discount.amount && currency) {
     return currencySymbols[currency]
-      ? `${currencySymbols[currency]}${discount.amount.toString()}`
-      : `${discount.amount.toString()} ${currency}`;
+      ? `${currencySymbols[currency]}${discount.amount.toString()} Off Every Purchase`
+      : `${discount.amount.toString()} ${currency} Off Every Purchase`;
   }
-  return discount.amount.toString();
+  return discount.type;
 }
 
 export function doesUrlMatch(url: string, supportedUrl: string): boolean {
@@ -63,11 +61,11 @@ export function doesUrlMatch(url: string, supportedUrl: string): boolean {
 }
 
 export function doAnyUrlsMatch(url: string, supportedUrls: string[]): boolean {
-  return supportedUrls.some(supportedUrl => doesUrlMatch(url, supportedUrl));
+  return supportedUrls.some((supportedUrl) => doesUrlMatch(url, supportedUrl));
 }
 
 export function getBitPayMerchantFromUrl(url: string, merchants: Merchant[]): Merchant | undefined {
-  return merchants.find(merchant => doAnyUrlsMatch(url, merchant.domains));
+  return merchants.find((merchant) => doAnyUrlsMatch(url, merchant.domains));
 }
 
 export function isBitPayAccepted(url: string, merchants: Merchant[]): boolean {
@@ -78,12 +76,12 @@ export function getMerchants(
   directIntegrations: DirectIntegration[] = [],
   availableGiftCardBrands: CardConfig[] = []
 ): Merchant[] {
-  const directIntegrationMerchants = directIntegrations.map(integration => ({
+  const directIntegrationMerchants = directIntegrations.map((integration) => ({
     ...integration,
     hasDirectIntegration: true,
     giftCards: []
   }));
-  const giftCardMerchants = availableGiftCardBrands.map(cardConfig => ({
+  const giftCardMerchants = availableGiftCardBrands.map((cardConfig) => ({
     hasDirectIntegration: false,
     name: cardConfig.name,
     displayName: cardConfig.displayName,

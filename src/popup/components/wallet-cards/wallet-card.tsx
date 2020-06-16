@@ -1,7 +1,8 @@
 import React from 'react';
 import classNames from 'classnames';
-import { GiftCard, CardConfig } from '../../../services/gift-card.types';
+import { format } from 'date-fns';
 import './wallet-card.scss';
+import { GiftCard, CardConfig } from '../../../services/gift-card.types';
 import { formatCurrency } from '../../../services/currency';
 import { getLatestBalance } from '../../../services/gift-card';
 
@@ -15,11 +16,6 @@ const WalletCard: React.FC<{
   const cardBackgroundStyle = {
     ...(!isGradient && { background: cardConfig.logoBackgroundColor }),
     ...(isGradient && { backgroundImage: cardConfig.logoBackgroundColor })
-  };
-  const formatDate = (dateIsoString: string): string => {
-    const date = new Date(dateIsoString);
-    const year = `${date.getFullYear()}`.slice(-2);
-    return `${date.getMonth() + 1}/${date.getDate()}/${year}`;
   };
   return (
     <div
@@ -45,8 +41,8 @@ const WalletCard: React.FC<{
             <img id="brandBoxCardLogo" src={cardConfig.logo} alt={`${cardConfig.displayName} logo`} />
           ) : (
             <div className="wallet-card--card-box__text">
-              <div className="wallet-card--card-box__text__label">Gift Card</div>
-              <div className="wallet-card--card-box__text__note">Purchased {formatDate(cards[0].date)}</div>
+              <div className="wallet-card--card-box__text__label">Store Credit</div>
+              <div className="wallet-card--card-box__text__note">{format(new Date(cards[0].date), 'MMM dd yyyy')}</div>
             </div>
           )}
           <div className={`wallet-card--${type}__balance`}>
