@@ -147,12 +147,6 @@ const PayWithBitpay: React.FC<
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [awaitingPayment]);
-  useEffect(() => {
-    window.dispatchEvent(new Event('PAY_VISIBLE'));
-    return (): void => {
-      window.dispatchEvent(new Event('PAY_HIDDEN'));
-    };
-  }, []);
   return (
     <>
       <div className="pay-with-bitpay">
