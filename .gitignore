@@ -1,5 +1,8 @@
 # ignore haters
 haters/
+.DS_Store
+src/.DS_Store
+
 
 ### Node ###
 # Logs
