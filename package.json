@@ -39,7 +39,7 @@
     "react-router-dom": "^5.1.2",
     "react-tracking": "^7.3.0",
     "rxjs": "^6.5.5",
-    "ts-md5": "1.2.4",
+    "ts-md5": "1.2.7",
     "uuid": "^7.0.2",
     "webextension-polyfill-ts": "^0.13.0"
   },
@@ -75,7 +75,7 @@
     "cross-env": "^6.0.3",
     "csp-html-webpack-plugin": "^4.0.0",
     "css-loader": "^3.4.2",
-    "cz-conventional-changelog": "3.1.0",
+    "cz-conventional-changelog": "3.2.0",
     "dotenv-webpack": "^1.7.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
