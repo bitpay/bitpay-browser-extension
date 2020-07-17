@@ -26,7 +26,7 @@ const SearchBar: React.FC<any> = ({ output, value, tracking }) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleScroll = (e: any): void => setScrollY(e?.currentTarget?.scrollTop);
     const parent = document.getElementById('search-bar')?.parentElement;
-    if (parent) parent.addEventListener('scroll', handleScroll);
+    if (parent) parent.addEventListener('scroll', handleScroll, { passive: true });
     return (): void => parent?.removeEventListener('scroll', handleScroll);
   }, []);
   return (

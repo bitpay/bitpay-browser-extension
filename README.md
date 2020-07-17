@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="700" src="https://bitpay.com/assets/extension-banner.png" />
+  <img src="https://bitpay.com/assets/extension-banner.png" />
 </p>
 <h1 align="center">
   Discover new ways to use crypto
