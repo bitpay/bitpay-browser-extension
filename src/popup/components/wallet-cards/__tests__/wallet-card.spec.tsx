@@ -46,8 +46,8 @@ describe('Wallet Card', () => {
     const wrapper = shallow(<WalletCard cards={GiftCardsData} cardConfig={CardConfigData} type="card-box" />);
     expect(wrapper.find('#pocketCardLogo').exists()).toBeFalsy();
     expect(wrapper.find('#brandBoxCardLogo').exists()).toBeFalsy();
-    expect(wrapper.find('.wallet-card--card-box__text__label').text()).toBe('Gift Card');
-    expect(wrapper.find('.wallet-card--card-box__text__note').text()).toBe('Purchased 4/23/20');
+    expect(wrapper.find('.wallet-card--card-box__text__label').text()).toBe('Store Credit');
+    expect(wrapper.find('.wallet-card--card-box__text__note').text()).toBe('Apr 23 2020');
     expect(wrapper.find('.wallet-card--card-box__balance').text()).toBe(`$${GetBalanceReturnValue}`);
   });
 });
