@@ -26,18 +26,16 @@ import {
 } from '../../../services/animations';
 import './pay-with-bitpay.scss';
 
-const PayWithBitpay: React.FC<
-  Partial<RouteComponentProps> & {
-    cardConfig: CardConfig;
-    invoiceParams: GiftCardInvoiceParams;
-    setEmail?: (email: string) => void;
-    user?: BitpayUser;
-    purchasedGiftCards: GiftCard[];
-    setPurchasedGiftCards: (cards: GiftCard[]) => void;
-    supportedMerchant?: Merchant;
-    onInvalidParams?: () => void;
-  }
-> = ({
+const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
+  cardConfig: CardConfig;
+  invoiceParams: GiftCardInvoiceParams;
+  setEmail?: (email: string) => void;
+  user?: BitpayUser;
+  purchasedGiftCards: GiftCard[];
+  setPurchasedGiftCards: (cards: GiftCard[]) => void;
+  supportedMerchant?: Merchant;
+  onInvalidParams?: () => void;
+}> = ({
   cardConfig,
   invoiceParams,
   history,
@@ -105,10 +103,10 @@ const PayWithBitpay: React.FC<
         url: `${process.env.API_ORIGIN}/invoice?id=${invoiceId}&view=popup`
       });
       const res = await Promise.race([
-        launchPromise,
+        launchPromise.catch(() => ({ data: { status: 'error' } })),
         waitForServerEvent(unredeemedGiftCard).catch(async () => {
           await wait(1000 * 60 * 15);
-          Promise.resolve({ data: { status: 'closed' } });
+          Promise.resolve({ data: { status: 'error' } });
         })
       ]);
       if (res.data && res.data.status === 'closed') {
@@ -141,7 +139,7 @@ const PayWithBitpay: React.FC<
         });
       }
     };
-    launchInvoice().catch((err) => {
+    launchInvoice().catch(err => {
       setErrorMessage(err.message || 'An unexpected error occurred');
       setAwaitingPayment(false);
     });
