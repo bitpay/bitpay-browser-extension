@@ -23,4 +23,12 @@
   height: 48px;
   padding: 0 12px;
   border-bottom: 1px solid rgba(black, 0.05);
+
+  .pay-click-handler {
+    cursor: pointer;
+    position: absolute;
+    left: 0;
+    height: 100%;
+    width: 50%;
+  }
 }

@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useState, useEffect } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { useTracking } from 'react-tracking';
@@ -39,9 +41,12 @@ const Navbar: React.FC<RouteComponentProps> = ({ history, location }) => {
     browser.runtime.sendMessage({ name: 'POPUP_CLOSED' });
   };
   const routesWithBackButton = ['/brand', '/card', '/amount', '/payment', '/settings/', '/category'];
-  const showBackButton = routesWithBackButton.some((route) => location.pathname.startsWith(route));
+  const showBackButton = routesWithBackButton.some(route => location.pathname.startsWith(route));
   const routesWithPayMode = ['/amount', '/payment'];
-  const payMode = routesWithPayMode.some((route) => location.pathname.startsWith(route));
+  const payMode = routesWithPayMode.some(route => location.pathname.startsWith(route));
+  const handleLogoClick = (): void => {
+    if (collapsed && payMode) expand();
+  };
   useEffect(() => {
     fromEvent<MessageEvent>(window, 'message')
       .pipe(debounceTime(1000))
@@ -49,6 +54,7 @@ const Navbar: React.FC<RouteComponentProps> = ({ history, location }) => {
   }, [tracking]);
   return (
     <div className={`header-bar fixed ${collapsed && payMode ? 'fixed--dark' : ''}`}>
+      <div className="pay-click-handler" onClick={handleLogoClick} />
       <BackButton show={!collapsed && showBackButton} onClick={goBack} />
       <BitpayLogo solo={!collapsed && showBackButton} payMode={collapsed && payMode} />
       <Toggle collapsed={collapsed} expand={expand} collapse={collapse} close={close} payMode={collapsed && payMode} />
