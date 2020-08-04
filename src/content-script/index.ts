@@ -6,8 +6,9 @@ import { CheckoutPageCssSelectors } from '../services/gift-card.types';
 import { dragElementFunc } from './drag';
 import { safelyParseJSON } from '../services/utils';
 
+const dragElementId = 'BitPayExtensionDrag';
 let iframe: HTMLIFrameElement | undefined;
-const DragElementId = 'BitPayExtensionDrag';
+let navbarMode: 'default' | 'pay' = 'default';
 
 const getOrderTotal = (selector: string): number | undefined => {
   const element = document.querySelector(selector);
@@ -39,7 +40,7 @@ function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string
     transition: height 250ms ease 0s, box-shadow 250ms ease-in-out, transform 250ms cubic-bezier(.25,.8,.25,1);
   `;
   const dragElementStyles = `
-    width: 160px; 
+    width: 115px; 
     height: ${FrameDimensions.collapsedHeight}px; 
     position: fixed;
     top: 10px;
@@ -80,7 +81,7 @@ function createIframe({ merchant }: { merchant?: Merchant }): HTMLIFrameElement 
 }
 
 function getDragElement(): HTMLElement | null {
-  return document.getElementById(DragElementId);
+  return document.getElementById(dragElementId);
 }
 
 function removeDragElement(): void {
@@ -95,7 +96,7 @@ function addDragElement(): void {
   const { dragElementStyles } = getIframeStyles();
   dragElement.style.cssText = dragElementStyles;
   dragElement.classList.add('drag-element');
-  dragElement.setAttribute('id', DragElementId);
+  dragElement.setAttribute('id', dragElementId);
   document.body.appendChild(dragElement);
 
   const dragEle = getDragElement();
@@ -160,6 +161,10 @@ browser.runtime.onMessage.addListener(async message => {
       return iframe && removeIframe(iframe);
     case 'POPUP_RESIZED':
       return iframe && resizeIframe(iframe, message.height);
+    case 'NAVBAR_MODE_CHANGED':
+      navbarMode = message.mode;
+      console.log('navbarMode', navbarMode);
+      return;
     case 'RESET_FRAME_POSITION':
       // eslint-disable-next-line no-case-declarations
       const contentWindow = iframe && iframe.contentWindow;

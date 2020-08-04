@@ -43,21 +43,23 @@ const Navbar: React.FC<RouteComponentProps> = ({ history, location }) => {
   const routesWithBackButton = ['/brand', '/card', '/amount', '/payment', '/settings/', '/category'];
   const showBackButton = routesWithBackButton.some(route => location.pathname.startsWith(route));
   const routesWithPayMode = ['/amount', '/payment'];
-  const payMode = routesWithPayMode.some(route => location.pathname.startsWith(route));
+  const inPaymentFlow = routesWithPayMode.some(route => location.pathname.startsWith(route));
+  const payMode = collapsed && inPaymentFlow;
   const handleLogoClick = (): void => {
-    if (collapsed && payMode) expand();
+    if (payMode) expand();
   };
+  browser.runtime.sendMessage({ name: 'NAVBAR_MODE_CHANGED', mode: payMode ? 'pay' : 'default' });
   useEffect(() => {
     fromEvent<MessageEvent>(window, 'message')
       .pipe(debounceTime(1000))
       .subscribe(() => tracking.trackEvent({ action: 'draggedWidget' }));
   }, [tracking]);
   return (
-    <div className={`header-bar fixed ${collapsed && payMode ? 'fixed--dark' : ''}`}>
-      <div className="pay-click-handler" onClick={handleLogoClick} />
+    <div className={`header-bar fixed ${payMode ? 'fixed--dark' : ''}`}>
+      {payMode && <div className="pay-click-handler" onClick={handleLogoClick} />}
       <BackButton show={!collapsed && showBackButton} onClick={goBack} />
-      <BitpayLogo solo={!collapsed && showBackButton} payMode={collapsed && payMode} />
-      <Toggle collapsed={collapsed} expand={expand} collapse={collapse} close={close} payMode={collapsed && payMode} />
+      <BitpayLogo solo={!collapsed && showBackButton} payMode={payMode} />
+      <Toggle collapsed={collapsed} expand={expand} collapse={collapse} close={close} payMode={payMode} />
     </div>
   );
 };
