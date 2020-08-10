@@ -179,7 +179,8 @@ export const getMerchantInitialEntries = ({
           clientId: extensionClientId,
           discounts: cardConfig?.discounts ? [cardConfig.discounts[0].code] : [],
           email: (bitpayUser && bitpayUser.email) || receiptEmail
-        }
+        },
+        isFirstPage: true
       }
     : {};
   const entries = orderTotal

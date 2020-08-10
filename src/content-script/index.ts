@@ -3,12 +3,12 @@ import { FrameDimensions } from '../services/frame';
 import { dispatchUrlChange } from '../services/browser';
 import { Merchant } from '../services/merchant';
 import { CheckoutPageCssSelectors } from '../services/gift-card.types';
-import { dragElementFunc } from './drag';
+import { dragElementFunc, DragMethods } from './drag';
 import { safelyParseJSON } from '../services/utils';
 
 const dragElementId = 'BitPayExtensionDrag';
+let dragMethods: DragMethods;
 let iframe: HTMLIFrameElement | undefined;
-let navbarMode: 'default' | 'pay' = 'default';
 
 const getOrderTotal = (selector: string): number | undefined => {
   const element = document.querySelector(selector);
@@ -52,12 +52,20 @@ function getIframeStyles(): { outerFrameStyles: string; innerFrameStyles: string
   return { outerFrameStyles, innerFrameStyles, dragElementStyles };
 }
 
-function createIframe({ merchant }: { merchant?: Merchant }): HTMLIFrameElement {
+function createIframe({
+  merchant,
+  initiallyCollapsed = false
+}: {
+  merchant?: Merchant;
+  initiallyCollapsed?: boolean;
+}): HTMLIFrameElement {
   const outerFrame = document.createElement('iframe');
   const baseUrl = browser.runtime.getURL('popup.html');
   const cardConfig = merchant && merchant.giftCards[0];
   const orderTotal = cardConfig?.cssSelectors && getOrderTotal(cardConfig.cssSelectors.orderTotal[0]);
-  const innerFrameSrc = `${baseUrl}?url=${window.location.href}${orderTotal ? `&amount=${orderTotal}` : ''}`;
+  const innerFrameSrc = `${baseUrl}?url=${window.location.href}${
+    orderTotal ? `&amount=${orderTotal}` : ''
+  }&initiallyCollapsed=${initiallyCollapsed}`;
   const { innerFrameStyles, outerFrameStyles } = getIframeStyles();
   outerFrame.srcdoc = `
     <html style="height: 100%">
@@ -101,7 +109,7 @@ function addDragElement(): void {
 
   const dragEle = getDragElement();
   if (dragEle) {
-    dragElementFunc(iframe, dragEle);
+    dragMethods = dragElementFunc(iframe, dragEle);
   }
 }
 
@@ -137,8 +145,20 @@ function injectValueIntoInputsWithSelectors(selectors: string[] = [], value = ''
   });
 }
 
-function toggleIframeVisibility(merchant?: Merchant): void {
-  iframe ? removeIframe(iframe) : addIframe(createIframe({ merchant }));
+function toggleIframeVisibility({
+  merchant,
+  initiallyCollapsed = false
+}: {
+  merchant?: Merchant;
+  initiallyCollapsed?: boolean;
+} = {}): void {
+  iframe ? removeIframe(iframe) : addIframe(createIframe({ merchant, initiallyCollapsed }));
+}
+
+function autoShowCollapsedWidgetIfSupportedMerchant(merchant: Merchant): void {
+  const cardConfig = merchant.giftCards[0];
+  const orderTotal = cardConfig?.cssSelectors && getOrderTotal(cardConfig.cssSelectors.orderTotal[0]);
+  if (orderTotal && !iframe) toggleIframeVisibility({ merchant, initiallyCollapsed: true });
 }
 
 browser.runtime.onMessage.addListener(async message => {
@@ -162,14 +182,16 @@ browser.runtime.onMessage.addListener(async message => {
     case 'POPUP_RESIZED':
       return iframe && resizeIframe(iframe, message.height);
     case 'NAVBAR_MODE_CHANGED':
-      navbarMode = message.mode;
-      console.log('navbarMode', navbarMode);
+      dragMethods.onNavbarModeChange(message.mode);
       return;
     case 'RESET_FRAME_POSITION':
       // eslint-disable-next-line no-case-declarations
       const contentWindow = iframe && iframe.contentWindow;
       if (contentWindow) contentWindow.postMessage({ message: 'draggedWidget' }, '*');
       return iframe && resetIframePosition(iframe, message.top, message.left);
+    case 'SUPPORTED_MERCHANT':
+      autoShowCollapsedWidgetIfSupportedMerchant(message.merchant);
+      return;
     default:
       console.log('Unsupported Event:', message);
   }

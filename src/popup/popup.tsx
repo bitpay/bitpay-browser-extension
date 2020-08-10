@@ -46,6 +46,8 @@ const Popup: React.FC = () => {
   const [initialIndex, setInitialIndex] = useState(0);
   const popupLaunchTime = useRef(Date.now());
   const parentUrl = useRef(new URLSearchParams(window.location.search).get('url') as string);
+  const initiallyCollapsed =
+    (new URLSearchParams(window.location.search).get('initiallyCollapsed') as string) === 'true';
   const [loaded, setLoaded] = useState(false);
   const [clientId, setClientId] = useState('');
   const [email, setEmail] = useState('');
@@ -159,7 +161,7 @@ const Popup: React.FC = () => {
     <>
       {loaded && (
         <Router initialEntries={initialEntries} initialIndex={initialIndex}>
-          <Navbar />
+          <Navbar initiallyCollapsed={initiallyCollapsed} />
           <Switch>
             <Route
               path="/amount/:brand"
@@ -210,6 +212,7 @@ const Popup: React.FC = () => {
                   purchasedGiftCards={purchasedGiftCards}
                   setPurchasedGiftCards={setPurchasedGiftCards}
                   supportedMerchant={supportedMerchant}
+                  initiallyCollapsed={initiallyCollapsed}
                   {...props}
                 />
               )}

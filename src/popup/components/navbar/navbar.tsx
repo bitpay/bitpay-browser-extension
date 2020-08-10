@@ -14,7 +14,11 @@ import BitpayLogo from './bp-logo/bp-logo';
 import BackButton from './back-button/back-button';
 import Toggle from './toggle/toggle';
 
-const Navbar: React.FC<RouteComponentProps> = ({ history, location }) => {
+const Navbar: React.FC<RouteComponentProps & { initiallyCollapsed: boolean }> = ({
+  history,
+  location,
+  initiallyCollapsed
+}) => {
   const tracking = useTracking();
   const [preCollapseHeight, setPreCollapseHeight] = useState(0);
   const [collapsed, setCollapsed] = useState(false);
@@ -54,6 +58,12 @@ const Navbar: React.FC<RouteComponentProps> = ({ history, location }) => {
       .pipe(debounceTime(1000))
       .subscribe(() => tracking.trackEvent({ action: 'draggedWidget' }));
   }, [tracking]);
+  useEffect(() => {
+    if (!initiallyCollapsed) return;
+    collapse();
+    setPreCollapseHeight(FrameDimensions.amountPageHeight);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <div className={`header-bar fixed ${payMode ? 'fixed--dark' : ''}`}>
       {payMode && <div className="pay-click-handler" onClick={handleLogoClick} />}

@@ -1,6 +1,7 @@
 import { browser } from 'webextension-polyfill-ts';
 
 export enum FrameDimensions {
+  amountPageHeight = 360,
   collapsedHeight = 47,
   height = 350,
   width = 300,

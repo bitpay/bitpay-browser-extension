@@ -8,7 +8,7 @@ import { GiftCardInvoiceParams, CardConfig, GiftCard } from '../../../services/g
 import { getCardPrecision, isAmountValid } from '../../../services/gift-card';
 import DiscountText from '../../components/discount-text/discount-text';
 import { Merchant } from '../../../services/merchant';
-import { resizeFrame } from '../../../services/frame';
+import { resizeFrame, FrameDimensions } from '../../../services/frame';
 import ActionButton from '../../components/action-button/action-button';
 import { BitpayUser } from '../../../services/bitpay-id';
 import { formatCurrency } from '../../../services/currency';
@@ -162,7 +162,7 @@ const Amount: React.FC<RouteComponentProps & {
     }
     setInputDirty(true);
   };
-  resizeFrame(360);
+  resizeFrame(FrameDimensions.amountPageHeight);
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events,  jsx-a11y/no-static-element-interactions
     <div className="amount-page" onClick={focusInput}>
