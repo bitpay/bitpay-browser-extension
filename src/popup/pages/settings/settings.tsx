@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 import { useTracking } from 'react-tracking';
@@ -8,14 +8,27 @@ import { BitpayUser } from '../../../services/bitpay-id';
 import { launchNewTab } from '../../../services/browser';
 import Gravatar from '../../components/gravatar/gravatar';
 import packageJson from '../../../../package.json';
+import { IOSSwitch } from '../../components/ios-switch/ios-switch';
+import { set } from '../../../services/storage';
 import './settings.scss';
 
-const Settings: React.FC<{ email: string; user: BitpayUser }> = ({ email, user }) => {
+const Settings: React.FC<{
+  email: string;
+  user: BitpayUser;
+  promptAtCheckout: boolean;
+  setPromptAtCheckout: Dispatch<SetStateAction<boolean>>;
+}> = ({ email, user, promptAtCheckout, setPromptAtCheckout }) => {
   const tracking = useTracking();
   resizeFrame(450);
   const launchRepo = (): void => {
     launchNewTab('https://github.com/bitpay/bitpay-browser-extension');
     tracking.trackEvent({ action: 'clickedVersion' });
+  };
+  const handlePromptAtCheckoutChange = async (): Promise<void> => {
+    const newPromptAtCheckout = !promptAtCheckout;
+    await set<boolean>('promptAtCheckout', newPromptAtCheckout);
+    setPromptAtCheckout(newPromptAtCheckout);
+    tracking.trackEvent({ action: newPromptAtCheckout ? 'enabledPromptAtCheckout' : 'disabledPromptAtCheckout' });
   };
   return (
     <div className="settings">
@@ -24,6 +37,13 @@ const Settings: React.FC<{ email: string; user: BitpayUser }> = ({ email, user }
         <Link type="button" className="settings-group__item" to="/settings/archive">
           Archived Gift Cards
         </Link>
+        <div className="settings-group__item">
+          <div className="settings-group__item__label">Prompt at Checkout</div>
+          <div className="settings-group__item__value">
+            <IOSSwitch checked={promptAtCheckout} onChange={handlePromptAtCheckoutChange} name="Prompt at Checkout" />
+          </div>
+        </div>
+        <div className="settings-group__caption">Automatically show BitPay widget at checkout</div>
       </div>
       <div className="settings-group">
         <div className="settings-group__label">BitPay Account</div>

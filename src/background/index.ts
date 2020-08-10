@@ -55,8 +55,9 @@ async function handleUrlChange(url: string, tab?: Tabs.Tab): Promise<void> {
   const merchants = await getCachedMerchants();
   const bitpayAccepted = isBitPayAccepted(url, merchants);
   const merchant = getBitPayMerchantFromUrl(url, merchants);
-  if (merchant && tab) {
-    sendMessageToTab({ merchant, name: 'SUPPORTED_MERCHANT' }, tab);
+  const promptAtCheckout = await get<boolean>('promptAtCheckout');
+  if (merchant && tab && promptAtCheckout) {
+    sendMessageToTab({ merchant, name: 'SHOW_WIDGET_IN_PAY_MODE' }, tab);
   }
   await setIcon(bitpayAccepted || isGiftCardInvoice(url));
   await refreshCachedMerchantsIfNeeded();

@@ -165,7 +165,7 @@ browser.runtime.onMessage.addListener(async message => {
   const messageName = message && message.name;
   switch (messageName) {
     case 'EXTENSION_ICON_CLICKED':
-      toggleIframeVisibility(message.merchant);
+      toggleIframeVisibility({ merchant: message.merchant });
       return;
     case 'INJECT_CLAIM_INFO':
       // eslint-disable-next-line no-case-declarations
@@ -189,7 +189,7 @@ browser.runtime.onMessage.addListener(async message => {
       const contentWindow = iframe && iframe.contentWindow;
       if (contentWindow) contentWindow.postMessage({ message: 'draggedWidget' }, '*');
       return iframe && resetIframePosition(iframe, message.top, message.left);
-    case 'SUPPORTED_MERCHANT':
+    case 'SHOW_WIDGET_IN_PAY_MODE':
       autoShowCollapsedWidgetIfSupportedMerchant(message.merchant);
       return;
     default:
