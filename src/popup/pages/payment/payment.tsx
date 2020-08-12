@@ -18,14 +18,25 @@ const Payment: React.FC<RouteComponentProps & {
   purchasedGiftCards: GiftCard[];
   setPurchasedGiftCards: Dispatch<SetStateAction<GiftCard[]>>;
   supportedMerchant?: Merchant;
-}> = ({ location, history, user, setEmail, purchasedGiftCards, setPurchasedGiftCards, supportedMerchant }) => {
+  initiallyCollapsed: boolean;
+}> = ({
+  location,
+  history,
+  user,
+  setEmail,
+  purchasedGiftCards,
+  setPurchasedGiftCards,
+  supportedMerchant,
+  initiallyCollapsed
+}) => {
   const ref = useRef<HTMLDivElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
 
-  const { amount, invoiceParams, cardConfig } = location.state as {
+  const { amount, invoiceParams, cardConfig, isFirstPage } = location.state as {
     amount: number;
     invoiceParams: GiftCardInvoiceParams;
     cardConfig: CardConfig;
+    isFirstPage: boolean;
   };
 
   const [email, setReceiptEmail] = useState(invoiceParams.email || '');
@@ -43,8 +54,9 @@ const Payment: React.FC<RouteComponentProps & {
     emailRef.current?.validity.valid ? setReceiptEmail(event.target.value) : setReceiptEmail('');
   };
   useEffect(() => {
+    if (initiallyCollapsed && isFirstPage) return;
     resizeToFitPage(ref, 71, 100);
-  }, [ref]);
+  }, [ref, initiallyCollapsed, isFirstPage]);
   return (
     <div className="payment">
       <div ref={ref}>

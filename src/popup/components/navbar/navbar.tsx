@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useState, useEffect } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { useTracking } from 'react-tracking';
@@ -12,7 +14,11 @@ import BitpayLogo from './bp-logo/bp-logo';
 import BackButton from './back-button/back-button';
 import Toggle from './toggle/toggle';
 
-const Navbar: React.FC<RouteComponentProps> = ({ history, location }) => {
+const Navbar: React.FC<RouteComponentProps & { initiallyCollapsed: boolean }> = ({
+  history,
+  location,
+  initiallyCollapsed
+}) => {
   const tracking = useTracking();
   const [preCollapseHeight, setPreCollapseHeight] = useState(0);
   const [collapsed, setCollapsed] = useState(false);
@@ -39,19 +45,31 @@ const Navbar: React.FC<RouteComponentProps> = ({ history, location }) => {
     browser.runtime.sendMessage({ name: 'POPUP_CLOSED' });
   };
   const routesWithBackButton = ['/brand', '/card', '/amount', '/payment', '/settings/', '/category'];
-  const showBackButton = routesWithBackButton.some((route) => location.pathname.startsWith(route));
+  const showBackButton = routesWithBackButton.some(route => location.pathname.startsWith(route));
   const routesWithPayMode = ['/amount', '/payment'];
-  const payMode = routesWithPayMode.some((route) => location.pathname.startsWith(route));
+  const inPaymentFlow = routesWithPayMode.some(route => location.pathname.startsWith(route));
+  const payMode = collapsed && inPaymentFlow;
+  const handleLogoClick = (): void => {
+    if (payMode) expand();
+  };
+  browser.runtime.sendMessage({ name: 'NAVBAR_MODE_CHANGED', mode: payMode ? 'pay' : 'default' });
   useEffect(() => {
     fromEvent<MessageEvent>(window, 'message')
       .pipe(debounceTime(1000))
       .subscribe(() => tracking.trackEvent({ action: 'draggedWidget' }));
   }, [tracking]);
+  useEffect(() => {
+    if (!initiallyCollapsed) return;
+    collapse();
+    setPreCollapseHeight(FrameDimensions.amountPageHeight);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
-    <div className={`header-bar fixed ${collapsed && payMode ? 'fixed--dark' : ''}`}>
+    <div className={`header-bar fixed ${payMode ? 'fixed--dark' : ''}`}>
+      {payMode && <div className="pay-click-handler" onClick={handleLogoClick} />}
       <BackButton show={!collapsed && showBackButton} onClick={goBack} />
-      <BitpayLogo solo={!collapsed && showBackButton} payMode={collapsed && payMode} />
-      <Toggle collapsed={collapsed} expand={expand} collapse={collapse} close={close} payMode={collapsed && payMode} />
+      <BitpayLogo solo={!collapsed && showBackButton} payMode={payMode} />
+      <Toggle collapsed={collapsed} expand={expand} collapse={collapse} close={close} payMode={payMode} />
     </div>
   );
 };

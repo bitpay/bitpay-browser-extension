@@ -140,6 +140,10 @@
       text-align: right;
       margin-right: -5px;
 
+      > span {
+        margin-right: 0;
+      }
+
       button &,
       a & {
         margin-right: 12px;

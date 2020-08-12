@@ -46,10 +46,20 @@ function isGiftCardInvoice(url: string): boolean {
   return url.startsWith(process.env.API_ORIGIN as string) && url.includes('/invoice?id=') && url.includes('view=popup');
 }
 
-async function handleUrlChange(url: string): Promise<void> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function sendMessageToTab(message: any, tab: Tabs.Tab): Promise<void> {
+  return browser.tabs.sendMessage(tab.id as number, message);
+}
+
+async function handleUrlChange(url: string, tab?: Tabs.Tab): Promise<void> {
   const merchants = await getCachedMerchants();
   const bitpayAccepted = isBitPayAccepted(url, merchants);
   const merchant = getBitPayMerchantFromUrl(url, merchants);
+  const promptAtCheckout = await get<boolean>('promptAtCheckout');
+  const shouldPromptAtCheckout = typeof promptAtCheckout === 'undefined' ? true : promptAtCheckout;
+  if (merchant && tab && shouldPromptAtCheckout) {
+    sendMessageToTab({ merchant, name: 'SHOW_WIDGET_IN_PAY_MODE' }, tab);
+  }
   await setIcon(bitpayAccepted || isGiftCardInvoice(url));
   await refreshCachedMerchantsIfNeeded();
   if (isGiftCardInvoice(url)) return;
@@ -70,11 +80,6 @@ async function createClientIdIfNotExists(): Promise<void> {
     await set<string>('analyticsClientId', uuid.v4());
   }
   clientId ? dispatchEvent({ action: 'updatedExtension' }) : dispatchEvent({ action: 'installedExtension' });
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function sendMessageToTab(message: any, tab: Tabs.Tab): Promise<void> {
-  return browser.tabs.sendMessage(tab.id as number, message);
 }
 
 browser.browserAction.onClicked.addListener(async tab => {
@@ -158,7 +163,7 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
     case 'TRACK':
       return dispatchEvent(message.event);
     case 'URL_CHANGED':
-      return message.url && handleUrlChange(message.url);
+      return message.url && handleUrlChange(message.url, tab);
     default:
       return tab && sendMessageToTab(message, tab);
   }

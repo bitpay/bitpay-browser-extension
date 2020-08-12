@@ -46,6 +46,8 @@ const Popup: React.FC = () => {
   const [initialIndex, setInitialIndex] = useState(0);
   const popupLaunchTime = useRef(Date.now());
   const parentUrl = useRef(new URLSearchParams(window.location.search).get('url') as string);
+  const initiallyCollapsed =
+    (new URLSearchParams(window.location.search).get('initiallyCollapsed') as string) === 'true';
   const [loaded, setLoaded] = useState(false);
   const [clientId, setClientId] = useState('');
   const [email, setEmail] = useState('');
@@ -53,6 +55,7 @@ const Popup: React.FC = () => {
   const [merchants, setMerchants] = useState([] as Merchant[]);
   const [supportedMerchant, setSupportedMerchant] = useState(undefined as Merchant | undefined);
   const [supportedGiftCards, setSupportedGiftCards] = useState([] as CardConfig[]);
+  const [promptAtCheckout, setPromptAtCheckout] = useState(true as boolean);
   const [purchasedGiftCards, setPurchasedGiftCards] = useState([] as GiftCard[]);
   const [realtimeInvoiceIds, setRealtimeInvoiceIds] = useState([] as string[]);
   const [user, setUser] = useState(undefined as BitpayUser | undefined);
@@ -126,7 +129,8 @@ const Popup: React.FC = () => {
         allPurchasedGiftCards,
         receiptEmail,
         bitpayUser,
-        extensionClientId
+        extensionClientId,
+        shouldPromptAtCheckout
       ] = await Promise.all([
         getCachedDirectory(),
         fetchCachedMerchants(),
@@ -134,7 +138,8 @@ const Popup: React.FC = () => {
         get<GiftCard[]>('purchasedGiftCards'),
         get<string>('email'),
         get<BitpayUser>('bitpayUser'),
-        get<string>('clientId')
+        get<string>('clientId'),
+        get<boolean>('promptAtCheckout')
       ]);
       const orderTotal = parseFloat(new URLSearchParams(window.location.search).get('amount') as string);
       const merchant = getBitPayMerchantFromUrl(parentUrl.current, allMerchants);
@@ -146,6 +151,7 @@ const Popup: React.FC = () => {
       setMerchants(allMerchants);
       setSupportedMerchant(merchant);
       setSupportedGiftCards(allSupportedGiftCards || []);
+      setPromptAtCheckout(typeof shouldPromptAtCheckout === 'undefined' ? true : shouldPromptAtCheckout);
       setPurchasedGiftCards((allPurchasedGiftCards || []).sort(sortByDescendingDate));
       setClientId(extensionClientId);
       setEmail(receiptEmail);
@@ -159,7 +165,7 @@ const Popup: React.FC = () => {
     <>
       {loaded && (
         <Router initialEntries={initialEntries} initialIndex={initialIndex}>
-          <Navbar />
+          <Navbar initiallyCollapsed={initiallyCollapsed} />
           <Switch>
             <Route
               path="/amount/:brand"
@@ -168,6 +174,7 @@ const Popup: React.FC = () => {
                   clientId={clientId}
                   email={email}
                   initialAmount={amount}
+                  initiallyCollapsed={initiallyCollapsed}
                   purchasedGiftCards={purchasedGiftCards}
                   setPurchasedGiftCards={setPurchasedGiftCards}
                   supportedMerchant={supportedMerchant}
@@ -210,6 +217,7 @@ const Popup: React.FC = () => {
                   purchasedGiftCards={purchasedGiftCards}
                   setPurchasedGiftCards={setPurchasedGiftCards}
                   supportedMerchant={supportedMerchant}
+                  initiallyCollapsed={initiallyCollapsed}
                   {...props}
                 />
               )}
@@ -221,7 +229,15 @@ const Popup: React.FC = () => {
             <Route
               path="/settings"
               exact
-              render={(props): JSX.Element => <Settings email={email} user={user as BitpayUser} {...props} />}
+              render={(props): JSX.Element => (
+                <Settings
+                  email={email}
+                  user={user as BitpayUser}
+                  promptAtCheckout={promptAtCheckout}
+                  setPromptAtCheckout={setPromptAtCheckout}
+                  {...props}
+                />
+              )}
             />
             <Route
               path="/settings/archive"

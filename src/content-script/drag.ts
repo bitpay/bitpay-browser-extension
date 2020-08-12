@@ -1,7 +1,13 @@
 import { browser } from 'webextension-polyfill-ts';
 import { FrameDimensions } from '../services/frame';
 
-export function dragElementFunc(iframe: HTMLIFrameElement | undefined, dragEle: HTMLElement): void {
+export type NavbarMode = 'default' | 'pay';
+
+export interface DragMethods {
+  onNavbarModeChange: (mode: NavbarMode) => void;
+}
+
+export function dragElementFunc(iframe: HTMLIFrameElement | undefined, dragEle: HTMLElement): DragMethods {
   let pos1 = 0;
   let pos2 = 0;
   let pos3 = 0;
@@ -9,6 +15,7 @@ export function dragElementFunc(iframe: HTMLIFrameElement | undefined, dragEle: 
   const windowInnerHeight = window.innerHeight;
   const windowInnerWidth = window.innerWidth;
   const padding = 10;
+  let navbarMode: NavbarMode = 'default';
   let rect: ClientRect;
   const viewport = {
     bottom: 0,
@@ -67,16 +74,23 @@ export function dragElementFunc(iframe: HTMLIFrameElement | undefined, dragEle: 
     }
   }
 
-  function closeDragElement(): void {
-    dragEle.style.height = `${FrameDimensions.collapsedHeight}px`;
-    dragEle.style.width = '160px';
-    dragEle.style.cursor = 'grab';
-
+  function resizeAndRepositionDragElement(): void {
+    const leftOffset = navbarMode === 'pay' ? '120px' : '75px';
+    const width = navbarMode === 'pay' ? '110px' : '145px';
     if (dragEle.style.left) {
-      dragEle.style.left = `calc(${dragEle.style.left} + 75px)`;
+      dragEle.style.left = `calc(${(iframe as HTMLIFrameElement).style.left} + ${leftOffset})`;
     } else {
       dragEle.style.right = '75px';
     }
+    dragEle.style.width = width;
+  }
+
+  function closeDragElement(): void {
+    dragEle.style.height = `${FrameDimensions.collapsedHeight}px`;
+    dragEle.style.width = '115px';
+    dragEle.style.cursor = 'grab';
+
+    resizeAndRepositionDragElement();
 
     if (iframe) {
       iframe.style.transform = 'translate3d(0px, 0px, 0px)';
@@ -115,4 +129,12 @@ export function dragElementFunc(iframe: HTMLIFrameElement | undefined, dragEle: 
     document.onmousemove = elementDrag;
   }
   dragEle.onmousedown = dragMouseDown;
+  resizeAndRepositionDragElement();
+
+  return {
+    onNavbarModeChange: (mode): void => {
+      navbarMode = mode;
+      resizeAndRepositionDragElement();
+    }
+  };
 }
