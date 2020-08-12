@@ -31,7 +31,7 @@
     "bitauth": "git+https://github.com/bitpay/bitauth.git#6bfe7df3d1cde303507d29a9d9c98b1f429ba46e",
     "classnames": "^2.2.6",
     "date-fns": "^2.11.1",
-    "framer-motion": "2.1.0",
+    "framer-motion": "^2.1.0",
     "material-ui-popup-state": "^1.5.3",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
