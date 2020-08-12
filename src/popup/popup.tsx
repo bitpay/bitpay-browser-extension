@@ -174,6 +174,7 @@ const Popup: React.FC = () => {
                   clientId={clientId}
                   email={email}
                   initialAmount={amount}
+                  initiallyCollapsed={initiallyCollapsed}
                   purchasedGiftCards={purchasedGiftCards}
                   setPurchasedGiftCards={setPurchasedGiftCards}
                   supportedMerchant={supportedMerchant}

@@ -26,6 +26,7 @@ const Amount: React.FC<RouteComponentProps & {
   setPurchasedGiftCards: Dispatch<SetStateAction<GiftCard[]>>;
   supportedMerchant?: Merchant;
   tracking?: TrackingProp;
+  initiallyCollapsed: boolean;
 }> = ({
   location,
   clientId,
@@ -36,10 +37,15 @@ const Amount: React.FC<RouteComponentProps & {
   purchasedGiftCards,
   setPurchasedGiftCards,
   supportedMerchant,
-  tracking
+  tracking,
+  initiallyCollapsed
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const { cardConfig, merchant } = location.state as { cardConfig: CardConfig; merchant: Merchant };
+  const { cardConfig, merchant, isFirstPage } = location.state as {
+    cardConfig: CardConfig;
+    merchant: Merchant;
+    isFirstPage: boolean;
+  };
   const hasFixedDenoms = cardConfig.supportedAmounts && cardConfig.supportedAmounts[0];
   const onMerchantWebsite = supportedMerchant?.name === merchant.name;
   const preloadedAmount =
@@ -162,7 +168,7 @@ const Amount: React.FC<RouteComponentProps & {
     }
     setInputDirty(true);
   };
-  resizeFrame(FrameDimensions.amountPageHeight);
+  if (!initiallyCollapsed || !isFirstPage) resizeFrame(FrameDimensions.amountPageHeight);
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events,  jsx-a11y/no-static-element-interactions
     <div className="amount-page" onClick={focusInput}>
