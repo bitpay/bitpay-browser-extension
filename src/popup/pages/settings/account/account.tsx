@@ -70,7 +70,7 @@ const Account: React.FC<RouteComponentProps & {
         {user ? (
           <div className="account__linked">
             <CardMenu items={['Disconnect Account']} onClick={disconnect} />
-            <div className="settings-group">
+            <div className="settings-group settings-group--no-border">
               <div className="settings-group__item settings-group__item--dark">
                 <div className="settings-group__item__avatar">
                   <Gravatar email={user.email} size="34" />

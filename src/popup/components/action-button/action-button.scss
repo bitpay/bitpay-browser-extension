@@ -37,8 +37,10 @@
       background-color: white;
       padding: 14px 14px 18px;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       box-shadow: 0 -2px 8px 0 rgba(black, 0.04);
+      text-align: center;
 
       a {
         width: 100%;
@@ -73,6 +75,13 @@
     width: 270px;
     margin-top: 0;
   }
+}
+
+.secondary-button {
+  color: $blue;
+  font-weight: $bold;
+  font-size: 16px;
+  padding-top: 14px;
 }
 
 button {

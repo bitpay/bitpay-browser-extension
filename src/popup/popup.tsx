@@ -6,6 +6,7 @@ import Category from './pages/category/category';
 import Brand from './pages/brand/brand';
 import Card from './pages/card/card';
 import Cards from './pages/cards/cards';
+import Country from './pages/country/country';
 import Wallet from './pages/wallet/wallet';
 import Settings from './pages/settings/settings';
 import Shop from './pages/shop/shop';
@@ -20,9 +21,10 @@ import {
 } from '../services/merchant';
 import Amount from './pages/amount/amount';
 import Payment from './pages/payment/payment';
+import Phone from './pages/phone/phone';
 import { get } from '../services/storage';
-import { GiftCard, CardConfig } from '../services/gift-card.types';
-import { sortByDescendingDate } from '../services/gift-card';
+import { GiftCard, CardConfig, PhoneCountryInfo } from '../services/gift-card.types';
+import { sortByDescendingDate, getCountry } from '../services/gift-card';
 import {
   updateCard,
   listenForInvoiceChanges,
@@ -50,9 +52,14 @@ const Popup: React.FC = () => {
     (new URLSearchParams(window.location.search).get('initiallyCollapsed') as string) === 'true';
   const [loaded, setLoaded] = useState(false);
   const [clientId, setClientId] = useState('');
+  const [country, setCountry] = useState('US');
   const [email, setEmail] = useState('');
   const [directory, setDirectory] = useState({} as Directory);
   const [merchants, setMerchants] = useState([] as Merchant[]);
+  const [phone, setPhone] = useState('');
+  const [phoneCountryInfo, setPhoneCountryInfo] = useState({ phoneCountryCode: '1', countryIsoCode: 'US' } as
+    | PhoneCountryInfo
+    | undefined);
   const [supportedMerchant, setSupportedMerchant] = useState(undefined as Merchant | undefined);
   const [supportedGiftCards, setSupportedGiftCards] = useState([] as CardConfig[]);
   const [promptAtCheckout, setPromptAtCheckout] = useState(true as boolean);
@@ -124,6 +131,7 @@ const Popup: React.FC = () => {
     const getStartPage = async (): Promise<void> => {
       const [
         directoryIndex,
+        countryCode,
         allMerchants,
         allSupportedGiftCards,
         allPurchasedGiftCards,
@@ -133,6 +141,7 @@ const Popup: React.FC = () => {
         shouldPromptAtCheckout
       ] = await Promise.all([
         getCachedDirectory(),
+        getCountry(),
         fetchCachedMerchants(),
         get<CardConfig[]>('supportedGiftCards'),
         get<GiftCard[]>('purchasedGiftCards'),
@@ -141,12 +150,17 @@ const Popup: React.FC = () => {
         get<string>('clientId'),
         get<boolean>('promptAtCheckout')
       ]);
+      const [phoneNumber, phoneCountryObject] = await Promise.all([
+        get<string>('phone'),
+        get<PhoneCountryInfo>('phoneCountryInfo')
+      ]);
       const orderTotal = parseFloat(new URLSearchParams(window.location.search).get('amount') as string);
       const merchant = getBitPayMerchantFromUrl(parentUrl.current, allMerchants);
       const entries = getMerchantInitialEntries({ merchant, extensionClientId, bitpayUser, receiptEmail, orderTotal });
       setInitialEntries(entries);
       setInitialIndex(entries.length - 1);
       setAmount(orderTotal);
+      setCountry(countryCode);
       setDirectory(saturateDirectory(directoryIndex, allMerchants));
       setMerchants(allMerchants);
       setSupportedMerchant(merchant);
@@ -155,6 +169,8 @@ const Popup: React.FC = () => {
       setPurchasedGiftCards((allPurchasedGiftCards || []).sort(sortByDescendingDate));
       setClientId(extensionClientId);
       setEmail(receiptEmail);
+      setPhone((phoneNumber || '').replace((phoneCountryObject && phoneCountryObject.phoneCountryCode) || '', ''));
+      setPhoneCountryInfo(phoneCountryObject);
       setUser(bitpayUser);
       setLoaded(true);
       tracking.trackEvent({ action: 'openedWidget' });
@@ -209,6 +225,10 @@ const Popup: React.FC = () => {
               render={(props): JSX.Element => <Balance updateGiftCard={updateGiftCard} {...props} />}
             />
             <Route
+              path="/country"
+              render={(props): JSX.Element => <Country setPhoneCountryInfo={setPhoneCountryInfo} {...props} />}
+            />
+            <Route
               path="/payment/:brand"
               render={(props): JSX.Element => (
                 <Payment
@@ -218,6 +238,19 @@ const Popup: React.FC = () => {
                   setPurchasedGiftCards={setPurchasedGiftCards}
                   supportedMerchant={supportedMerchant}
                   initiallyCollapsed={initiallyCollapsed}
+                  {...props}
+                />
+              )}
+            />
+            <Route
+              path="/phone"
+              render={(props): JSX.Element => (
+                <Phone
+                  country={country}
+                  phone={phone}
+                  phoneCountryInfo={phoneCountryInfo}
+                  setPhoneCountryInfo={setPhoneCountryInfo}
+                  setPhone={setPhone}
                   {...props}
                 />
               )}

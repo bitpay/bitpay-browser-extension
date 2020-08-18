@@ -1565,6 +1565,13 @@
     "@types/history" "*"
     "@types/react" "*"
 
+"@types/react-text-mask@^5.4.6":
+  version "5.4.6"
+  resolved "https://registry.yarnpkg.com/@types/react-text-mask/-/react-text-mask-5.4.6.tgz#3a81e9de472beb939038e78cb16d737ae94ba14a"
+  integrity sha512-0KkER9oXZY/v1x8aoMTHwANlWnKT5tnmV7Zz+g81gBvcHRtcIHotcpY4KgWRwx0T5JMcsYmEh7wGOz0lwdONew==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-tracking@^7.0.2":
   version "7.0.4"
   resolved "https://registry.yarnpkg.com/@types/react-tracking/-/react-tracking-7.0.4.tgz#f9ba7a55dfc423ca08f381ffc4edfbc2367cbf4a"
@@ -3253,6 +3260,11 @@ cosmiconfig@^6.0.0:
     parse-json "^5.0.0"
     path-type "^4.0.0"
     yaml "^1.7.2"
+
+countries-list@^2.5.6:
+  version "2.5.6"
+  resolved "https://registry.yarnpkg.com/countries-list/-/countries-list-2.5.6.tgz#af237e7d00b2d1283fe766614a945fe5348eefbb"
+  integrity sha512-IEt6KCIzexbR1pTvSJakKCKbqlmHKkEO4oYHN6UCiNToUdN/zXy/1NxiUfZ3ktS0QO/UryCJGPoLkLdYsrAzNw==
 
 create-ecdh@^4.0.0:
   version "4.0.4"
@@ -8071,7 +8083,7 @@ prop-types-exact@^1.2.0:
     object.assign "^4.1.0"
     reflect.ownkeys "^0.2.0"
 
-prop-types@^15.0.0, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@^15.0.0, prop-types@^15.5.6, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -8282,6 +8294,13 @@ react-test-renderer@^16.0.0-0:
     prop-types "^15.6.2"
     react-is "^16.8.6"
     scheduler "^0.19.1"
+
+react-text-mask@^5.4.3:
+  version "5.4.3"
+  resolved "https://registry.yarnpkg.com/react-text-mask/-/react-text-mask-5.4.3.tgz#991efb4299e30c2e6c2c46d13f617169463e0d2d"
+  integrity sha1-mR77QpnjDC5sLEbRP2FxaUY+DS0=
+  dependencies:
+    prop-types "^15.5.6"
 
 react-tracking@^7.3.0:
   version "7.3.0"

@@ -5,7 +5,10 @@
 
   .settings-group {
     margin-bottom: 0;
-    border: none;
+
+    &--no-border {
+      border: none;
+    }
 
     &__item {
       &--dark {

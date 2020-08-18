@@ -80,6 +80,13 @@ function getCardConfigFromApiConfigMap(availableCardMap: AvailableCardMap): Card
   return availableCards;
 }
 
+export async function getCountry(): Promise<string> {
+  const { country } = await fetch('https://bitpay.com/wallet-card/location')
+    .then(res => res.json())
+    .catch(() => 'US');
+  return country;
+}
+
 export async function createBitPayInvoice({
   params,
   user

@@ -44,7 +44,16 @@ const Navbar: React.FC<RouteComponentProps & { initiallyCollapsed: boolean }> = 
     tracking.trackEvent({ action: 'closedWidget' });
     browser.runtime.sendMessage({ name: 'POPUP_CLOSED' });
   };
-  const routesWithBackButton = ['/brand', '/card', '/amount', '/payment', '/settings/', '/category'];
+  const routesWithBackButton = [
+    '/brand',
+    '/card',
+    '/amount',
+    '/payment',
+    '/phone',
+    '/settings/',
+    '/category',
+    '/country'
+  ];
   const showBackButton = routesWithBackButton.some(route => location.pathname.startsWith(route));
   const routesWithPayMode = ['/amount', '/payment'];
   const inPaymentFlow = routesWithPayMode.some(route => location.pathname.startsWith(route));

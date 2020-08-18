@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const SearchBar: React.FC<any> = ({ output, value, tracking }) => {
+const SearchBar: React.FC<any> = ({ output, value, tracking, placeholder, autoFocus }) => {
   const [analyticsSubject] = useState(new Subject());
   useEffect(() => {
     analyticsSubject.pipe(debounceTime(1000)).subscribe(query => {
@@ -34,10 +34,12 @@ const SearchBar: React.FC<any> = ({ output, value, tracking }) => {
       <div className="search-bar">
         <div className="search-bar__box">
           <input
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus={autoFocus}
             value={value || ''}
             onChange={onChange}
             className="search-bar__box__input"
-            placeholder="Search Brand or Category"
+            placeholder={placeholder || `Search Brand or Category`}
             type="text"
           />
           {value ? (
