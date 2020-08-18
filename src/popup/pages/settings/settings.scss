@@ -75,6 +75,18 @@
     text-align: left;
     height: $cell-height;
 
+    &--consent {
+      margin-top: 15px;
+      &:after {
+        display: none;
+      }
+
+      > div {
+        font-size: 11px;
+        font-weight: 400;
+      }
+    }
+
     &:not(:last-child) {
       &:after {
         content: "";
@@ -164,6 +176,12 @@
           top: calc(50% + 2px);
           transform: translateY(-50%);
         }
+
+        &.no-arrow {
+          &:before {
+            display: none;
+          }
+        }
       }
     }
   }
@@ -174,6 +192,23 @@
     height: $cell-height;
     display: flex;
     align-items: center;
+
+    &__country {
+      display: flex;
+      align-items: center;
+    }
+
+    &__flag {
+      height: 18px;
+      margin-right: 10px;
+    }
+
+    &__country-code {
+      color: $black;
+      font-size: 14px;
+      font-weight: 500;
+      margin-right: 7px;
+    }
 
     > input {
       font-size: 14px;

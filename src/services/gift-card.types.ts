@@ -27,6 +27,7 @@ export interface GiftCardActivationFee {
 
 export interface CommonCardConfig {
   activationFees?: GiftCardActivationFee[];
+  allowedPhoneCountries?: string[];
   brandColor?: string;
   cardImage: string;
   cssSelectors?: CheckoutPageCssSelectors;
@@ -45,6 +46,7 @@ export interface CommonCardConfig {
   logoBackgroundColor: string;
   minAmount?: number;
   maxAmount?: number;
+  mobilePaymentsSupported?: number;
   printRequired?: boolean;
   redeemButtonText?: string;
   redeemInstructions?: string;
@@ -109,6 +111,7 @@ export interface GiftCardInvoiceParams {
   clientId: string;
   discounts: string[];
   email?: string;
+  phone?: string;
 }
 
 export interface GiftCardOrder {
@@ -146,4 +149,9 @@ export interface Invoice {
   nonPayProPaymentReceived?: boolean;
   transactionCurrency: string;
   status: 'new' | 'paid' | 'confirmed' | 'complete' | 'expired' | 'invalid';
+}
+
+export interface PhoneCountryInfo {
+  phoneCountryCode: string;
+  countryIsoCode: string;
 }

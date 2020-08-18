@@ -168,6 +168,17 @@ const Amount: React.FC<RouteComponentProps & {
     }
     setInputDirty(true);
   };
+  const onContinue = (): void =>
+    cardConfig.mobilePaymentsSupported
+      ? history.push({
+          pathname: `/phone`,
+          state: {
+            amount,
+            cardConfig,
+            invoiceParams
+          }
+        })
+      : goToPaymentPage();
   if (!initiallyCollapsed || !isFirstPage) resizeFrame(FrameDimensions.amountPageHeight);
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events,  jsx-a11y/no-static-element-interactions
@@ -222,7 +233,7 @@ const Amount: React.FC<RouteComponentProps & {
       <div className="amount-page__cta">
         {paymentPageAvailable ? (
           <div className="action-button__footer">
-            <ActionButton onClick={goToPaymentPage}>Continue</ActionButton>
+            <ActionButton onClick={onContinue}>Continue</ActionButton>
           </div>
         ) : (
           <PayWithBitpay

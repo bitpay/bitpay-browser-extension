@@ -1,6 +1,6 @@
 import { browser } from 'webextension-polyfill-ts';
 import { FrameDimensions } from '../services/frame';
-import { dispatchUrlChange } from '../services/browser';
+import { dispatchUrlChange, dispatchAnalyticsEvent } from '../services/browser';
 import { Merchant } from '../services/merchant';
 import { CheckoutPageCssSelectors } from '../services/gift-card.types';
 import { dragElementFunc, DragMethods } from './drag';
@@ -158,7 +158,14 @@ function toggleIframeVisibility({
 function autoShowCollapsedWidgetIfSupportedMerchant(merchant: Merchant): void {
   const cardConfig = merchant.giftCards[0];
   const orderTotal = cardConfig?.cssSelectors && getOrderTotal(cardConfig.cssSelectors.orderTotal[0]);
-  if (orderTotal && !iframe) toggleIframeVisibility({ merchant, initiallyCollapsed: true });
+  if (orderTotal && !iframe) {
+    toggleIframeVisibility({ merchant, initiallyCollapsed: true });
+    dispatchAnalyticsEvent({
+      action: 'autoShownPayButton',
+      merchant: merchant.name,
+      gaAction: `autoShownPayButton:${merchant.name}`
+    });
+  }
 }
 
 browser.runtime.onMessage.addListener(async message => {

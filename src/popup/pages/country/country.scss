@@ -1,0 +1,13 @@
+@import "../../../styles/variables";
+
+div.country {
+  background-color: white;
+  .settings-group {
+    border-bottom: 0;
+  }
+  .settings-group__item__value {
+    color: $blue;
+    font-weight: 500;
+    margin-right: 0;
+  }
+}
