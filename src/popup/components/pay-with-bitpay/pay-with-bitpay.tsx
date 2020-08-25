@@ -119,10 +119,12 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
       }
       const giftCard = await redeemGiftCard(unredeemedGiftCard);
       const transactionCurrency = giftCard.invoice?.transactionCurrency;
+      const synced = !!(user && user.syncGiftCards);
       tracking.trackEvent({
         action: 'purchasedGiftCard',
-        gaAction: `purchasedGiftCard:${cardConfig.name}:${transactionCurrency}`,
+        gaAction: `purchasedGiftCard:${cardConfig.name}:${transactionCurrency}:${synced ? 'synced' : 'unsynced'}`,
         brand: cardConfig.name,
+        synced,
         transactionCurrency,
         ...(cardConfig.discounts && cardConfig.discounts[0] && { ...getGiftCardPromoEventParams(cardConfig) })
       });
