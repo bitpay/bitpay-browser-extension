@@ -104,7 +104,8 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
       });
       const res = await Promise.race([
         launchPromise.catch(() => ({ data: { status: 'error' } })),
-        waitForServerEvent(unredeemedGiftCard).catch(async () => {
+        waitForServerEvent({ unredeemedGiftCard, user }).catch(async err => {
+          console.error('Received an error while waiting for server event', err);
           await wait(1000 * 60 * 15);
           Promise.resolve({ data: { status: 'error' } });
         })

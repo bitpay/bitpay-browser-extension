@@ -2,6 +2,7 @@ import { Observable, Observer } from 'rxjs';
 import { GiftCard, Invoice } from './gift-card.types';
 import { set } from './storage';
 import { redeemGiftCard, getBitPayInvoice } from './gift-card';
+import { BitpayUser, apiCall } from './bitpay-id';
 
 export interface CustomEvent extends Event {
   data: string;
@@ -38,15 +39,24 @@ export const handlePaymentEvent = async (
   return purchasedGiftCards;
 };
 
-const getBusUrl = async (invoiceId: string): Promise<string> => {
+const getBusUrl = async ({ invoiceId, user }: { invoiceId: string; user?: BitpayUser }): Promise<string> => {
   const {
     data: { url, token }
-  } = await fetch(`${process.env.API_ORIGIN}/invoices/${invoiceId}/events`).then(res => res.json());
+  } =
+    user && user.syncGiftCards
+      ? { data: await apiCall(user.token, 'getInvoiceBusToken', { invoiceId }) }
+      : await fetch(`${process.env.API_ORIGIN}/invoices/${invoiceId}/events`).then(res => res.json());
   return `${url}?token=${token}&action=subscribe&events[]=payment&events[]=confirmation&events[]=paymentRejected`;
 };
 
-export const createEventSourceObservable = async (invoiceId: string): Promise<Observable<Invoice>> => {
-  const busUrl = await getBusUrl(invoiceId);
+export const createEventSourceObservable = async ({
+  invoiceId,
+  user
+}: {
+  invoiceId: string;
+  user?: BitpayUser;
+}): Promise<Observable<Invoice>> => {
+  const busUrl = await getBusUrl({ invoiceId, user });
   return Observable.create((observer: Observer<Invoice>) => {
     const source = new EventSource(busUrl);
     source.addEventListener('statechange', (event: Event) => {
@@ -80,12 +90,24 @@ const createEventSource = (url: string): Promise<Invoice> =>
     });
   });
 
-export const waitForServerEvent = async (unredeemedGiftCard: GiftCard): Promise<Invoice> => {
-  const busUrl = await getBusUrl(unredeemedGiftCard.invoiceId);
+export const waitForServerEvent = async ({
+  user,
+  unredeemedGiftCard
+}: {
+  user?: BitpayUser;
+  unredeemedGiftCard: GiftCard;
+}): Promise<Invoice> => {
+  const busUrl = await getBusUrl({ invoiceId: unredeemedGiftCard.invoiceId, user });
   return createEventSource(busUrl);
 };
 
-export const listenForInvoiceChanges = async (unredeemedGiftCard: GiftCard): Promise<Invoice> => {
+export const listenForInvoiceChanges = async ({
+  unredeemedGiftCard,
+  user
+}: {
+  unredeemedGiftCard: GiftCard;
+  user?: BitpayUser;
+}): Promise<Invoice> => {
   const invoice = await getBitPayInvoice(unredeemedGiftCard.invoiceId);
-  return invoice.status === 'new' ? waitForServerEvent(unredeemedGiftCard) : invoice;
+  return invoice.status === 'new' ? waitForServerEvent({ unredeemedGiftCard, user }) : invoice;
 };
