@@ -10,6 +10,7 @@ export interface BitauthIdentity {
 }
 
 export interface BitpayUser {
+  eid?: string;
   email: string;
   familyName?: string;
   givenName?: string;
@@ -76,7 +77,7 @@ export async function generatePairingToken(payload: PairingData): Promise<void> 
     if (user.error) {
       throw user.error;
     }
-    const { email, familyName, givenName } = user;
-    await set<BitpayUser>('bitpayUser', { email, familyName, givenName, token, syncGiftCards: true });
+    const { eid, email, familyName, givenName } = user;
+    await set<BitpayUser>('bitpayUser', { eid, email, familyName, givenName, token, syncGiftCards: true });
   }
 }

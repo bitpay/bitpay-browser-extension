@@ -95,7 +95,8 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
         invoiceId,
         name: invoiceParams.brand,
         totalDiscount,
-        status: 'UNREDEEMED'
+        status: 'UNREDEEMED',
+        ...(user && user.eid && { userEid: user.eid })
       } as GiftCard;
       await saveGiftCard(unredeemedGiftCard);
       const launchPromise = browser.runtime.sendMessage({
