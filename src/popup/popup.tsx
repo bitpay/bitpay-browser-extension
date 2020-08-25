@@ -99,7 +99,9 @@ const Popup: React.FC = () => {
       if (unredeemedGiftCards.length) {
         setRealtimeInvoiceIds([...realtimeInvoiceIds, ...unredeemedGiftCards.map(c => c.invoiceId)]);
         unredeemedGiftCards.forEach(async card => {
-          const updatedInvoice = await listenForInvoiceChanges(card).catch(() => undefined);
+          const updatedInvoice = await listenForInvoiceChanges({ unredeemedGiftCard: card, user }).catch(
+            () => undefined
+          );
           if (!updatedInvoice) return;
           const newCards = await handlePaymentEvent(card, updatedInvoice, purchasedGiftCards);
           setPurchasedGiftCards(newCards);
@@ -107,7 +109,7 @@ const Popup: React.FC = () => {
       }
       justCreatedGiftCards.forEach(async card => {
         const alreadyFinalized = (c: GiftCard): boolean => ['SUCCESS', 'FAILURE'].includes(c.status);
-        const source = await createEventSourceObservable(card.invoiceId).catch(() => undefined);
+        const source = await createEventSourceObservable({ invoiceId: card.invoiceId, user }).catch(() => undefined);
         if (!source) return;
         const subscription = source.pipe(skip(1)).subscribe(async updatedInvoice => {
           const giftCard = purchasedGiftCards.find(c => c.invoiceId === card.invoiceId);

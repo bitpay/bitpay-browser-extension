@@ -95,7 +95,8 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
         invoiceId,
         name: invoiceParams.brand,
         totalDiscount,
-        status: 'UNREDEEMED'
+        status: 'UNREDEEMED',
+        ...(user && user.eid && { userEid: user.eid })
       } as GiftCard;
       await saveGiftCard(unredeemedGiftCard);
       const launchPromise = browser.runtime.sendMessage({
@@ -104,7 +105,8 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
       });
       const res = await Promise.race([
         launchPromise.catch(() => ({ data: { status: 'error' } })),
-        waitForServerEvent(unredeemedGiftCard).catch(async () => {
+        waitForServerEvent({ unredeemedGiftCard, user }).catch(async err => {
+          console.error('Received an error while waiting for server event', err);
           await wait(1000 * 60 * 15);
           Promise.resolve({ data: { status: 'error' } });
         })
@@ -117,10 +119,12 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
       }
       const giftCard = await redeemGiftCard(unredeemedGiftCard);
       const transactionCurrency = giftCard.invoice?.transactionCurrency;
+      const synced = !!(user && user.syncGiftCards);
       tracking.trackEvent({
         action: 'purchasedGiftCard',
-        gaAction: `purchasedGiftCard:${cardConfig.name}:${transactionCurrency}`,
+        gaAction: `purchasedGiftCard:${cardConfig.name}:${transactionCurrency}:${synced ? 'synced' : 'unsynced'}`,
         brand: cardConfig.name,
+        synced,
         transactionCurrency,
         ...(cardConfig.discounts && cardConfig.discounts[0] && { ...getGiftCardPromoEventParams(cardConfig) })
       });
