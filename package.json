@@ -1,6 +1,6 @@
 {
   "name": "pay-with-bitpay",
-  "version": "1.4.1",
+  "version": "1.4.4",
   "description": "Be alerted whenever a website you visit accepts BitPay as a payment option.",
   "private": true,
   "repository": "https://github.com/bitpay/pay-with-bitpay.git",
@@ -43,7 +43,8 @@
     "rxjs": "^6.5.5",
     "ts-md5": "1.2.7",
     "uuid": "^7.0.2",
-    "webextension-polyfill-ts": "^0.13.0"
+    "webextension-polyfill-ts": "^0.13.0",
+    "yarn": "^1.22.5"
   },
   "devDependencies": {
     "@babel/core": "^7.8.7",
