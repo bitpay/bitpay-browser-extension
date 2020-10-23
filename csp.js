@@ -1,10 +1,11 @@
 const apiOrigin = process.env.API_ORIGIN;
 const isProd = process.env.NODE_ENV === 'production';
+const isFirefox = process.env.TARGET_BROWSER === 'firefox';
 
 const cspObject = {
   'default-src': ["'self'", apiOrigin],
   'base-uri': ["'self'"],
-  'connect-src': [apiOrigin, 'https://www.google-analytics.com', ...(isProd ? [] : ['ws:'])],
+  'connect-src': [apiOrigin, ...(isFirefox ? [] : ['https://www.google-analytics.com']), ...(isProd ? [] : ['ws:'])],
   'img-src': ['https://gravatar.com', 'https://*.wp.com', apiOrigin],
   'font-src': ['https://fonts.gstatic.com'],
   'object-src': ["'self'"],
