@@ -1,7 +1,7 @@
 @import "../../../styles/variables";
 
 .tab-bar {
-  height: 50px;
+  height: 48px;
   flex-shrink: 0;
   display: flex;
   width: 100%;
@@ -32,5 +32,6 @@
 
   img {
     cursor: pointer;
+    width: 16px;
   }
 }
