@@ -73,9 +73,9 @@ export async function refreshUserInfo(token: string): Promise<void> {
   }
 }
 
-export async function refreshUserInfoIfNeeded(): Promise<void> {
+export async function refreshUserInfoIfNeeded(forceRefresh = false): Promise<void> {
   const user = await get<BitpayUser>('bitpayUser');
-  if (user && !Object.prototype.hasOwnProperty.call(user, 'incentiveLevel')) {
+  if ((user && !Object.prototype.hasOwnProperty.call(user, 'incentiveLevel')) || forceRefresh) {
     await refreshUserInfo(user.token);
   }
 }
