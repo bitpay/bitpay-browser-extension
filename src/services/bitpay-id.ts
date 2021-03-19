@@ -16,6 +16,8 @@ export interface BitpayUser {
   givenName?: string;
   syncGiftCards: boolean;
   token: string;
+  incentiveLevel: string;
+  incentiveLevelId: string;
 }
 export interface PairingData {
   code?: string;
@@ -51,6 +53,33 @@ export async function apiCall(token: string, method: string, params: any = {}): 
   return res && res.data;
 }
 
+export async function refreshUserInfo(token: string): Promise<void> {
+  const user = await apiCall(token, 'getBasicInfo');
+  if (user) {
+    if (user.error) {
+      throw user.error;
+    }
+    const { eid, email, familyName, givenName, incentiveLevel, incentiveLevelId } = user;
+    await set<BitpayUser>('bitpayUser', {
+      eid,
+      email,
+      familyName,
+      givenName,
+      token,
+      syncGiftCards: true,
+      incentiveLevel,
+      incentiveLevelId
+    });
+  }
+}
+
+export async function refreshUserInfoIfNeeded(): Promise<void> {
+  const user = await get<BitpayUser>('bitpayUser');
+  if (user && !Object.prototype.hasOwnProperty.call(user, 'incentiveLevel')) {
+    await refreshUserInfo(user.token);
+  }
+}
+
 export async function generatePairingToken(payload: PairingData): Promise<void> {
   const { secret, code } = payload;
   const appIdentity = await getIdentity();
@@ -72,12 +101,5 @@ export async function generatePairingToken(payload: PairingData): Promise<void> 
     params: JSON.stringify(finalParamsObject)
   };
   const { data: token }: { data: string } = await post(`${process.env.API_ORIGIN}/api/v2/`, requestParams);
-  const user = await apiCall(token, 'getBasicInfo');
-  if (user) {
-    if (user.error) {
-      throw user.error;
-    }
-    const { eid, email, familyName, givenName } = user;
-    await set<BitpayUser>('bitpayUser', { eid, email, familyName, givenName, token, syncGiftCards: true });
-  }
+  await refreshUserInfo(token);
 }
