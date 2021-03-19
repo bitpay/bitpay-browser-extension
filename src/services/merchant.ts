@@ -10,7 +10,7 @@ import { removeProtocolAndWww } from './utils';
 import { DirectIntegration, fetchDirectIntegrations, Directory, fetchDirectory, DirectoryDiscount } from './directory';
 import { get, set } from './storage';
 import { currencySymbols } from './currency';
-import { apiCall, BitpayUser, refreshUserInfo } from './bitpay-id';
+import { BitpayUser } from './bitpay-id';
 
 export interface Merchant extends DirectIntegration {
   name: string;
