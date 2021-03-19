@@ -10,13 +10,15 @@ import {
   fetchDirectoryAndMerchants
 } from '../services/merchant';
 import { get, set } from '../services/storage';
-import { generatePairingToken } from '../services/bitpay-id';
+import { generatePairingToken, refreshUserInfoIfNeeded } from '../services/bitpay-id';
 
 let cachedMerchants: Merchant[] | undefined;
 let cacheDate = 0;
 const cacheValidityDuration = 1000 * 60;
 
-const windowIdResolveMap: { [windowId: number]: (message: GiftCardInvoiceMessage) => GiftCardInvoiceMessage } = {};
+const windowIdResolveMap: {
+  [windowId: number]: (message: GiftCardInvoiceMessage) => GiftCardInvoiceMessage;
+} = {};
 
 function getIconPath(bitpayAccepted: boolean): string {
   return `/assets/icons/favicon${bitpayAccepted ? '' : '-inactive'}-128.png`;
@@ -89,7 +91,11 @@ browser.browserAction.onClicked.addListener(async tab => {
       name: 'EXTENSION_ICON_CLICKED',
       merchant
     })
-    .catch(() => browser.tabs.create({ url: `${process.env.API_ORIGIN}/extension?launchExtension=true` }));
+    .catch(() =>
+      browser.tabs.create({
+        url: `${process.env.API_ORIGIN}/extension?launchExtension=true`
+      })
+    );
 });
 
 browser.runtime.onInstalled.addListener(async () => {
@@ -97,6 +103,7 @@ browser.runtime.onInstalled.addListener(async () => {
   allTabs.forEach(tab =>
     browser.tabs.executeScript(tab.id, { file: 'js/contentScript.bundle.js' }).catch(() => undefined)
   );
+  await refreshUserInfoIfNeeded();
   await Promise.all([refreshCachedMerchantsIfNeeded(), createClientIdIfNotExists()]);
 });
 
@@ -141,7 +148,9 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
       delete windowIdResolveMap[tab?.windowId as number];
       browser.tabs.remove(tab?.id as number).catch(() => {
         if (tab?.id) {
-          browser.tabs.executeScript(tab?.id as number, { code: 'window.close()' });
+          browser.tabs.executeScript(tab?.id as number, {
+            code: 'window.close()'
+          });
         }
       });
       await pairBitpayId(message.data);

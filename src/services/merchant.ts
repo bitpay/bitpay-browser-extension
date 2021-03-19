@@ -3,13 +3,14 @@ import {
   sortByDisplayName,
   fetchAvailableCards,
   addToSupportedGiftCards,
-  getGiftCardPromoEventParams
+  getGiftCardPromoEventParams,
+  getCountry
 } from './gift-card';
 import { removeProtocolAndWww } from './utils';
 import { DirectIntegration, fetchDirectIntegrations, Directory, fetchDirectory, DirectoryDiscount } from './directory';
 import { get, set } from './storage';
 import { currencySymbols } from './currency';
-import { BitpayUser } from './bitpay-id';
+import { apiCall, BitpayUser, refreshUserInfo } from './bitpay-id';
 
 export interface Merchant extends DirectIntegration {
   name: string;
@@ -109,10 +110,10 @@ export async function fetchCachedMerchants(): Promise<Merchant[]> {
 }
 
 export async function fetchMerchants(): Promise<Merchant[]> {
-  const user = await get<BitpayUser>('bitpayUser');
+  const [country, user] = await Promise.all([getCountry(), get<BitpayUser>('bitpayUser')]);
   const [directIntegrations, availableGiftCards, supportedGiftCards = []] = await Promise.all([
     fetchDirectIntegrations(),
-    fetchAvailableCards({ user }),
+    fetchAvailableCards({ country, user }),
     get<CardConfig[]>('supportedGiftCards')
   ]);
   const newSupportedGiftCards = addToSupportedGiftCards(supportedGiftCards, availableGiftCards);

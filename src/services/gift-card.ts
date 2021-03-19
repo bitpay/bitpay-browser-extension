@@ -33,7 +33,12 @@ function getCardConfigFromApiBrandConfig(cardName: string, apiBrandConfig: ApiCa
     .reduce((allFees, card) => [...allFees, ...(card.activationFees || [])], [] as GiftCardActivationFee[]);
 
   const { amount, type, maxAmount, minAmount, website, ...config } = firstCard;
-  const baseConfig = { ...config, name: cardName, activationFees, website: website || '' };
+  const baseConfig = {
+    ...config,
+    name: cardName,
+    activationFees,
+    website: website || ''
+  };
   const rangeMin = range && (range.minAmount as number);
   return range
     ? {
@@ -55,14 +60,18 @@ export function sortByDisplayName(a: { displayName: string }, b: { displayName: 
   return aSortValue > bSortValue ? 1 : -1;
 }
 
-function fetchPublicAvailableCardMap(): Promise<AvailableCardMap> {
-  const url = `${process.env.API_ORIGIN}/gift-cards/cards`;
-  return fetch(url).then(res => res.json());
-}
-
-async function fetchAvailableCardMap({ user }: { user: BitpayUser }): Promise<AvailableCardMap> {
-  const availableCardMap =
-    user && user.syncGiftCards ? await apiCall(user.token, 'getGiftCardCatalog') : await fetchPublicAvailableCardMap();
+async function fetchAvailableCardMap({
+  country,
+  user
+}: {
+  country: string;
+  user: BitpayUser;
+}): Promise<AvailableCardMap> {
+  const incentiveLevelId = (user && user.syncGiftCards && user.incentiveLevelId) || '';
+  const url = `${process.env.API_ORIGIN}/gift-cards/catalog/${country}${
+    incentiveLevelId ? `/${incentiveLevelId}` : ''
+  }`;
+  const availableCardMap = await fetch(url).then(res => res.json());
   return availableCardMap;
 }
 
@@ -129,12 +138,16 @@ export async function redeemGiftCard(data: Partial<GiftCard>): Promise<GiftCard>
       const invoiceStatus = invoice?.status as string;
       const hasValidPayment = ['paid', 'confirmed', 'complete'].includes(invoiceStatus);
       const isDelayed = pendingMessages.includes(errMessage) || errMessage.indexOf('Please wait') !== -1;
-      return { ...data, invoice, status: isDelayed && hasValidPayment ? 'PENDING' : 'FAILURE' };
+      return {
+        ...data,
+        invoice,
+        status: isDelayed && hasValidPayment ? 'PENDING' : 'FAILURE'
+      };
     });
   return giftCard as GiftCard;
 }
 
-export function fetchAvailableCards(params: { user: BitpayUser }): Promise<CardConfig[]> {
+export function fetchAvailableCards(params: { user: BitpayUser; country: string }): Promise<CardConfig[]> {
   return fetchAvailableCardMap(params).then(availableCardMap => getCardConfigFromApiConfigMap(availableCardMap));
 }
 
@@ -176,7 +189,10 @@ export const getTotalDiscount = (amount: number, discounts: GiftCardDiscount[] =
   discounts.reduce((sum, discount) => sum + getDiscountAmount(amount, discount), 0);
 
 export const getLatestBalanceEntry = (card: GiftCard): GiftCardBalanceEntry =>
-  (card.balanceHistory || []).sort(sortByDescendingDate)[0] || { date: card.date, amount: card.amount };
+  (card.balanceHistory || []).sort(sortByDescendingDate)[0] || {
+    date: card.date,
+    amount: card.amount
+  };
 
 export const getLatestBalance = (card: GiftCard): number => getLatestBalanceEntry(card).amount;
 
