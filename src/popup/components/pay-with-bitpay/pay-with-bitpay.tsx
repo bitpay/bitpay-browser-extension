@@ -14,7 +14,7 @@ import {
 import Snack from '../snack/snack';
 import { waitForServerEvent, deleteCard } from '../../../services/gift-card-storage';
 import { wait } from '../../../services/utils';
-import { BitpayUser } from '../../../services/bitpay-id';
+import { BitpayUser, refreshUserInfoIfNeeded } from '../../../services/bitpay-id';
 import { injectClaimInfo } from '../../../services/browser';
 import { PayWithBitpayImage } from '../svg/pay-with-bitpay-image';
 import { Merchant } from '../../../services/merchant';
@@ -146,6 +146,7 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
     launchInvoice().catch(err => {
       setErrorMessage(err.message || 'An unexpected error occurred');
       setAwaitingPayment(false);
+      refreshUserInfoIfNeeded(true);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [awaitingPayment]);
