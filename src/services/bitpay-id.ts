@@ -54,7 +54,10 @@ export async function apiCall(token: string, method: string, params: any = {}): 
 }
 
 export async function refreshUserInfo(token: string): Promise<void> {
-  const user = await apiCall(token, 'getBasicInfo');
+  const [user, previouslySavedUser] = await Promise.all([
+    apiCall(token, 'getBasicInfo'),
+    get<BitpayUser>('bitpayUser')
+  ]);
   if (user) {
     if (user.error) {
       throw user.error;
@@ -66,7 +69,7 @@ export async function refreshUserInfo(token: string): Promise<void> {
       familyName,
       givenName,
       token,
-      syncGiftCards: true,
+      syncGiftCards: previouslySavedUser ? previouslySavedUser.syncGiftCards : true,
       incentiveLevel,
       incentiveLevelId
     });
@@ -75,7 +78,7 @@ export async function refreshUserInfo(token: string): Promise<void> {
 
 export async function refreshUserInfoIfNeeded(forceRefresh = false): Promise<void> {
   const user = await get<BitpayUser>('bitpayUser');
-  if ((user && !Object.prototype.hasOwnProperty.call(user, 'incentiveLevel')) || forceRefresh) {
+  if (user && (!Object.prototype.hasOwnProperty.call(user, 'incentiveLevel') || forceRefresh)) {
     await refreshUserInfo(user.token);
   }
 }
