@@ -68,7 +68,7 @@ async function fetchAvailableCardMap({
   user: BitpayUser;
 }): Promise<AvailableCardMap> {
   const incentiveLevelId = (user && user.syncGiftCards && user.incentiveLevelId) || '';
-  const url = `${process.env.API_ORIGIN}/gift-cards/catalog/${country}${
+  const url = `${process.env.API_ORIGIN}/gift-cards/catalog/${country || 'US'}${
     incentiveLevelId ? `/${incentiveLevelId}` : ''
   }`;
   const availableCardMap = await fetch(url).then(res => res.json());
@@ -103,9 +103,10 @@ export async function createBitPayInvoice({
   params: GiftCardInvoiceParams;
   user?: BitpayUser;
 }): Promise<GiftCardOrder> {
+  const finalParams = { ...params, pluginInfo: 'BitPay Extension' };
   return user && user.syncGiftCards
-    ? apiCall(user.token, 'createGiftCardInvoice', params)
-    : post(`${process.env.API_ORIGIN}/gift-cards/pay`, params);
+    ? apiCall(user.token, 'createGiftCardInvoice', finalParams)
+    : post(`${process.env.API_ORIGIN}/gift-cards/pay`, finalParams);
 }
 
 export async function getBitPayInvoice(id: string): Promise<Invoice> {
