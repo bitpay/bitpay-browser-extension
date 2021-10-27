@@ -63,7 +63,7 @@ const Phone: React.FC<RouteComponentProps & {
 
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    resizeToFitPage(ref, 185);
+    resizeToFitPage(ref, cardConfig?.phoneRequired ? 150 : 185);
   }, [ref]);
   const [formValid, setFormValid] = useState(false);
   const phoneRef = useRef<MaskedInput>(null);
@@ -106,9 +106,17 @@ const Phone: React.FC<RouteComponentProps & {
       <div ref={ref}>
         <form onSubmit={enableContactless}>
           <div className="account__zero-state">
-            <div className="account__title">Enable Contactless?</div>
+            <div className="account__title">
+              {cardConfig?.phoneRequired ? <>Enter Phone</> : <>Enable Contactless?</>}
+            </div>
             <div className="account__body" style={{ marginBottom: 0 }}>
-              Add a phone number to connect this card to Apple Pay or Google Pay.
+              Add a phone number to
+              {cardConfig?.mobilePaymentsSupported ? (
+                <> enable {cardConfig?.phoneRequired && <> two-factor authentication and</>} Apple Pay or Google Pay</>
+              ) : (
+                <> activate this gift card</>
+              )}
+              .
             </div>
           </div>
           <div style={{ textAlign: 'left' }}>
@@ -151,8 +159,8 @@ const Phone: React.FC<RouteComponentProps & {
           </div>
           <div className="settings-group__item settings-group__item--consent">
             <div className="settings-group__item__label--small">
-              By giving my phone number, I give explicit consent to BitPay to use it to connect this card to Apple Pay
-              or Google Pay.
+              By giving my phone number, I give explicit consent to BitPay to use it to activate this card{' '}
+              {cardConfig?.mobilePaymentsSupported && <>and connect it to Apple Pay or Google Pay</>}.
             </div>
             <div className="settings-group__item__value">
               <IOSSwitch checked={permissionGranted} onChange={handleSwitchChange} name="permission" />
@@ -160,27 +168,29 @@ const Phone: React.FC<RouteComponentProps & {
           </div>
           <div className="action-button__footer--fixed">
             <ActionButton type="submit" disabled={!formValid}>
-              Enable Contactless
+              {cardConfig?.phoneRequired ? <>Continue</> : <>Enable Contactless</>}
             </ActionButton>
-            <Link
-              to={{
-                pathname: `/payment/${cardConfig.name}`,
-                state: {
-                  amount,
-                  cardConfig,
-                  invoiceParams
-                }
-              }}
-              onClick={(): void => {
-                tracking.trackEvent({
-                  action: 'skippedContactless',
-                  merchant: cardConfig.name,
-                  gaAction: `skippedContactless:${cardConfig.name}`
-                });
-              }}
-            >
-              <div className="secondary-button">Skip</div>
-            </Link>
+            {!cardConfig?.phoneRequired && (
+              <Link
+                to={{
+                  pathname: `/payment/${cardConfig.name}`,
+                  state: {
+                    amount,
+                    cardConfig,
+                    invoiceParams
+                  }
+                }}
+                onClick={(): void => {
+                  tracking.trackEvent({
+                    action: 'skippedContactless',
+                    merchant: cardConfig.name,
+                    gaAction: `skippedContactless:${cardConfig.name}`
+                  });
+                }}
+              >
+                <div className="secondary-button">Skip</div>
+              </Link>
+            )}
           </div>
         </form>
       </div>

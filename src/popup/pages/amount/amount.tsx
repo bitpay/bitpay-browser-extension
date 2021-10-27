@@ -169,7 +169,7 @@ const Amount: React.FC<RouteComponentProps & {
     setInputDirty(true);
   };
   const onContinue = (): void =>
-    cardConfig.mobilePaymentsSupported
+    cardConfig.phoneRequired || cardConfig.mobilePaymentsSupported
       ? history.push({
           pathname: `/phone`,
           state: {
@@ -233,7 +233,9 @@ const Amount: React.FC<RouteComponentProps & {
       <div className="amount-page__cta">
         {paymentPageAvailable ? (
           <div className="action-button__footer">
-            <ActionButton onClick={onContinue}>Continue</ActionButton>
+            <ActionButton onClick={onContinue} disabled={!amount}>
+              Continue
+            </ActionButton>
           </div>
         ) : (
           <PayWithBitpay

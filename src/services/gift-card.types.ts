@@ -46,7 +46,8 @@ export interface CommonCardConfig {
   logoBackgroundColor: string;
   minAmount?: number;
   maxAmount?: number;
-  mobilePaymentsSupported?: number;
+  mobilePaymentsSupported?: boolean;
+  phoneRequired?: boolean;
   printRequired?: boolean;
   redeemButtonText?: string;
   redeemInstructions?: string;
