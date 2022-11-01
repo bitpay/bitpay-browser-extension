@@ -13,11 +13,12 @@ import { set } from '../../../services/storage';
 import './settings.scss';
 
 const Settings: React.FC<{
+  clientId: string;
   email: string;
   user: BitpayUser;
   promptAtCheckout: boolean;
   setPromptAtCheckout: Dispatch<SetStateAction<boolean>>;
-}> = ({ email, user, promptAtCheckout, setPromptAtCheckout }) => {
+}> = ({ clientId, email, user, promptAtCheckout, setPromptAtCheckout }) => {
   const tracking = useTracking();
   resizeFrame(450);
   const launchRepo = (): void => {
@@ -89,6 +90,12 @@ const Settings: React.FC<{
           <div className="settings-group__item__label">Version</div>
           <div className="settings-group__item__value">{packageJson.version}</div>
         </button>
+        <div className="settings-group__item settings-group__item--long">
+          <div>
+            <div className="settings-group__item__label">Extension ID</div>
+            <div className="settings-group__item__value">{clientId}</div>
+          </div>
+        </div>
       </div>
     </div>
   );

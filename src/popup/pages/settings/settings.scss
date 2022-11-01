@@ -75,6 +75,14 @@
     text-align: left;
     height: $cell-height;
 
+    &--long {
+      height: 79px;
+
+      > div > div.settings-group__item__value {
+        margin-top: 6px;
+      }
+    }
+
     &--consent {
       margin-top: 15px;
       &:after {
