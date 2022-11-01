@@ -267,6 +267,7 @@ const Popup: React.FC = () => {
               render={(props): JSX.Element => (
                 <Settings
                   email={email}
+                  clientId={clientId}
                   user={user as BitpayUser}
                   promptAtCheckout={promptAtCheckout}
                   setPromptAtCheckout={setPromptAtCheckout}
