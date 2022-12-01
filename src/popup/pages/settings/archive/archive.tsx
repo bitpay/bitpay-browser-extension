@@ -53,11 +53,13 @@ const Archive: React.FC<{ purchasedGiftCards: GiftCard[]; supportedGiftCards: Ca
                 />
                 <div className="settings-group__item__label">
                   <div>{cardConfig?.displayName}</div>
-                  <div className="settings-group__item__note">
-                    {formatCurrency(card.amount, card.currency, { hideSymbol: true })}
+                  <div className="settings-group__item__label__subtext">
+                    {format(new Date(card.date), 'MMM dd yyyy')}
                   </div>
                 </div>
-                <div className="settings-group__item__value">{format(new Date(card.date), 'MMM dd yyyy')}</div>
+                <div className="settings-group__item__value" style={{ fontWeight: 500 }}>
+                  {formatCurrency(card.amount, card.currency, { hideSymbol: false })}
+                </div>
               </Link>
             );
           })}

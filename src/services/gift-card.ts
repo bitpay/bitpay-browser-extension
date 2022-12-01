@@ -9,7 +9,8 @@ import {
   GiftCardOrder,
   Invoice,
   GiftCardDiscount,
-  GiftCardBalanceEntry
+  GiftCardBalanceEntry,
+  CardConfigMap
 } from './gift-card.types';
 import { post } from './utils';
 import { getPrecision } from './currency';
@@ -207,3 +208,9 @@ export function getGiftCardPromoEventParams(promotedCard: CardConfig) {
     discountAmount: discount.amount
   };
 }
+
+export const getCardConfigMap = (cardConfigList: CardConfig[]): CardConfigMap =>
+  cardConfigList.reduce(
+    (map, cardConfig) => ({ ...map, ...{ [cardConfig.name]: cardConfig } }),
+    {} as { [name: string]: CardConfig }
+  );

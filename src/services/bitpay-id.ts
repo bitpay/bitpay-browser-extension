@@ -1,4 +1,7 @@
 import * as bitauthService from 'bitauth';
+import { keyBy } from 'lodash';
+import { sortByDescendingDate } from './gift-card';
+import { GiftCard } from './gift-card.types';
 import { get, set } from './storage';
 import { post } from './utils';
 
@@ -53,17 +56,51 @@ export async function apiCall(token: string, method: string, params: any = {}): 
   return res && res.data;
 }
 
+export async function syncGiftCards(user: BitpayUser): Promise<GiftCard[]> {
+  const savedGiftCards = (await get<GiftCard[]>('purchasedGiftCards')) || [];
+  const syncedGiftCards = savedGiftCards.filter(giftCard => giftCard.userEid === user.eid).sort(sortByDescendingDate);
+  const latestSyncDate = syncedGiftCards[0]?.date;
+  const olderThanThreeDays = (dateString: string): boolean => {
+    const threeDaysAgo = Date.now() - 1000 * 60 * 60 * 24 * 3;
+    return new Date(dateString).getTime() < threeDaysAgo;
+  };
+  const unsyncedGiftCardsResponse = await apiCall(user.token, 'findGiftCards', { dateStart: latestSyncDate });
+  const unsyncedGiftCards = unsyncedGiftCardsResponse.map((resObj: any) => ({
+    ...resObj,
+    brand: undefined,
+    createdOn: undefined,
+    name: resObj.brand,
+    date: resObj.createdOn,
+    userEid: user.eid,
+    archived: olderThanThreeDays(resObj.createdOn),
+    totalDiscount: resObj.totalDiscount,
+    discounts: resObj.totalDiscount ? [{ type: 'flatrate', amount: resObj.totalDiscount, code: '' }] : undefined,
+    status: 'SYNCED'
+  })) as GiftCard[];
+  if (!unsyncedGiftCards.length) {
+    return savedGiftCards;
+  }
+  const giftCardMap = keyBy(savedGiftCards, giftCard => giftCard.invoiceId);
+  const giftCards = unsyncedGiftCards.reduce(
+    (newSavedGiftCards, unsyncedGiftCard) =>
+      giftCardMap[unsyncedGiftCard.invoiceId] ? newSavedGiftCards : newSavedGiftCards.concat(unsyncedGiftCard),
+    savedGiftCards as GiftCard[]
+  );
+  await set<GiftCard[]>('purchasedGiftCards', giftCards);
+  return giftCards;
+}
+
 export async function refreshUserInfo(token: string): Promise<void> {
-  const [user, previouslySavedUser] = await Promise.all([
+  const [userRes, previouslySavedUser] = await Promise.all([
     apiCall(token, 'getBasicInfo'),
     get<BitpayUser>('bitpayUser')
   ]);
-  if (user) {
-    if (user.error) {
-      throw user.error;
+  if (userRes) {
+    if (userRes.error) {
+      throw userRes.error;
     }
-    const { eid, email, familyName, givenName, incentiveLevel, incentiveLevelId } = user;
-    await set<BitpayUser>('bitpayUser', {
+    const { eid, email, familyName, givenName, incentiveLevel, incentiveLevelId } = userRes;
+    const user = {
       eid,
       email,
       familyName,
@@ -72,7 +109,8 @@ export async function refreshUserInfo(token: string): Promise<void> {
       syncGiftCards: previouslySavedUser ? previouslySavedUser.syncGiftCards : true,
       incentiveLevel,
       incentiveLevelId
-    });
+    };
+    await set<BitpayUser>('bitpayUser', user);
   }
 }
 

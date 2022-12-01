@@ -9,7 +9,7 @@ import {
 import { removeProtocolAndWww } from './utils';
 import { DirectIntegration, fetchDirectIntegrations, Directory, fetchDirectory, DirectoryDiscount } from './directory';
 import { get, set } from './storage';
-import { currencySymbols } from './currency';
+import { currencySymbols, formatCurrency } from './currency';
 import { BitpayUser } from './bitpay-id';
 
 export interface Merchant extends DirectIntegration {
@@ -42,13 +42,16 @@ export function spreadAmounts(values: Array<number>, currency: string): string {
 export function formatDiscount(discount: DirectoryDiscount, currency?: string, short?: boolean): string {
   const helper = !short ? ' Off Every Purchase' : '';
   if (discount.type === 'custom') return discount.value || 'Discount Available';
+  const discountAmountString = new Intl.NumberFormat('en-US', {
+    style: 'decimal',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2
+  }).format(discount.amount || 0);
   if (discount.type === 'percentage' && discount.amount) {
-    return `${discount.amount.toString()}%${helper}`;
+    return `${discountAmountString}%${helper}`;
   }
   if (discount.type === 'flatrate' && discount.amount && currency) {
-    return currencySymbols[currency]
-      ? `${currencySymbols[currency]}${discount.amount.toString()}${helper}`
-      : `${discount.amount.toString()} ${currency}${helper}`;
+    return `${formatCurrency(discount.amount, currency, { hideSymbol: !currencySymbols[currency] })}${helper}`;
   }
   return discount.type;
 }

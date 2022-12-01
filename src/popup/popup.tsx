@@ -23,8 +23,8 @@ import Amount from './pages/amount/amount';
 import Payment from './pages/payment/payment';
 import Phone from './pages/phone/phone';
 import { get } from '../services/storage';
-import { GiftCard, CardConfig, PhoneCountryInfo } from '../services/gift-card.types';
-import { sortByDescendingDate, getCountry } from '../services/gift-card';
+import { GiftCard, CardConfig, PhoneCountryInfo, CardConfigMap } from '../services/gift-card.types';
+import { sortByDescendingDate, getCountry, getCardConfigMap } from '../services/gift-card';
 import {
   updateCard,
   listenForInvoiceChanges,
@@ -35,7 +35,7 @@ import Email from './pages/settings/email/email';
 import Archive from './pages/settings/archive/archive';
 import Legal from './pages/settings/legal/legal';
 import Balance from './pages/card/balance/balance';
-import { BitpayUser } from '../services/bitpay-id';
+import { BitpayUser, syncGiftCards } from '../services/bitpay-id';
 import Account from './pages/settings/account/account';
 import { refreshMerchantCache, dispatchAnalyticsEvent } from '../services/browser';
 import { Directory, saturateDirectory, getCachedDirectory } from '../services/directory';
@@ -72,18 +72,30 @@ const Popup: React.FC = () => {
     setPurchasedGiftCards(newCards);
   };
 
+  const syncAndUpdateGiftCards = async (
+    supportedCardConfigMap: CardConfigMap,
+    bitpayUser?: BitpayUser
+  ): Promise<void> => {
+    if (bitpayUser) {
+      const latestGiftCards = await syncGiftCards(bitpayUser);
+      setPurchasedGiftCards((latestGiftCards || []).filter(({ name }) => supportedCardConfigMap[name]));
+    }
+  };
+
   useEffect(() => {
     if (Date.now() - popupLaunchTime.current < 1000) return;
-    const updateMerchants = async (): Promise<void> => {
+    const syncMerchantsAndGiftCards = async (): Promise<void> => {
       const [newDirectory, newMerchants] = await fetchDirectoryAndMerchants();
       setDirectory(saturateDirectory(newDirectory, newMerchants));
       setMerchants(newMerchants);
       setSupportedMerchant(getBitPayMerchantFromUrl(parentUrl.current, newMerchants));
       const newSupportedGiftCards = await get<CardConfig[]>('supportedGiftCards');
       setSupportedGiftCards(newSupportedGiftCards);
+      const newCardConfigMap = getCardConfigMap(newSupportedGiftCards || []);
       refreshMerchantCache();
+      await syncAndUpdateGiftCards(newCardConfigMap, user);
     };
-    updateMerchants()
+    syncMerchantsAndGiftCards()
       .then()
       .catch(err => console.log('Error updating merchants after user change', err));
   }, [user]);
@@ -140,7 +152,9 @@ const Popup: React.FC = () => {
         receiptEmail,
         bitpayUser,
         extensionClientId,
-        shouldPromptAtCheckout
+        shouldPromptAtCheckout,
+        phoneNumber,
+        phoneCountryObject
       ] = await Promise.all([
         getCachedDirectory(),
         getCountry(),
@@ -150,9 +164,7 @@ const Popup: React.FC = () => {
         get<string>('email'),
         get<BitpayUser>('bitpayUser'),
         get<string>('clientId'),
-        get<boolean>('promptAtCheckout')
-      ]);
-      const [phoneNumber, phoneCountryObject] = await Promise.all([
+        get<boolean>('promptAtCheckout'),
         get<string>('phone'),
         get<PhoneCountryInfo>('phoneCountryInfo')
       ]);
@@ -167,8 +179,11 @@ const Popup: React.FC = () => {
       setMerchants(allMerchants);
       setSupportedMerchant(merchant);
       setSupportedGiftCards(allSupportedGiftCards || []);
+      const supportedCardConfigMap = getCardConfigMap(allSupportedGiftCards || []);
       setPromptAtCheckout(typeof shouldPromptAtCheckout === 'undefined' ? true : shouldPromptAtCheckout);
-      setPurchasedGiftCards((allPurchasedGiftCards || []).sort(sortByDescendingDate));
+      setPurchasedGiftCards(
+        (allPurchasedGiftCards || []).filter(({ name }) => supportedCardConfigMap[name]).sort(sortByDescendingDate)
+      );
       setClientId(extensionClientId);
       setEmail(receiptEmail);
       setPhone((phoneNumber || '').replace((phoneCountryObject && phoneCountryObject.phoneCountryCode) || '', ''));
@@ -176,6 +191,7 @@ const Popup: React.FC = () => {
       setUser(bitpayUser);
       setLoaded(true);
       tracking.trackEvent({ action: 'openedWidget' });
+      syncAndUpdateGiftCards(supportedCardConfigMap, bitpayUser);
     };
     getStartPage();
   }, [tracking]);
