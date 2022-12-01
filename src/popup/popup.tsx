@@ -152,9 +152,7 @@ const Popup: React.FC = () => {
         receiptEmail,
         bitpayUser,
         extensionClientId,
-        shouldPromptAtCheckout,
-        phoneNumber,
-        phoneCountryObject
+        shouldPromptAtCheckout
       ] = await Promise.all([
         getCachedDirectory(),
         getCountry(),
@@ -164,7 +162,9 @@ const Popup: React.FC = () => {
         get<string>('email'),
         get<BitpayUser>('bitpayUser'),
         get<string>('clientId'),
-        get<boolean>('promptAtCheckout'),
+        get<boolean>('promptAtCheckout')
+      ]);
+      const [phoneNumber, phoneCountryObject] = await Promise.all([
         get<string>('phone'),
         get<PhoneCountryInfo>('phoneCountryInfo')
       ]);
