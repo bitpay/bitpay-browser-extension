@@ -146,6 +146,12 @@
         color: $slateDark;
         opacity: 0.75;
       }
+
+      &__subtext {
+        font-weight: $regular;
+        color: $slateDark;
+        opacity: 0.5;
+      }
     }
 
     &__value {

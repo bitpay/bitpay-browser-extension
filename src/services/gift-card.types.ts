@@ -87,7 +87,7 @@ export interface GiftCard extends UnsoldGiftCard {
   displayName: string;
   invoiceId: string;
   pin?: string;
-  status: 'SUCCESS' | 'PENDING' | 'FAILURE' | 'UNREDEEMED';
+  status: 'SUCCESS' | 'PENDING' | 'FAILURE' | 'UNREDEEMED' | 'SYNCED';
   clientId: string;
   totalDiscount?: number;
   balanceHistory?: GiftCardBalanceEntry[];

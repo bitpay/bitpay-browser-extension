@@ -47,7 +47,7 @@ const LineItems: React.FC<{ cardConfig: CardConfig; card: Partial<GiftCard> & Un
         card.discounts.map((discount, index: number) => (
           <div className="line-items__item" key={index}>
             <div className="line-items__item__label">
-              {formatDiscount(discount, cardConfig.currency, true)} Discount
+              {discount.code ? `${formatDiscount(discount, cardConfig.currency, true)} ` : ''}Discount
             </div>
             <div className="line-items__item__value">
               -&nbsp;
