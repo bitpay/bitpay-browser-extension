@@ -101,7 +101,9 @@ export function getMerchants(
     instructions: cardConfig.description,
     giftCards: [cardConfig]
   }));
-  return [...directIntegrationMerchants, ...giftCardMerchants].sort(sortByDisplayName);
+  return [...directIntegrationMerchants, ...giftCardMerchants]
+    .filter(merchant => !!merchant.displayName)
+    .sort(sortByDisplayName);
 }
 
 export async function fetchCachedMerchants(): Promise<Merchant[]> {
