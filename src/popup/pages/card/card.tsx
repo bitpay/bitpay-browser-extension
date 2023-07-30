@@ -75,7 +75,12 @@ const Card: React.FC<RouteComponentProps & {
     updateCard({ ...card, archived: false });
     tracking.trackEvent({ action: 'unarchivedGiftCard' });
   };
-  const menuItems = ['Edit Balance', card.archived ? 'Unarchive' : 'Archive', 'Help'];
+  const menuItems = [
+    'Edit Balance',
+    card.archived ? 'Unarchive' : 'Archive',
+    ...(card.claimLink ? ['Print'] : []),
+    'Help'
+  ];
   const handleMenuClick = (item: string): void => {
     switch (item) {
       case 'Edit Balance':
@@ -89,6 +94,11 @@ const Card: React.FC<RouteComponentProps & {
         break;
       case 'Unarchive':
         unarchive();
+        break;
+      case 'Print':
+        if (card.claimLink) {
+          launchNewTab(card.claimLink);
+        }
         break;
       case 'Help':
         tracking.trackEvent({ action: 'clickedHelp' });
