@@ -232,7 +232,7 @@ if (window.location.origin === process.env.API_ORIGIN) {
           : undefined
       });
     });
-  } else if (window.location.href.includes('/wallet-card')) {
+  } else if (window.location.href.includes('/wallet-verify')) {
     setTimeout(() => window.postMessage({ message: 'pairingOnly' }, process.env.API_ORIGIN as string), 300);
     window.addEventListener('message', ({ data }) => {
       const dataObj = typeof data === 'string' ? safelyParseJSON(data) : data;
