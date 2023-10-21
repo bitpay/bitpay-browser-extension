@@ -240,6 +240,7 @@ const Amount: React.FC<RouteComponentProps & {
         ) : (
           <PayWithBitpay
             invoiceParams={{ ...invoiceParams, amount }}
+            user={user}
             cardConfig={cardConfig}
             history={history}
             purchasedGiftCards={purchasedGiftCards}
