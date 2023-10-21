@@ -157,7 +157,8 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
       return resolveFn && resolveFn({ data: { status: 'complete' } });
     }
     case 'INVOICE_EVENT': {
-      if (!message.data || !message.data.status) {
+      const actionableStatuses = ['new', 'paid', 'confirmed', 'complete', 'expired', 'invalid', 'closed'];
+      if (!message.data || !message.data.status || !actionableStatuses.includes(message.data.status)) {
         return;
       }
       const resolveFn = windowIdResolveMap[tab?.windowId as number];
