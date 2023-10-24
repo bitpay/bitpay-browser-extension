@@ -27,6 +27,7 @@ const Shop: React.FC<{ directory: Directory; merchants: Merchant[]; location: an
     merchant =>
       searchVal &&
       (merchant.name.toLowerCase().includes(searchVal.toLowerCase()) ||
+        merchant.displayName.toLowerCase().includes(searchVal.toLowerCase()) ||
         merchant.tags.find(category => category.includes(searchVal.toLowerCase())))
   );
   const handleClick = (merchant?: Merchant): void => {
