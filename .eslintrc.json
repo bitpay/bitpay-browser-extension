@@ -1,37 +1,39 @@
 {
-  "extends": ["onepass"],
-  "rules": {
-    "no-console": 0,
-    "no-extend-native": 0,
-    "react/jsx-filename-extension": [1, {
-      "extensions": [".jsx", "tsx"]
-    }],
-    "arrow-body-style": ["error", "as-needed"],
-    "react/jsx-props-no-spreading": 0,
-    "jsx-a11y/label-has-associated-control": 0,
-    "no-unused-expressions": ["error", {
-      "allowTernary": true
-    }],
-    "@typescript-eslint/no-unused-vars": ["error", { "ignoreRestSiblings": true }],
-    "no-unused-vars": ["error", { "ignoreRestSiblings": true }],
-    "prettier/prettier": [
-      "error",
-      {
-        "trailingComma": "none",
-        "singleQuote": true,
-        "printWidth": 120,
-        "tabWidth": 2
-      }
-    ],
-    "indent": "off",
-    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}]
-  },
-  "settings": {
-    "import/resolver": {
-      "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"],
-        "moduleDirectory": ["node_modules", "src/"]
-      }
-    }
-  }
+	"extends": [
+		"@abhijithvijayan/eslint-config/typescript",
+		"@abhijithvijayan/eslint-config/node",
+		"@abhijithvijayan/eslint-config/react"
+	],
+	"parserOptions": {
+		"project": [
+			"./tsconfig.json"
+		],
+		"sourceType": "module"
+	},
+	"rules": {
+		"arrow-parens": ["error", "as-needed"],
+		"comma-dangle": ["error", "never"],
+		"no-console": "off",
+		"no-extend-native": "off",
+		"react/jsx-props-no-spreading": "off",
+		"jsx-a11y/label-has-associated-control": "off",
+		"class-methods-use-this": "off",
+		"max-classes-per-file": "off",
+		"no-trailing-spaces": ["error", { "skipBlankLines": true }],
+		"node/no-missing-import": "off",
+		"node/no-unpublished-import": "off",
+		"node/no-unsupported-features/es-syntax": ["error", {
+			"ignores": ["modules"]
+		}],
+		"object-curly-spacing": [ "error", "always" ],
+		"prettier/prettier": "off"
+	},
+	"env": {
+		"webextensions": true
+	},
+	"settings": {
+		"node": {
+			"tryExtensions": [".tsx"] // append tsx to the list as well
+		}
+	}
 }

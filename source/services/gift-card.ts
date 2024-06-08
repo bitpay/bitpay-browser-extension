@@ -91,7 +91,7 @@ function getCardConfigFromApiConfigMap(availableCardMap: AvailableCardMap): Card
 }
 
 export async function getCountry(): Promise<string> {
-  const { country } = await fetch('https://bitpay.com/wallet-card/location')
+  const { country } = await fetch(`${process.env.API_ORIGIN}/wallet-card/location`)
     .then(res => res.json())
     .catch(() => 'US');
   return country;
