@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable @typescript-eslint/camelcase */
 const pkg = require('../../package.json');
-const csp = require('../../csp');
+const csp = require('../../csp.js');
 
 const manifestInput = {
   manifest_version: 2,
@@ -9,10 +8,10 @@ const manifestInput = {
   version: pkg.version,
 
   icons: {
-    '16': 'assets/icons/favicon-16.png',
-    '32': 'assets/icons/favicon-32.png',
-    '48': 'assets/icons/favicon-48.png',
-    '128': 'assets/icons/favicon-128.png'
+    16: 'assets/icons/favicon-16.png',
+    32: 'assets/icons/favicon-32.png',
+    48: 'assets/icons/favicon-48.png',
+    128: 'assets/icons/favicon-128.png'
   },
 
   description: 'Spend crypto instantly',
@@ -38,10 +37,10 @@ const manifestInput = {
 
   browser_action: {
     default_icon: {
-      '16': 'assets/icons/favicon-16.png',
-      '32': 'assets/icons/favicon-32.png',
-      '48': 'assets/icons/favicon-48.png',
-      '128': 'assets/icons/favicon-128.png'
+      16: 'assets/icons/favicon-16.png',
+      32: 'assets/icons/favicon-32.png',
+      48: 'assets/icons/favicon-48.png',
+      128: 'assets/icons/favicon-128.png'
     },
     default_title: 'Pay with BitPay',
     '__chrome|opera__chrome_style': false,

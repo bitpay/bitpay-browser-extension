@@ -1,43 +1,39 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
 const webpack = require('webpack');
-const wextManifest = require('wext-manifest');
-const ZipPlugin = require('zip-webpack-plugin');
+const FilemanagerPlugin = require('filemanager-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const Dotenv = require('dotenv-webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
-const WriteWebpackPlugin = require('write-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const ExtensionReloader = require('webpack-extension-reloader');
+const ExtensionReloader = require('webpack-ext-reloader');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const WextManifestWebpackPlugin = require('wext-manifest-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-
-const dotEnv = new Dotenv({
-  path: process.env.NODE_ENV === 'production' ? '.env' : `.env.${process.env.NODE_ENV}`,
-  defaults: true
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const WriteWebpackPlugin = require('write-webpack-plugin');
+const wextManifest = require('wext-manifest');
+require('dotenv').config({
+  path:
+    process.env.NODE_ENV === 'production'
+      ? '.env.defaults'
+      : `.env.${process.env.NODE_ENV}`
 });
 
-const apiOrigin = dotEnv.definitions['process.env.API_ORIGIN'].replace(/"/g, '');
-process.env.API_ORIGIN = apiOrigin;
-
-const csp = require('./csp');
-const manifestInput = require('./src/manifest');
+const manifestInput = require('./source/manifest/index.js');
 
 const viewsPath = path.join(__dirname, 'views');
-const sourcePath = path.join(__dirname, 'src');
+const sourcePath = path.join(__dirname, 'source');
 const destPath = path.join(__dirname, 'extension');
 const nodeEnv = process.env.NODE_ENV || 'development';
 const targetBrowser = process.env.TARGET_BROWSER;
+
 const manifest = wextManifest[targetBrowser](manifestInput);
 
 const extensionReloaderPlugin =
   nodeEnv === 'development'
     ? new ExtensionReloader({
-        port: 9090,
-        reloadPage: true,
+        port: 9090, // Which port use to create the server
+        reloadPage: true, // Force the reload of the page also
         entries: {
           // TODO: reload manifest on update
           contentScript: 'contentScript',
@@ -46,7 +42,6 @@ const extensionReloaderPlugin =
         }
       })
     : () => {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         this.apply = () => {};
       };
 
@@ -63,13 +58,19 @@ const getExtensionFileType = browser => {
 };
 
 module.exports = {
-  mode: nodeEnv,
+  devtool: false, // https://github.com/webpack/webpack/issues/1194#issuecomment-560382342
 
-  node: {
-    fs: 'empty'
+  stats: {
+    all: false,
+    builtAt: true,
+    errors: true,
+    hash: true
   },
 
+  mode: nodeEnv,
+
   entry: {
+    manifest: path.join(sourcePath, 'manifest', 'index.js'),
     background: path.join(sourcePath, 'background', 'index.ts'),
     contentScript: path.join(sourcePath, 'content-script', 'index.ts'),
     popup: path.join(sourcePath, 'popup', 'index.tsx'),
@@ -77,19 +78,37 @@ module.exports = {
   },
 
   output: {
-    filename: 'js/[name].bundle.js',
-    path: path.join(destPath, targetBrowser)
+    path: path.join(destPath, targetBrowser),
+    filename: 'js/[name].bundle.js'
   },
 
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.json'],
     alias: {
-      'webextension-polyfill-ts': path.resolve(path.join(__dirname, 'node_modules', 'webextension-polyfill-ts'))
+      'webextension-polyfill-ts': path.resolve(
+        path.join(__dirname, 'node_modules', 'webextension-polyfill-ts')
+      )
+    },
+    fallback: {
+      crypto: require.resolve('crypto-browserify'),
+      path: require.resolve('path-browserify'),
+      stream: require.resolve('stream-browserify')
     }
   },
 
   module: {
     rules: [
+      {
+        type: 'javascript/auto', // prevent webpack handling json with its own loaders,
+        test: /manifest\.json$/,
+        use: {
+          loader: 'wext-manifest-loader',
+          options: {
+            usePackageJSONVersion: true // set to false to not use package.json version for manifest
+          }
+        },
+        exclude: /node_modules/
+      },
       {
         test: /\.(js|ts)x?$/,
         loader: 'babel-loader',
@@ -104,15 +123,23 @@ module.exports = {
           {
             loader: 'css-loader', // Takes the CSS files and returns the CSS with imports and url(...) for Webpack
             options: {
+              url: false,
               sourceMap: true
             }
           },
           {
-            loader: 'postcss-loader', // For autoprefixer
+            loader: 'postcss-loader',
             options: {
-              ident: 'postcss',
-              // eslint-disable-next-line global-require, @typescript-eslint/no-var-requires
-              plugins: [require('autoprefixer')()]
+              postcssOptions: {
+                plugins: [
+                  [
+                    'autoprefixer',
+                    {
+                      // Options
+                    }
+                  ]
+                ]
+              }
             }
           },
           'resolve-url-loader', // Rewrites relative paths in url() statements
@@ -123,15 +150,37 @@ module.exports = {
   },
 
   plugins: [
+    // Plugin to not generate js bundle for manifest entry
+    new WextManifestWebpackPlugin(),
+    // Generate sourcemaps
+    new webpack.SourceMapDevToolPlugin({ filename: false }),
     new ForkTsCheckerWebpackPlugin(),
     // environmental variables
     new webpack.EnvironmentPlugin(['NODE_ENV', 'TARGET_BROWSER']),
-    dotEnv,
+    new webpack.ProvidePlugin({
+      process: 'process/browser'
+    }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer']
+    }),
+    new webpack.DefinePlugin({
+      'process.env': JSON.stringify(process.env)
+    }),
+    // write manifest.json
+    new WriteWebpackPlugin([
+      {
+        name: manifest.name,
+        data: Buffer.from(manifest.content)
+      }
+    ]),
     // delete previous build files
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: [
         path.join(process.cwd(), `extension/${targetBrowser}`),
-        path.join(process.cwd(), `extension/${targetBrowser}.${getExtensionFileType(targetBrowser)}`)
+        path.join(
+          process.cwd(),
+          `extension/${targetBrowser}.${getExtensionFileType(targetBrowser)}`
+        )
       ],
       cleanStaleWebpackAssets: false,
       verbose: true
@@ -140,64 +189,56 @@ module.exports = {
       template: path.join(viewsPath, 'popup.html'),
       inject: 'body',
       chunks: ['popup'],
+      hash: true,
       filename: 'popup.html'
     }),
     new HtmlWebpackPlugin({
       template: path.join(viewsPath, 'options.html'),
       inject: 'body',
       chunks: ['options'],
+      hash: true,
       filename: 'options.html'
     }),
-    new CspHtmlWebpackPlugin(csp.cspObject, {
-      enabled: true,
-      hashingMethod: 'sha256',
-      hashEnabled: {
-        'script-src': process.env.NODE_ENV === 'production',
-        'style-src': false
-      },
-      nonceEnabled: {
-        'script-src': process.env.NODE_ENV === 'production',
-        'style-src': false
-      }
-    }),
     // write css file(s) to build folder
-    new MiniCssExtractPlugin({
-      filename: 'css/[name].css'
-    }),
+    new MiniCssExtractPlugin({ filename: 'css/[name].css' }),
     // copy static assets
-    new CopyWebpackPlugin([
-      {
-        from: 'src/assets',
-        to: 'assets'
-      }
-    ]),
-    // write manifest.json
-    new WriteWebpackPlugin([
-      {
-        name: manifest.name,
-        data: Buffer.from(manifest.content)
-      }
-    ]),
+    new CopyWebpackPlugin({
+      patterns: [{ from: 'source/assets', to: 'assets' }]
+    }),
     // plugin to enable browser reloading in development mode
     extensionReloaderPlugin
   ],
 
   optimization: {
+    minimize: true,
     minimizer: [
       new TerserPlugin({
-        cache: true,
         parallel: true,
         terserOptions: {
-          output: {
+          format: {
             comments: false
           }
         },
         extractComments: false
       }),
-      new ZipPlugin({
-        path: destPath,
-        extension: `${getExtensionFileType(targetBrowser)}`,
-        filename: `${targetBrowser}`
+      new OptimizeCSSAssetsPlugin({
+        cssProcessorPluginOptions: {
+          preset: ['default', { discardComments: { removeAll: true } }]
+        }
+      }),
+      new FilemanagerPlugin({
+        events: {
+          onEnd: {
+            archive: [
+              {
+                format: 'zip',
+                source: path.join(destPath, targetBrowser),
+                destination: `${path.join(destPath, targetBrowser)}.${getExtensionFileType(targetBrowser)}`,
+                options: { zlib: { level: 6 } }
+              }
+            ]
+          }
+        }
       })
     ]
   }
