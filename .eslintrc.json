@@ -19,6 +19,7 @@
 		"jsx-a11y/label-has-associated-control": "off",
 		"class-methods-use-this": "off",
 		"max-classes-per-file": "off",
+		"no-trailing-spaces": ["error", { "skipBlankLines": true }],
 		"node/no-missing-import": "off",
 		"node/no-unpublished-import": "off",
 		"node/no-unsupported-features/es-syntax": ["error", {

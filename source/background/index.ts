@@ -1,6 +1,5 @@
 import { browser, Tabs } from 'webextension-polyfill-ts';
 import * as uuid from 'uuid';
-import { dispatchEvent } from '../services/analytics';
 import { GiftCardInvoiceMessage } from '../services/gift-card.types';
 import {
   isBitPayAccepted,
@@ -16,6 +15,8 @@ let cachedMerchants: Merchant[] | undefined;
 let cacheDate = 0;
 const cacheValidityDuration = 1000 * 60;
 
+const browserAction = browser.action || browser.browserAction;
+
 const windowIdResolveMap: {
   [windowId: number]: (message: GiftCardInvoiceMessage) => GiftCardInvoiceMessage;
 } = {};
@@ -25,7 +26,7 @@ function getIconPath(bitpayAccepted: boolean): string {
 }
 
 function setIcon(bitpayAccepted: boolean): void {
-  browser.browserAction.setIcon({ path: getIconPath(bitpayAccepted) });
+  browserAction.setIcon({ path: getIconPath(bitpayAccepted) });
 }
 
 async function getCachedMerchants(): Promise<Merchant[]> {
@@ -39,7 +40,7 @@ async function refreshCachedMerchants(): Promise<void> {
 
 async function refreshCachedMerchantsIfNeeded(): Promise<void> {
   if (Date.now() < cacheDate + cacheValidityDuration) return;
-  return fetchDirectoryAndMerchants()
+  await fetchDirectoryAndMerchants()
     .then(() => refreshCachedMerchants())
     .catch(err => console.log('Error refreshing merchants', err));
 }
@@ -64,12 +65,6 @@ async function handleUrlChange(url: string, tab?: Tabs.Tab): Promise<void> {
   }
   await setIcon(bitpayAccepted || isGiftCardInvoice(url));
   await refreshCachedMerchantsIfNeeded();
-  if (isGiftCardInvoice(url)) return;
-  dispatchEvent({
-    action: `setExtensionIcon:${
-      merchant ? `active:${merchant.hasDirectIntegration ? 'direct' : 'giftCard'}` : `inactive`
-    }`
-  });
 }
 
 async function createClientIdIfNotExists(): Promise<void> {
@@ -81,10 +76,9 @@ async function createClientIdIfNotExists(): Promise<void> {
   if (!analyticsClientId) {
     await set<string>('analyticsClientId', uuid.v4());
   }
-  clientId ? dispatchEvent({ action: 'updatedExtension' }) : dispatchEvent({ action: 'installedExtension' });
 }
 
-browser.browserAction.onClicked.addListener(async tab => {
+browserAction.onClicked.addListener(async tab => {
   const merchant = tab.url && getBitPayMerchantFromUrl(tab.url, await getCachedMerchants());
   await browser.tabs
     .sendMessage(tab.id as number, {
@@ -101,7 +95,9 @@ browser.browserAction.onClicked.addListener(async tab => {
 browser.runtime.onInstalled.addListener(async () => {
   const allTabs = await browser.tabs.query({});
   allTabs.forEach(tab =>
-    browser.tabs.executeScript(tab.id, { file: 'js/contentScript.bundle.js' }).catch(() => undefined)
+    browser.scripting
+      ? browser.scripting.executeScript({ target: { tabId: tab.id! }, files: ['js/contentScript.bundle.js'] }).catch(() => undefined)
+      : browser.tabs.executeScript(tab.id, { file: 'js/contentScript.bundle.js' }).catch(() => undefined)
   );
   await refreshUserInfoIfNeeded();
   await Promise.all([refreshCachedMerchantsIfNeeded(), createClientIdIfNotExists()]);
@@ -146,20 +142,14 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
     case 'ID_CONNECTED': {
       const resolveFn = windowIdResolveMap[tab?.windowId as number];
       delete windowIdResolveMap[tab?.windowId as number];
-      browser.tabs.remove(tab?.id as number).catch(() => {
-        if (tab?.id) {
-          browser.tabs.executeScript(tab?.id as number, {
-            code: 'window.close()'
-          });
-        }
-      });
+      browser.tabs.remove(tab?.id as number).catch(() => {});
       await pairBitpayId(message.data);
       return resolveFn && resolveFn({ data: { status: 'complete' } });
     }
     case 'INVOICE_EVENT': {
       const actionableStatuses = ['new', 'paid', 'confirmed', 'complete', 'expired', 'invalid', 'closed'];
       if (!message.data || !message.data.status || !actionableStatuses.includes(message.data.status)) {
-        return;
+        break;
       }
       const resolveFn = windowIdResolveMap[tab?.windowId as number];
       return resolveFn && resolveFn(message);
@@ -171,7 +161,7 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
     case 'REFRESH_MERCHANT_CACHE':
       return refreshCachedMerchants();
     case 'TRACK':
-      return dispatchEvent(message.event);
+      break;
     case 'URL_CHANGED':
       return message.url && handleUrlChange(message.url, tab);
     default:

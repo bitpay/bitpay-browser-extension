@@ -19,13 +19,15 @@ require('dotenv').config({
       : `.env.${process.env.NODE_ENV}`
 });
 
-const manifestInput = require('./source/manifest/index.js');
-
 const viewsPath = path.join(__dirname, 'views');
 const sourcePath = path.join(__dirname, 'source');
 const destPath = path.join(__dirname, 'extension');
 const nodeEnv = process.env.NODE_ENV || 'development';
 const targetBrowser = process.env.TARGET_BROWSER;
+
+const manifestVersion = targetBrowser === 'firefox' || nodeEnv === 'development' ? 2 : 3;
+const manifestFileName = `v${manifestVersion}.js`;
+const manifestInput = require(`./source/manifest/${manifestFileName}`);
 
 const manifest = wextManifest[targetBrowser](manifestInput);
 
@@ -70,7 +72,7 @@ module.exports = {
   mode: nodeEnv,
 
   entry: {
-    manifest: path.join(sourcePath, 'manifest', 'index.js'),
+    manifest: path.join(sourcePath, 'manifest', manifestFileName),
     background: path.join(sourcePath, 'background', 'index.ts'),
     contentScript: path.join(sourcePath, 'content-script', 'index.ts'),
     popup: path.join(sourcePath, 'popup', 'index.tsx'),

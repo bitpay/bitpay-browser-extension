@@ -41,7 +41,7 @@ Then run the following:
 ### Development
 
 - `yarn install` to install dependencies.
-- To watch file changes in developement
+- To watch file changes in development (please note that Hot Module Replacement is currently only supported for Manifest v2 builds):
 
   - Chrome
     - `yarn run dev:chrome`

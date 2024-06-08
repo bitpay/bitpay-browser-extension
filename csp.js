@@ -13,7 +13,7 @@ const cspObject = {
   'img-src': ['https://gravatar.com', 'https://*.wp.com', apiOrigin],
   'font-src': ['https://fonts.gstatic.com'],
   'object-src': ["'self'"],
-  'script-src': isProd ? ["'self'"] : ["'self'", "'unsafe-eval'"],
+  'script-src': ["'self'"],
   'style-src': ["'self'", 'https://fonts.googleapis.com/', "'unsafe-inline'"]
 };
 
