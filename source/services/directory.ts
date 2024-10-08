@@ -42,6 +42,7 @@ export interface Directory {
 
 export interface DirectoryDiscount {
   type: 'flatrate' | 'percentage' | 'custom';
+  displayType?: 'boost' | 'discount';
   amount?: number;
   currency?: string;
   value?: string;

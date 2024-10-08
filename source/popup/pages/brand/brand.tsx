@@ -6,7 +6,7 @@ import Observer from '@researchgate/react-intersection-observer';
 import ReactMarkdown from 'react-markdown';
 import { motion } from 'framer-motion';
 import { Directory, DirectoryCategory } from '../../../services/directory';
-import { Merchant, getDiscount } from '../../../services/merchant';
+import { Merchant, getCouponColor, getDiscount } from '../../../services/merchant';
 import { resizeToFitPage, FrameDimensions } from '../../../services/frame';
 import { goToPage } from '../../../services/browser';
 import CardDenoms from '../../components/card-denoms/card-denoms';
@@ -47,7 +47,7 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ locat
     goToPage(merchant.cta.link);
     tracking.trackEvent(getEventParams('clickedMerchantCta'));
   };
-  const color = merchant.theme === '#ffffff' ? '#4f6ef7' : merchant.theme;
+  const color = getCouponColor(merchant);
   const bubbleColor = { color, borderColor: color };
   const suggested = useMemo((): { category: DirectoryCategory; suggestions: Merchant[] } => {
     const category = [...directory.categories].sort(
@@ -182,7 +182,7 @@ const Brand: React.FC<RouteComponentProps & { directory: Directory }> = ({ locat
 
               <Observer onChange={handleIntersection} threshold={0.8} disabled={pageEntering}>
                 <div>
-                  {suggested.suggestions.slice(0, 2).map((suggestion) => (
+                  {suggested.suggestions.slice(0, 2).map(suggestion => (
                     <Link
                       to={{
                         pathname: `/brand/${suggestion.name}`,

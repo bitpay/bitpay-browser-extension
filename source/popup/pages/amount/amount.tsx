@@ -2,10 +2,11 @@ import React, { useRef, useState, Dispatch, SetStateAction, useEffect } from 're
 import { RouteComponentProps } from 'react-router-dom';
 import { TrackingProp } from 'react-tracking';
 import { motion } from 'framer-motion';
+import classNames from 'classnames';
 import CardDenoms from '../../components/card-denoms/card-denoms';
 import PayWithBitpay from '../../components/pay-with-bitpay/pay-with-bitpay';
 import { GiftCardInvoiceParams, CardConfig, GiftCard } from '../../../services/gift-card.types';
-import { getCardPrecision, isAmountValid } from '../../../services/gift-card';
+import { getBoostedAmount, getCardPrecision, getVisibleCoupon, hasVisibleDiscount, hasVisibleBoost, isAmountValid, getMaxAmountWithBoost } from '../../../services/gift-card';
 import DiscountText from '../../components/discount-text/discount-text';
 import { Merchant } from '../../../services/merchant';
 import { resizeFrame, FrameDimensions } from '../../../services/frame';
@@ -14,6 +15,7 @@ import { BitpayUser } from '../../../services/bitpay-id';
 import { formatCurrency } from '../../../services/currency';
 import { trackComponent } from '../../../services/analytics';
 import './amount.scss';
+import Snack from '../../components/snack/snack';
 
 const shkAmp = 12;
 
@@ -52,11 +54,13 @@ const Amount: React.FC<RouteComponentProps & {
     (onMerchantWebsite && isAmountValid(initialAmount || 0, cardConfig) && initialAmount) ||
     (cardConfig.supportedAmounts && cardConfig.supportedAmounts[0] ? cardConfig.supportedAmounts[0] : 0);
   const [amount, setAmount] = useState(preloadedAmount);
+  const [errorMessage, setErrorMessage] = useState('');
   const [inputValue, setInputValue] = useState(
     preloadedAmount
       ? formatCurrency(preloadedAmount, cardConfig.currency, { customPrecision: 'minimal' }).replace(/[^\d.-]/g, '')
       : ''
   );
+  const boostedAmount = formatCurrency(getBoostedAmount(cardConfig, amount), cardConfig.currency);
   useEffect(() => {
     if (initialAmount)
       return tracking?.trackEvent({
@@ -67,13 +71,13 @@ const Amount: React.FC<RouteComponentProps & {
   }, [tracking, initialAmount, cardConfig]);
   const [inputError, setInputError] = useState(false);
   const [inputDirty, setInputDirty] = useState(false);
-  const discount = (cardConfig.discounts || [])[0];
+  const coupon = getVisibleCoupon(cardConfig);
   const invoiceParams: GiftCardInvoiceParams = {
     brand: cardConfig.name,
     currency: cardConfig.currency,
     amount: preloadedAmount,
     clientId,
-    discounts: discount ? [discount.code] : [],
+    coupons: coupon ? [coupon.code] : [],
     email: (user && user.email) || email
   };
   const precision = getCardPrecision(cardConfig);
@@ -81,7 +85,7 @@ const Amount: React.FC<RouteComponentProps & {
   const maxAmount = cardConfig.maxAmount as number;
   const minAmount = cardConfig.minAmount as number;
   const paymentPageAvailable =
-    (cardConfig.activationFees && cardConfig.activationFees.length) || discount || (!email && !user);
+    (cardConfig.activationFees && cardConfig.activationFees.length) || !!getVisibleCoupon(cardConfig) || (!email && !user);
   const changeFixedAmount = (delta: number): void => {
     const denoms = cardConfig.supportedAmounts as number[];
     const maxIndex = denoms.length - 1;
@@ -148,16 +152,17 @@ const Amount: React.FC<RouteComponentProps & {
     return tracking?.trackEvent({ action: 'changedAmount', method: 'type', gaAction: 'changedAmount:type' });
   };
   const goToPaymentPage = (): void => {
-    isAmountValid(amount, cardConfig)
-      ? history.push({
-          pathname: `/payment/${cardConfig.name}`,
-          state: {
-            amount,
-            cardConfig,
-            invoiceParams
-          }
-        })
-      : shakeInput();
+    if (!isAmountValid(amount, cardConfig)) {
+      return;
+    }
+    history.push({
+      pathname: `/payment/${cardConfig.name}`,
+      state: {
+        amount: getBoostedAmount(cardConfig, amount),
+        cardConfig,
+        invoiceParams
+      }
+    })
   };
   const handleKeyDown = (key: number): void => {
     if (paymentPageAvailable && key === 13) {
@@ -168,24 +173,40 @@ const Amount: React.FC<RouteComponentProps & {
     }
     setInputDirty(true);
   };
-  const onContinue = (): void =>
-    cardConfig.phoneRequired || cardConfig.mobilePaymentsSupported
-      ? history.push({
-          pathname: `/phone`,
-          state: {
-            amount,
-            cardConfig,
-            invoiceParams
-          }
-        })
-      : goToPaymentPage();
+  const validateAmount = () : boolean => {
+    if (getBoostedAmount(cardConfig, amount) > maxAmount) {
+      const maxAmountWithBoost = getMaxAmountWithBoost(cardConfig);
+      setErrorMessage(`The boosted amount must not exceed ${formatCurrency(maxAmount, cardConfig.currency, { customPrecision: 'minimal' })}. Please enter an amount of ${formatCurrency(maxAmountWithBoost!, cardConfig.currency, { customPrecision: 'minimal' })} or less.`);
+      shakeInput();
+      return false;
+    }
+    return true;
+  }
+  const onContinue = (): void => {
+    if (!validateAmount()) {
+      return;
+    }
+    if (cardConfig.phoneRequired || cardConfig.mobilePaymentsSupported) {
+      history.push({
+        pathname: `/phone`,
+        state: {
+          amount: getBoostedAmount(cardConfig, amount),
+          cardConfig,
+          invoiceParams
+        }
+      });
+    } else {
+      goToPaymentPage();
+    }
+  }
   if (!initiallyCollapsed || !isFirstPage) resizeFrame(FrameDimensions.amountPageHeight);
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events,  jsx-a11y/no-static-element-interactions
     <div className="amount-page" onClick={focusInput}>
+      <Snack message={errorMessage} onClose={() => {setErrorMessage('')}} />
       <div className="amount-page__title">
         <div className="amount-page__merchant-name">{cardConfig.displayName}</div>
-        {discount && (
+        {hasVisibleDiscount(cardConfig) && (
           <div className="amount-page__promo">
             <DiscountText merchant={merchant} />
           </div>
@@ -231,6 +252,12 @@ const Amount: React.FC<RouteComponentProps & {
         </div>
       </div>
       <div className="amount-page__cta">
+        {hasVisibleBoost(cardConfig) && (
+          <div className={classNames({
+            'boost-amount': true,
+            'boost-amount--visible': amount > 0
+          })}>{boostedAmount} with&nbsp;<DiscountText merchant={merchant} /></div>
+        )}
         {paymentPageAvailable ? (
           <div className="action-button__footer">
             <ActionButton onClick={onContinue} disabled={!amount}>
@@ -239,14 +266,14 @@ const Amount: React.FC<RouteComponentProps & {
           </div>
         ) : (
           <PayWithBitpay
-            invoiceParams={{ ...invoiceParams, amount }}
+            invoiceParams={{ ...invoiceParams, amount: getBoostedAmount(cardConfig, amount) }}
             user={user}
             cardConfig={cardConfig}
             history={history}
             purchasedGiftCards={purchasedGiftCards}
             setPurchasedGiftCards={setPurchasedGiftCards}
             supportedMerchant={supportedMerchant}
-            onInvalidParams={(): void => shakeInput()}
+            onInvalidParams={(): void => { validateAmount() }}
           />
         )}
       </div>

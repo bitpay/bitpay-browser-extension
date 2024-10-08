@@ -2,16 +2,17 @@ import React, { useEffect } from 'react';
 import './merchant-cta.scss';
 import { Link } from 'react-router-dom';
 import { useTracking } from 'react-tracking';
-import { Merchant, getDiscount, getGiftCardDiscount, getPromoEventParams } from '../../../services/merchant';
+import { Merchant, getDiscount, getPromoEventParams } from '../../../services/merchant';
 import CardDenoms from '../card-denoms/card-denoms';
 import SuperToast from '../super-toast/super-toast';
 import DiscountText from '../discount-text/discount-text';
+import { getVisibleCoupon } from '../../../services/gift-card';
 
 const MerchantCta: React.FC<{ merchant?: Merchant; slimCTA: boolean }> = ({ merchant, slimCTA }) => {
   const tracking = useTracking();
   const ctaPath = merchant && (merchant.hasDirectIntegration ? `/brand/${merchant.name}` : `/amount/${merchant.name}`);
   const hasDiscount = !!(merchant && getDiscount(merchant));
-  const hasGiftCardDiscount = !!(merchant && getGiftCardDiscount(merchant));
+  const hasGiftCardDiscount = !!(merchant && getVisibleCoupon(merchant.giftCards[0]));
   useEffect(() => {
     if (!merchant || !hasGiftCardDiscount) return;
     tracking.trackEvent({

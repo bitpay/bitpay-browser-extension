@@ -30,6 +30,23 @@
     .action-button__footer {
       margin-top: 0;
     }
+    .boost-amount {
+      color: $slateDark;
+      display: flex;
+      justify-content: center;
+      font-size: 14px;
+      margin-top: -20px;
+      padding: 10px;
+      padding-top: 0;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 300ms ease;
+
+      &--visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   }
 
   &__amount-box {

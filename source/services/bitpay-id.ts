@@ -74,7 +74,6 @@ export async function syncGiftCards(user: BitpayUser): Promise<GiftCard[]> {
     userEid: user.eid,
     archived: olderThanThreeDays(resObj.createdOn),
     totalDiscount: resObj.totalDiscount,
-    discounts: resObj.totalDiscount ? [{ type: 'flatrate', amount: resObj.totalDiscount, code: '' }] : undefined,
     status: 'SYNCED'
   })) as GiftCard[];
   if (!unsyncedGiftCards.length) {

@@ -3,10 +3,11 @@ import './merchant-cell.scss';
 import { Merchant } from '../../../services/merchant';
 import CardDenoms from '../card-denoms/card-denoms';
 import DiscountText from '../discount-text/discount-text';
+import { getVisibleCoupon } from '../../../services/gift-card';
 
 const MerchantCell: React.FC<{ merchant: Merchant }> = ({ merchant }) => {
   const cardConfig = merchant.giftCards[0];
-  const discount = merchant.discount || (cardConfig && cardConfig.discounts && cardConfig.discounts[0]);
+  const discount = merchant.discount || getVisibleCoupon(cardConfig);
   return (
     <div className="merchant-cell">
       <img className="merchant-cell__avatar" alt={`${merchant.displayName} logo`} src={merchant.icon} />
