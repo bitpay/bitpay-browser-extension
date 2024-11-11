@@ -10,7 +10,8 @@ import {
   Invoice,
   GiftCardDiscount,
   GiftCardBalanceEntry,
-  CardConfigMap
+  CardConfigMap,
+  GiftCardCoupon
 } from './gift-card.types';
 import { post } from './utils';
 import { getPrecision } from './currency';
@@ -184,11 +185,80 @@ export function isAmountValid(amount: number, cardConfig: CardConfig): boolean {
   return cardConfig.supportedAmounts ? true : amount <= maxAmount && amount >= minAmount;
 }
 
+export function isSupportedCouponType(coupon: GiftCardCoupon): boolean {
+  return (
+    ['percentage', 'flatrate'].includes(coupon.type) &&
+    ['boost', 'discount'].includes(coupon.displayType)
+  );
+}
+
+export function getVisibleCoupon(cardConfig: CardConfig): GiftCardCoupon | undefined {
+  const coupons = cardConfig && cardConfig.coupons;
+  return coupons && coupons.find(c => isSupportedCouponType(c) && !c.hidden);
+}
+
+export function hasVisibleBoost(cardConfig: CardConfig): boolean {
+  const coupon = getVisibleCoupon(cardConfig);
+  return !!(coupon && coupon.displayType === 'boost');
+}
+
+export function hasVisibleDiscount(cardConfig: CardConfig): boolean {
+  const coupon = getVisibleCoupon(cardConfig);
+  return !!(coupon && coupon.displayType === 'discount');
+}
+
+export function getBoostPercentage(couponAmount: number): number {
+  const couponPercentage = couponAmount / 100;
+  const displayBoostPercentage = couponPercentage / (1 - couponPercentage);
+  return displayBoostPercentage;
+}
+
+export function getDisplayableBoostPercentage(percentage: number): number {
+  return parseFloat((getBoostPercentage(percentage!) * 100).toFixed(1));
+}
+
+export function getMaxAmountWithBoost(cardConfig: CardConfig): number | undefined {
+  const { maxAmount } = cardConfig;
+  if (!maxAmount) {
+    return undefined;
+  }
+  const coupon = getVisibleCoupon(cardConfig);
+  if (!coupon || coupon.displayType !== 'boost') {
+    return maxAmount;
+  }
+  if (coupon.type === 'percentage') {
+    return maxAmount * (1 - (coupon.amount / 100));
+  }
+  return maxAmount - coupon.amount;
+}
+
+export function getBoostAmount(cardConfig: CardConfig, enteredAmount: number): number {
+  const coupon = getVisibleCoupon(cardConfig);
+  if (!coupon || coupon.displayType !== 'boost') {
+    return 0;
+  }
+  return coupon.type === 'percentage'
+    ? enteredAmount * getBoostPercentage(coupon.amount)
+    : coupon.amount;
+}
+
+export function getBoostedAmount(
+  cardConfig: CardConfig,
+  enteredAmount: number
+): number {
+  if (!enteredAmount) {
+    return 0;
+  }
+  const boostedAmount =
+    enteredAmount + getBoostAmount(cardConfig, enteredAmount);
+  return boostedAmount;
+}
+
 export const getDiscountAmount = (amount: number, discount: GiftCardDiscount): number =>
   discount.type === 'percentage' ? (discount.amount / 100) * amount : discount.amount;
 
 export const getTotalDiscount = (amount: number, discounts: GiftCardDiscount[] = []): number =>
-  discounts.reduce((sum, discount) => sum + getDiscountAmount(amount, discount), 0);
+  discounts.slice(0, 1).reduce((sum, discount) => sum + getDiscountAmount(amount, discount), 0);
 
 export const getLatestBalanceEntry = (card: GiftCard): GiftCardBalanceEntry =>
   (card.balanceHistory || []).sort(sortByDescendingDate)[0] || {
@@ -200,12 +270,12 @@ export const getLatestBalance = (card: GiftCard): number => getLatestBalanceEntr
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function getGiftCardPromoEventParams(promotedCard: CardConfig) {
-  const discount = (promotedCard.discounts && promotedCard.discounts[0]) as GiftCardDiscount;
+  const coupon = getVisibleCoupon(promotedCard)!;
   return {
     brand: promotedCard.name,
-    promoName: discount.code,
-    promoType: discount.type,
-    discountAmount: discount.amount
+    promoName: coupon.code,
+    promoType: coupon.type,
+    discountAmount: coupon.amount
   };
 }
 

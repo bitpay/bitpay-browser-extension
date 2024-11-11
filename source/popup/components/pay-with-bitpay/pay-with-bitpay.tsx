@@ -130,7 +130,7 @@ const PayWithBitpay: React.FC<Partial<RouteComponentProps> & {
       });
       const finalGiftCard = {
         ...giftCard,
-        discounts: cardConfig.discounts
+        coupons: cardConfig.coupons
       } as GiftCard;
       await saveGiftCard(finalGiftCard);
       showCard(finalGiftCard);

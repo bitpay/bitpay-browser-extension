@@ -4,7 +4,10 @@ import {
   fetchAvailableCards,
   addToSupportedGiftCards,
   getGiftCardPromoEventParams,
-  getCountry
+  getCountry,
+  getVisibleCoupon,
+  getDisplayableBoostPercentage,
+  hasVisibleBoost
 } from './gift-card';
 import { removeProtocolAndWww } from './utils';
 import { DirectIntegration, fetchDirectIntegrations, Directory, fetchDirectory, DirectoryDiscount } from './directory';
@@ -40,18 +43,19 @@ export function spreadAmounts(values: Array<number>, currency: string): string {
 }
 
 export function formatDiscount(discount: DirectoryDiscount, currency?: string, short?: boolean): string {
-  const helper = !short ? ' Off Every Purchase' : '';
+  const helper = discount.displayType === 'boost' ? ' Boost' : ' Off Every Purchase';
   if (discount.type === 'custom') return discount.value || 'Discount Available';
+  const percentage = discount.displayType === 'boost' ? getDisplayableBoostPercentage(discount.amount!) : discount.amount;
   const discountAmountString = new Intl.NumberFormat('en-US', {
     style: 'decimal',
     minimumFractionDigits: 0,
     maximumFractionDigits: 2
-  }).format(discount.amount || 0);
+  }).format(percentage || 0);
   if (discount.type === 'percentage' && discount.amount) {
-    return `${discountAmountString}%${helper}`;
+    return `${discountAmountString}%${!short ? helper : ''}`;
   }
   if (discount.type === 'flatrate' && discount.amount && currency) {
-    return `${formatCurrency(discount.amount, currency, { hideSymbol: !currencySymbols[currency] })}${helper}`;
+    return `${formatCurrency(discount.amount, currency, { hideSymbol: !currencySymbols[currency], customPrecision: 'minimal' })}${!short ? helper : ''}`;
   }
   return discount.type;
 }
@@ -136,7 +140,14 @@ export async function fetchDirectoryAndMerchants(): Promise<[Directory, Merchant
 
 export function getGiftCardDiscount(merchant: Merchant): GiftCardDiscount | undefined {
   const cardConfig = merchant.giftCards[0];
-  return cardConfig && cardConfig.discounts && cardConfig.discounts[0];
+  return getVisibleCoupon(cardConfig);
+}
+
+export function getCouponColor(merchant: Merchant): string {
+  if (hasVisibleBoost(merchant.giftCards[0])) {
+    return '#0B754A';
+  }
+  return merchant.theme === '#ffffff' ? '#4f6ef7' : merchant.theme
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type

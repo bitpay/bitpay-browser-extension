@@ -12,6 +12,14 @@ export interface CheckoutPageCssSelectors {
 
 export interface GiftCardDiscount {
   code: string;
+  hidden?: boolean;
+  type: 'flatrate' | 'percentage';
+  amount: number;
+}
+
+export interface GiftCardCoupon extends GiftCardDiscount {
+  code: string;
+  displayType: 'boost' | 'discount';
   type: 'flatrate' | 'percentage';
   amount: number;
 }
@@ -35,6 +43,7 @@ export interface CommonCardConfig {
   defaultClaimCodeType: ClaimCodeType;
   description: string;
   discounts?: GiftCardDiscount[];
+  coupons?: GiftCardCoupon[];
   displayName: string;
   emailRequired: boolean;
   featured?: boolean;
@@ -67,7 +76,7 @@ export interface UnsoldGiftCard {
   amount: number;
   currency: string;
   name: string;
-  discounts?: GiftCardDiscount[];
+  coupons?: GiftCardCoupon[];
 }
 
 export interface GiftCardBalanceEntry {
@@ -84,6 +93,7 @@ export interface GiftCard extends UnsoldGiftCard {
   claimCode: string;
   claimLink?: string;
   date: string;
+  discounts?: GiftCardDiscount[];
   displayName: string;
   invoiceId: string;
   pin?: string;
@@ -111,7 +121,8 @@ export interface GiftCardInvoiceParams {
   currency: string;
   amount: number;
   clientId: string;
-  discounts: string[];
+  discounts?: string[];
+  coupons?: string[];
   email?: string;
   phone?: string;
 }

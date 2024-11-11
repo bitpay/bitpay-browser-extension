@@ -44,10 +44,10 @@ const Payment: React.FC<RouteComponentProps & {
     amount,
     currency: invoiceParams.currency,
     name: cardConfig.name,
-    discounts: cardConfig.discounts
+    coupons: cardConfig.coupons
   };
   const shouldShowLineItems = !!(
-    (cardConfig.discounts && cardConfig.discounts.length) ||
+    (cardConfig.coupons && cardConfig.coupons.length) ||
     (cardConfig.activationFees && cardConfig.activationFees.length)
   );
   const onEmailChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
