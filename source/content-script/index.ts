@@ -221,6 +221,7 @@ if (window.location.origin === process.env.API_ORIGIN) {
   if (window.location.href.includes('/invoice')) {
     const invoiceId = new URLSearchParams(window.location.search).get('id');
     window.addEventListener('message', message => {
+      if (message.origin !== process.env.API_ORIGIN) return;
       browser.runtime.sendMessage(undefined, {
         name: 'INVOICE_EVENT',
         data: message.data
@@ -234,7 +235,8 @@ if (window.location.origin === process.env.API_ORIGIN) {
     });
   } else if (window.location.href.includes('/wallet-verify')) {
     setTimeout(() => window.postMessage({ message: 'pairingOnly' }, process.env.API_ORIGIN as string), 300);
-    window.addEventListener('message', ({ data }) => {
+    window.addEventListener('message', ({ origin, data }) => {
+      if (origin !== process.env.API_ORIGIN) return;
       const dataObj = typeof data === 'string' ? safelyParseJSON(data) : data;
       const { message, params } = dataObj || {};
       if (message !== 'pairing') return;
