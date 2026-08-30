@@ -154,8 +154,10 @@ module.exports = {
   plugins: [
     // Plugin to not generate js bundle for manifest entry
     new WextManifestWebpackPlugin(),
-    // Generate sourcemaps
-    new webpack.SourceMapDevToolPlugin({ filename: false }),
+    // Generate inline sourcemaps for development builds only
+    ...(nodeEnv === 'development'
+      ? [new webpack.SourceMapDevToolPlugin({ filename: false })]
+      : []),
     new ForkTsCheckerWebpackPlugin(),
     // environmental variables
     new webpack.EnvironmentPlugin(['NODE_ENV', 'TARGET_BROWSER']),
