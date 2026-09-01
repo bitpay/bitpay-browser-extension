@@ -44,7 +44,7 @@
     "react-tracking": "^7.3.0",
     "rxjs": "^6.5.5",
     "ts-md5": "1.2.7",
-    "uuid": "^14.0.1",
+    "uuid": "^14.0.2",
     "webext-base-css": "^1.4.4",
     "webextension-polyfill-ts": "^0.26.0"
   },
